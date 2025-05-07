@@ -3,19 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   ft_striteri.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: frey-gal <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: miggarc2 <miggarc2@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/04 18:01:15 by frey-gal          #+#    #+#             */
-/*   Updated: 2024/10/16 16:55:23 by frey-gal         ###   ########.fr       */
+/*   Created: 2024/09/15 17:54:28 by miggarc2          #+#    #+#             */
+/*   Updated: 2024/09/16 19:58:18 by miggarc2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-#include "./libft.h"
 
 void	ft_striteri(char *s, void (*f)(unsigned int, char *))
 {
 	unsigned int	i;
 
+	if (!f)
+		return ;
 	i = 0;
 	while (s[i])
 	{

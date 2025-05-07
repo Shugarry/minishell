@@ -3,31 +3,28 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strmapi.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: frey-gal <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: miggarc2 <miggarc2@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/04 17:00:50 by frey-gal          #+#    #+#             */
-/*   Updated: 2024/10/16 16:55:56 by frey-gal         ###   ########.fr       */
+/*   Created: 2024/09/15 17:54:28 by miggarc2          #+#    #+#             */
+/*   Updated: 2024/09/16 19:36:08 by miggarc2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./libft.h"
+#include <stdlib.h>
 
 char	*ft_strmapi(char const *s, char (*f)(unsigned int, char))
 {
-	unsigned int	i;
-	char			*str;
-	size_t			len;
+	unsigned int	len;
+	char			*api;
 
-	i = 0;
-	len = ft_strlen(s);
-	str = (char *)malloc((ft_strlen(s) + 1) * sizeof(char));
-	if (str == NULL)
-		return (NULL);
-	while (i < len)
-	{
-		str[i] = f(i, s[i]);
-		i++;
-	}
-	str[i] = '\0';
-	return (str);
+	len = 0;
+	while (s[len])
+		len++;
+	api = (char *)malloc(sizeof(char) * (len + 1));
+	if (!api)
+		return (0);
+	api[len] = 0;
+	while (len--)
+		api [len] = f(len, s[len]);
+	return (api);
 }

@@ -3,40 +3,45 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strtrim.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: frey-gal <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: miggarc2 <miggarc2@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/25 16:37:11 by frey-gal          #+#    #+#             */
-/*   Updated: 2024/10/16 16:56:21 by frey-gal         ###   ########.fr       */
+/*   Created: 2024/09/15 17:54:28 by miggarc2          #+#    #+#             */
+/*   Updated: 2025/03/03 19:46:30 by miggarc2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./libft.h"
+#include "libft.h"
 
-size_t	find_end(const char *s1, const char *set)
+static int	ft_is_set(char const c, char const *set)
 {
-	size_t	len;
-
-	len = ft_strlen(s1);
-	while (0 < len && ft_strchr(set, s1[len - 1]))
-		len--;
-	return (len);
+	while (*set)
+		if (*set++ == c)
+			return (1);
+	return (0);
 }
 
-char	*ft_strtrim(const char *s1, const char *set)
+char	*ft_strtrim(char const *s1, char const *set)
 {
-	size_t	i;
-	size_t	len;
-	char	*tmp;
+	char	*trim;
+	size_t	start;
+	size_t	end;
+	size_t	size;
 
-	i = 0;
-	if (!s1)
-		return (NULL);
-	while (s1[i] && ft_strchr(set, s1[i]))
-		i++;
-	len = find_end(s1 + i, set);
-	tmp = (char *)malloc((len + 1) * sizeof(char));
-	if (tmp == NULL)
-		return (NULL);
-	ft_strlcpy(tmp, s1 + i, len + 1);
-	return (tmp);
+	start = 0;
+	end = 0;
+	while (s1[start] && ft_is_set(s1[start], set))
+		start++;
+	while (s1[end])
+		end++;
+	end--;
+	while (end > start && ft_is_set(s1[end], set))
+		end--;
+	size = end - start + 1;
+	trim = (char *)malloc(sizeof(char) * (size + 1));
+	if (!trim)
+		return (0);
+	trim[size] = 0;
+	while (size-- > 0)
+		trim[size] = s1[end--];
+	return (trim);
 }

@@ -3,59 +3,66 @@
 /*                                                        :::      ::::::::   */
 /*   ft_itoa.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: frey-gal <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: miggarc2 <miggarc2@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/02 15:42:53 by frey-gal          #+#    #+#             */
-/*   Updated: 2024/10/16 16:54:12 by frey-gal         ###   ########.fr       */
+/*   Created: 2024/09/15 17:54:28 by miggarc2          #+#    #+#             */
+/*   Updated: 2025/03/25 16:08:12 by miggarc2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./libft.h"
+#include "libft.h"
 
-int	int_len(int n)
+static int	ft_nbr_size(int n)
 {
-	int	i;
+	size_t			size;
+	unsigned int	unb;
 
-	i = 0;
-	if (n == 0)
-		return (1);
+	size = 1;
 	if (n < 0)
 	{
-		i++;
-		n = -n;
+		size++;
+		unb = -n;
 	}
-	while (n != 0)
+	else
+		unb = n;
+	while (unb >= 10)
 	{
-		n /= 10;
-		i++;
+		size++;
+		unb /= 10;
 	}
-	return (i);
+	return (size);
+}
+
+static void	ft_fill_nbr(char *nbr, int n, int size)
+{
+	unsigned int	unb;
+
+	nbr[size] = 0;
+	if (n < 0)
+	{
+		unb = -n;
+		nbr[0] = 45;
+	}
+	else
+		unb = n;
+	while (size-- > 0)
+	{
+		if (n < 0 && nbr[size] == 45)
+			break ;
+		nbr[size] = unb % 10 + 48;
+		unb /= 10;
+	}
 }
 
 char	*ft_itoa(int n)
 {
-	char	*str;
-	int		len;
-	int		i;
+	char			*nbr;
+	int				size;
 
-	i = 0;
-	len = int_len(n);
-	str = (char *)malloc((len + 1) * sizeof(char));
-	if (str == NULL)
-		return (NULL);
-	str[len] = '\0';
-	if (n == 0)
-		str[0] = '0';
-	if (n < 0)
-		str[0] = '-';
-	while (i < len)
-	{
-		if (n < 0)
-			str[len - 1 - i] = '0' - (n % 10);
-		else if (n > 0)
-			str[len - 1 - i] = '0' + (n % 10);
-		n /= 10;
-		i++;
-	}
-	return (str);
+	size = ft_nbr_size(n);
+	nbr = (char *)malloc(sizeof(char) * (size + 1));
+	if (!nbr)
+		return (0);
+	ft_fill_nbr(nbr, n, size);
+	return (nbr);
 }

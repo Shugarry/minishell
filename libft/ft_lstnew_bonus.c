@@ -1,25 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_lstnew.c                                        :+:      :+:    :+:   */
+/*   ft_lstnew_bonus.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: frey-gal <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: miggarc2 <miggarc2@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/16 18:28:30 by frey-gal          #+#    #+#             */
-/*   Updated: 2024/10/17 17:33:39 by frey-gal         ###   ########.fr       */
+/*   Created: 2024/09/15 17:54:28 by miggarc2          #+#    #+#             */
+/*   Updated: 2024/09/17 00:31:44 by miggarc2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./libft.h"
+#include "libft.h"
 
 t_list	*ft_lstnew(void *content)
 {
-	t_list	*head;
+	t_list	*node;
 
-	head = (t_list *)malloc(sizeof(t_list));
-	if (head == NULL)
-		return (NULL);
-	head->content = content;
-	head->next = NULL;
-	return (head);
+	node = (t_list *)malloc(sizeof(t_list));
+	if (!node)
+		return (0);
+	node->content = content;
+	node->next = 0;
+	return (node);
 }

@@ -3,31 +3,28 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strrchr.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: frey-gal <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: miggarc2 <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/20 18:29:46 by frey-gal          #+#    #+#             */
-/*   Updated: 2024/10/16 16:56:15 by frey-gal         ###   ########.fr       */
+/*   Created: 2024/09/12 18:19:05 by miggarc2          #+#    #+#             */
+/*   Updated: 2025/03/19 16:15:09 by miggarc2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./libft.h"
+#include <stddef.h>
 
 char	*ft_strrchr(const char *s, int c)
 {
-	int			flag;
-	int			i;
+	size_t	rslt_pos;
+	size_t	i;
 
+	rslt_pos = 0;
+	while (s && s[rslt_pos])
+		rslt_pos++;
 	i = 0;
-	flag = 0;
-	while (s[i])
-	{
-		if (s[i] == (unsigned char)c)
-			flag = i;
-		i++;
-	}
-	if (flag || s[0] == (unsigned char)c)
-		return ((char *)s + flag);
-	if ((unsigned char)c == 0)
-		return ((char *)s + i);
-	return (NULL);
+	while (s && s[i])
+		if (s[i++] == (char)c)
+			rslt_pos = i - 1;
+	if (s && s[rslt_pos] == (char)c)
+		return ((char *)&s[rslt_pos]);
+	return (0);
 }

@@ -3,39 +3,30 @@
 /*                                                        :::      ::::::::   */
 /*   ft_atoi.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: frey-gal <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: miggarc2 <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/23 13:04:20 by frey-gal          #+#    #+#             */
-/*   Updated: 2024/10/16 16:59:50 by frey-gal         ###   ########.fr       */
+/*   Created: 2024/09/12 18:19:05 by miggarc2          #+#    #+#             */
+/*   Updated: 2024/09/19 15:25:26 by miggarc2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./libft.h"
+#include "libft.h"
 
 int	ft_atoi(const char *nptr)
 {
-	int	n;
-	int	flag;
+	unsigned int	i;
+	unsigned int	unb;
+	int				sign;
 
-	flag = 0;
-	n = 0;
-	while ((*nptr <= 13 && *nptr >= 9) || *nptr == 32)
-		nptr++;
-	if (ft_strncmp(nptr, "-2147483648", 11) == 0)
-		return (-2147483648);
-	if (*nptr == '+')
-		nptr++;
-	else if (*nptr == '-')
-	{
-		nptr++;
-		flag++;
-	}
-	while (ft_isdigit(*nptr))
-	{
-		n *= 10;
-		n = n + (*nptr++ - '0');
-	}
-	if (flag)
-		n = -n;
-	return (n);
+	i = 0;
+	unb = 0;
+	sign = 1;
+	while (nptr[i] == 32 || (nptr[i] >= 9 && nptr[i] <= 13))
+		i++;
+	if (nptr[i] == 43 || nptr[i] == 45)
+		if (nptr[i++] == 45)
+			sign *= -1;
+	while (nptr[i] >= 48 && nptr[i] <= 57)
+		unb = (unb * 10) + (nptr[i++] - 48);
+	return (unb * sign);
 }

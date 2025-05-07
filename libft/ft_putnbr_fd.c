@@ -3,34 +3,32 @@
 /*                                                        :::      ::::::::   */
 /*   ft_putnbr_fd.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: frey-gal <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: miggarc2 <miggarc2@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/04 18:22:07 by frey-gal          #+#    #+#             */
-/*   Updated: 2024/10/16 16:54:58 by frey-gal         ###   ########.fr       */
+/*   Created: 2024/09/15 17:54:28 by miggarc2          #+#    #+#             */
+/*   Updated: 2024/09/24 19:03:59 by miggarc2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./libft.h"
+#include <unistd.h>
 
 void	ft_putnbr_fd(int n, int fd)
 {
 	char	c;
 
-	if (n == INT_MIN)
+	if (n == -2147483648)
 	{
 		write(fd, "-2147483648", 11);
 		return ;
 	}
 	if (n < 0)
 	{
-		n = -n;
-		write(fd, "-", 1);
+		if (write (fd, "-", 1) == -1)
+			return ;
+		n *= -1;
 	}
-	if (n >= 0)
-	{
-		if (n >= 10)
-			ft_putnbr_fd(n / 10, fd);
-		c = '0' + n % 10;
-		write(fd, &c, 1);
-	}
+	if (n > 9)
+		ft_putnbr_fd(n / 10, fd);
+	c = n % 10 + 48;
+	write(fd, &c, 1);
 }
