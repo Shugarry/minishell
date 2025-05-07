@@ -1,38 +1,35 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_lstmap.c                                        :+:      :+:    :+:   */
+/*   ft_lstmap_bonus.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: frey-gal <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: miggarc2 <miggarc2@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/16 21:47:05 by frey-gal          #+#    #+#             */
-/*   Updated: 2024/10/17 18:24:25 by frey-gal         ###   ########.fr       */
+/*   Created: 2024/09/15 17:54:28 by miggarc2          #+#    #+#             */
+/*   Updated: 2024/09/20 20:30:07 by miggarc2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./libft.h"
+#include "libft.h"
 
 t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *))
 {
-	t_list	*head;
-	t_list	*node;
-	void	*content;
+	t_list	*rslt_lst;
+	t_list	*tmp_node;
 
-	if (f == NULL || del == NULL)
-		return (NULL);
-	head = NULL;
+	if (!f || !del)
+		return (0);
+	rslt_lst = 0;
 	while (lst)
 	{
-		content = f(lst->content);
-		node = ft_lstnew(content);
-		if (node == NULL)
+		tmp_node = ft_lstnew(f(lst->content));
+		if (!tmp_node)
 		{
-			ft_lstclear(&head, del);
-			del(content);
-			return (NULL);
+			ft_lstclear(&rslt_lst, del);
+			return (0);
 		}
-		ft_lstadd_back(&head, node);
+		ft_lstadd_back(&rslt_lst, tmp_node);
 		lst = lst->next;
 	}
-	return (head);
+	return (rslt_lst);
 }
