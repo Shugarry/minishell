@@ -6,7 +6,7 @@
 #    By: frey-gal <frey-gal@student.42barcelona.co  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/04/20 02:23:03 by frey-gal          #+#    #+#              #
-#    Updated: 2025/05/07 19:14:03 by miggarc2         ###   ########.fr        #
+#    Updated: 2025/05/07 20:16:28 by miggarc2         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,7 @@ NAME		= minishell
 CC			= cc
 CFLAGS		= -Wall -Wextra -Werror #-fsanitize=address -g
 
-SRC			= srcs/main.c
+SRC			= srcs/minishell.c srcs/minishell_input.c
 
 OBJ			= $(SRC:.c=.o)
 
@@ -88,7 +88,7 @@ all: $(NAME)
 
 $(NAME): $(OBJ) $(LIBFT)
 	@echo "\n==> Linking $(NAME)..."
-	@$(CC) $(CFLAGS) $(OBJ) $(LIBFT) -o $(NAME)
+	@$(CC) $(CFLAGS) $(OBJ) -lreadline $(LIBFT) -o $(NAME)
 
 srcs/%.o: srcs/%.c $(HDR) $(LIB_HDR) Makefile
 	@echo " -> Compiling $<"
