@@ -6,7 +6,7 @@
 /*   By: miggarc2 <miggarc2@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 17:10:44 by miggarc2          #+#    #+#             */
-/*   Updated: 2025/05/07 20:12:50 by miggarc2         ###   ########.fr       */
+/*   Updated: 2025/05/07 21:16:01 by miggarc2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,12 @@ typedef struct s_var
 	char	***cmds;
 }			t_var;
 
+// minishell_input.c
+void	ft_open_heredoc(t_var *var, char *limit, size_t limit_len, char **env);
+char	*ft_cmd_resolve(t_var *var, int i);
+void	ft_start_args(t_var *var, char **av, int ac);
+
+// minishell.c
 void	ft_exit(t_var *var, int exit_code);
 int		ft_perror(char *err1, char *err2, char *err3, int err_no);
 int		ft_pipex(t_var *var, int end, char **env, int exit_code);

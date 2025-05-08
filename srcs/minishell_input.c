@@ -6,20 +6,44 @@
 /*   By: miggarc2 <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 19:02:08 by miggarc2          #+#    #+#             */
-/*   Updated: 2025/05/07 20:37:49 by miggarc2         ###   ########.fr       */
+/*   Updated: 2025/05/07 22:35:34 by miggarc2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-void	ft_open_heredoc(t_var *var, char *limit, size_t limit_len)
+static int	ft_word_count(char const *s, char c)
+{
+	int	i;
+	int	count;
+
+	i = 0;
+	count = 0;
+	while (s && s[i])
+	{
+		if (s[i] != c)
+		{
+			count++;
+			while (s[i] && s[i] != c)
+				i++;
+		}
+		while (s[i] == c)
+			i++;
+	}
+	return (count);
+}
+
+void	ft_open_heredoc(t_var *var, char *limit, size_t limit_len, char **env)
 {
 	char	*line;
-	int		here_fd;
+	char	**args;
+	int		word_count;
+//	int		here_fd;
 
-	here_fd = open("here_doc", O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (here_fd < 0)
-		ft_exit(var, ft_perror("", strerror(errno), "\n", errno));
+	(void)var;
+//	here_fd = open("here_doc", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+//	if (here_fd < 0)
+//		ft_exit(var, ft_perror("", strerror(errno), "\n", errno));
 	while (1)
 	{
 //		ft_putstr_fd("pipex heredoc> ", STDOUT_FILENO);
@@ -30,14 +54,18 @@ void	ft_open_heredoc(t_var *var, char *limit, size_t limit_len)
 		{
 			close(STDIN_FILENO);
 			free(line);
-			line = readline("minishell"); //get_next_line(STDIN_FILENO);
+			line = readline("exit\n"); //get_next_line(STDIN_FILENO);
 			break ;
 		}
 		else if (*line != '\0')
 			add_history(line); //ft_putstr_fd(line, here_fd);
+		args = ft_split(line, ' ');
+		word_count = (_Bool) ft_word_count(line, ' ');
+		ft_start_args(var, args, word_count);
+		ft_pipex(var, 0, env, 0);
 		free(line);
 	}
-	close(here_fd);
+//	close(here_fd);
 }
 
 char	*ft_cmd_resolve(t_var *var, int i)
@@ -72,26 +100,27 @@ void	ft_start_args(t_var *var, char **av, int ac)
 {
 	int	i;
 
-	var->fd_in = open(av[1], O_RDONLY);
-	if (var->fd_in < 0)
-		ft_perror(strerror(errno), ": ", av[1], 1);
-	if (var->hdoc)
-		var->fd_out = open(av[ac - 1], O_WRONLY | O_CREAT | O_APPEND, 0644);
-	else
-		var->fd_out = open(av[ac - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (var->fd_out < 0)
-		ft_perror(strerror(errno), ": ", av[ac - 1], 1);
-	var->cmds = (char ***)ft_calloc(ac - 2 - var->hdoc, sizeof(char **));
+//	var->fd_in = open(av[1], O_RDONLY);
+//	if (var->fd_in < 0)
+//		ft_perror(strerror(errno), ": ", av[1], 1);
+//	if (var->hdoc)
+//		var->fd_out = open(av[ac - 1], O_WRONLY | O_CREAT | O_APPEND, 0644);
+//	else
+//		var->fd_out = open(av[ac - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+//	if (var->fd_out < 0)
+//		ft_perror(strerror(errno), ": ", av[ac - 1], 1);
+	var->cmds = (char ***)ft_calloc(ac + 1, sizeof(char **));
 	if (!var->cmds)
 		ft_exit(var, ft_perror("", strerror(errno), "", errno));
 	i = -1;
-	while (++i <= ac - 4 - var->hdoc)
+	while (++i < ac)
 	{
-		var->cmds[i] = ft_split(av[i + 2 + var->hdoc], ' ');
+		var->cmds[i] = av; //ft_split(av[i], ' ');
 		if (!var->cmds[i])
 			ft_exit(var, ft_perror("", strerror(errno), "", errno));
 		var->cmds[i][0] = ft_cmd_resolve(var, i);
 	}
+	var->cmds[i] = NULL;
 }
 
 int	main(int ac, char **av, char **env)
@@ -101,6 +130,7 @@ int	main(int ac, char **av, char **env)
 
 	ft_bzero(&var, sizeof(t_var));
 	var.hdoc = 1;
+	(void)av;
 	if (ac != 1)
 		ft_exit(&var, ft_perror(" syntax: ", \
 				"./minishell", "", 1));
@@ -115,7 +145,7 @@ int	main(int ac, char **av, char **env)
 //	var.pipes = (int *)ft_calloc((ac - 4 - var.hdoc) * 2, sizeof(int));
 //	if (!var.pipes)
 //		ft_exit(&var, ft_perror("", strerror(errno), "", errno));
-	ft_open_heredoc(&var, "exit", 4);
-	ft_start_args(&var, av, ac);
-	ft_exit(&var, ft_pipex(&var, var.hdoc, env, 0));
+	ft_open_heredoc(&var, "exit", 4, env);
+//	ft_start_args(&var, av, ac);
+//	ft_exit(&var, ft_pipex(&var, var.hdoc, env, 0));
 }
