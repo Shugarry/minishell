@@ -13,7 +13,7 @@
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-# include "libft.h"
+# include "libft/libft.h"
 # include <unistd.h>
 # include <stdio.h>
 # include <fcntl.h>
@@ -38,6 +38,7 @@ typedef struct s_var
 	int		fd_out;
 	char	**paths;
 	char	***cmds;
+	t_manager	*memlist;
 }			t_var;
 
 // minishell_input.c
@@ -49,5 +50,11 @@ void	ft_start_args(t_var *var, char **av, int ac);
 void	ft_exit(t_var *var, int exit_code);
 int		ft_perror(char *err1, char *err2, char *err3, int err_no);
 int		ft_pipex(t_var *var, int end, char **env, int exit_code);
+
+//mem_manager.c
+void	*memlist_alloc(t_manager **head, size_t size);
+void	*memlist_add(t_manager **head, void *ptr);
+int		memlist_free_all(t_manager **head);
+int		memlist_free_ptr(t_manager **head, void *ptr);
 
 #endif
