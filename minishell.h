@@ -24,6 +24,12 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 
+typedef struct s_manager
+{
+	void	*ptr;
+	struct	s_manager *next;
+}	t_manager;
+
 typedef struct s_var
 {
 	_Bool	hdoc;
