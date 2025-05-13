@@ -33,35 +33,6 @@ static int	ft_word_count(char const *s, char c)
 	return (count);
 }
 
-void	ft_open_heredoc(t_var *var, char *limit, size_t limit_len, char **env)
-{
-	char	*line;
-	char	**args;
-	int		word_count;
-
-	(void)var;
-	while (1)
-	{
-		line = readline("minishell$ ");
-		if (!line)
-			break ;
-		if (ft_strncmp(line, limit, limit_len) == 0)
-		{
-			close(STDIN_FILENO);
-			free(line);
-			line = readline("exit\n");
-			break ;
-		}
-		else if (*line != '\0')
-			add_history(line);
-		args = ft_split(line, ' ');
-		word_count = (_Bool) ft_word_count(line, ' ');
-		ft_start_args(var, args, word_count);
-		ft_pipex(var, 0, env, 0);
-		free(line);
-	}
-}
-
 char	*ft_cmd_resolve(t_var *var, int i)
 {
 	int		j;
@@ -108,24 +79,53 @@ void	ft_start_args(t_var *var, char **av, int ac)
 	var->cmds[i] = NULL;
 }
 
+void	ft_start_mini(t_var *var)
+{
+	char	*line;
+	char	**args;
+	int		word_count;
+
+	while (1)
+	{
+		line = readline("minishell$ ");
+		if (!line)
+			break ;
+		// Pend tokenize
+
+
+
+		if (ft_strncmp(line, "exit", 4) == 0)
+		{
+			close(STDIN_FILENO);
+			free(line);
+			line = readline("exit\n");
+			break ;
+		}
+		else if (*line != '\0')
+			add_history(line);
+		args = ft_split(line, '|');
+		word_count = ft_word_count(line, '|');
+		ft_start_args(var, args, word_count);
+		ft_pipex(var, 0, var->env, 0);
+		free(line);
+	}
+}
+
 int	main(int ac, char **av, char **env)
 {
-	int		i;
 	t_var	var;
 
 	ft_bzero(&var, sizeof(t_var));
-	var.hdoc = 1;
-	(void)av;
 	if (ac != 1)
-		ft_exit(&var, ft_perror(" syntax: ", \
-				"./minishell", "", 1));
-	i = 0;
-	while (env[i] && ft_strncmp(env[i], "PATH=", 5))
-		i++;
-	if (!env[i])
-		ft_exit(&var, ft_perror("", strerror(errno), "", errno));
-	var.paths = ft_split(env[i] + 5, ':');
+		ft_exit(&var, ft_perror(" syntax: ", "./minishell", "", 1));
+	var.av = av;
+	var.env = env;
+	if (!(*var.env))	// Pend use getenv_plus
+		*var.env = getcwd(var.pwd, sizeof(var.pwd));
+	else
+		*var.env = getenv("PATH");
+	var.paths = ft_split(*var.env, ':');
 	if (!var.paths)
 		ft_exit(&var, ft_perror("", strerror(errno), "", errno));
-	ft_open_heredoc(&var, "exit", 4, env);
+	ft_start_mini(&var);
 }

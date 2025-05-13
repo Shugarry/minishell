@@ -30,8 +30,12 @@ typedef struct s_var
 	int		*pipes;
 	int		fd_in;
 	int		fd_out;
+	char	**av;
+	char	**env;
 	char	**paths;
 	char	***cmds;
+	t_list	*token;
+	char	pwd[4096];
 }			t_var;
 
 // minishell_input.c
