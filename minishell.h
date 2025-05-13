@@ -39,11 +39,12 @@ typedef struct s_var
 }			t_var;
 
 // minishell_input.c
-void	ft_open_heredoc(t_var *var, char *limit, size_t limit_len, char **env);
+void	ft_start_mini(t_var *var);
 char	*ft_cmd_resolve(t_var *var, int i);
 void	ft_start_args(t_var *var, char **av, int ac);
 
 // minishell.c
+void	ft_clean(char **var_ptr);
 void	ft_exit(t_var *var, int exit_code);
 int		ft_perror(char *err1, char *err2, char *err3, int err_no);
 int		ft_pipex(t_var *var, int end, char **env, int exit_code);

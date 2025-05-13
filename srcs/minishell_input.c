@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../minishell.h"
+#include "minishell.h"
 
 static int	ft_word_count(char const *s, char c)
 {
@@ -71,7 +71,7 @@ void	ft_start_args(t_var *var, char **av, int ac)
 	i = -1;
 	while (++i < ac)
 	{
-		var->cmds[i] = av;
+		var->cmds[i] = ft_split(av[i], ' ');	
 		if (!var->cmds[i])
 			ft_exit(var, ft_perror("", strerror(errno), "", errno));
 		var->cmds[i][0] = ft_cmd_resolve(var, i);
@@ -94,7 +94,7 @@ void	ft_start_mini(t_var *var)
 
 
 
-		if (ft_strncmp(line, "exit", 4) == 0)
+		if (ft_strncmp(line, "exit\0", 5) == 0)
 		{
 			close(STDIN_FILENO);
 			free(line);
@@ -102,11 +102,26 @@ void	ft_start_mini(t_var *var)
 			break ;
 		}
 		else if (*line != '\0')
+		{
 			add_history(line);
-		args = ft_split(line, '|');
-		word_count = ft_word_count(line, '|');
-		ft_start_args(var, args, word_count);
-		ft_pipex(var, 0, var->env, 0);
+			args = ft_split(line, '|');
+			word_count = ft_word_count(line, '|');
+			var->pipes = (int *)ft_calloc((word_count - 1) * 2, sizeof(int));
+       		if (word_count > 1 && !var->pipes)
+				ft_exit(var, ft_perror("", strerror(errno), "", errno));
+			ft_start_args(var, args, word_count);
+			ft_pipex(var, word_count - 1, var->env, 0);
+			if (var->pipes)
+				free(var->pipes);
+			ft_clean(args);
+			if (var->cmds)
+			{
+				int i = 0;
+				while (var->cmds[i])
+					ft_clean(var->cmds[i++]);
+				free(var->cmds);
+			}
+		}
 		free(line);
 	}
 }

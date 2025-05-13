@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../minishell.h"
+#include "minishell.h"
 
 int	ft_perror(char *err1, char *err2, char *err3, int err_no)
 {
@@ -61,19 +61,19 @@ void	ft_exit(t_var *var, int exit_code)
 void	ft_exec_child(t_var *var, int i, int end, char **env)
 {
 	(void)end;
-/*	if (i < end)
+	if (i < end)
 		close(var->pipes[2 * i]);
-	if (i == 0 && dup2(var->fd_in, STDIN_FILENO) < 0)
+/*	if (i == 0 && dup2(var->fd_in, STDIN_FILENO) < 0)
 		ft_exit(var, 1);
-	else if (i > 0 && dup2(var->pipes[2 * i - 2], STDIN_FILENO) < 0)
+	else */if (i > 0 && dup2(var->pipes[2 * i - 2], STDIN_FILENO) < 0)
 		ft_exit(var, 1);
 	if (i < end && dup2(var->pipes[2 * i + 1], STDOUT_FILENO) < 0)
 		ft_exit(var, 1);
-	else if (i == end && dup2(var->fd_out, STDOUT_FILENO) < 0)
-		ft_exit(var, 1);
+//	else if (i == end && dup2(var->fd_out, STDOUT_FILENO) < 0)
+//		ft_exit(var, 1);
 	if (var->cmds[i][0] == NULL)
 		ft_exit(var, ft_perror("", "permission denied: ", "", 126));
-*/	execve(var->cmds[i][0], var->cmds[i], env);
+	execve(var->cmds[i][0], var->cmds[i], env);
 	ft_exit(var, ft_perror(var->cmds[i][0], ": command not found", "", 127));
 }
 
@@ -86,22 +86,22 @@ int	ft_pipex(t_var *var, int end, char **env, int exit_code)
 	i = -1;
 	while (var->cmds[++i])
 	{
-//		if (i < end && pipe(&var->pipes[2 * i]) < 0)
-//			ft_exit(var, ft_perror("", strerror(errno), "", errno));
+		if (i < end && pipe(&var->pipes[2 * i]) < 0)
+			ft_exit(var, ft_perror("", strerror(errno), "", errno));
 		child = fork();
 		if (child < 0)
 			ft_exit(var, ft_perror("", strerror(errno), "", errno));
 		else if (child == 0)
 			ft_exec_child(var, i, end, env);
-//		if (i < end)
-//			close(var->pipes[2 * i + 1]);
+		if (i < end)
+			close(var->pipes[2 * i + 1]);
 	}
 	while (i-- >= 0)
 	{
 		if (waitpid(-1, &status, 0) == child && WIFEXITED(status))
 			exit_code = WEXITSTATUS(status);
-//		if (--i)
-//			close(var->pipes[2 * (i - 1)]);
+		if (--i)
+			close(var->pipes[2 * (i - 1)]);
 	}
 	return (exit_code);
 }
