@@ -14,5 +14,8 @@
 
 void	kill_and_exit(t_manager **head, int status, char *message)
 {
-	printf("%s: %s\n", message, strerror(error));
+	if (message != NULL)
+		printf("%s: %s\n", message, strerror(errno));
+	memlist_free_all(head);
+	exit(EXIT_FAILURE);
 }
