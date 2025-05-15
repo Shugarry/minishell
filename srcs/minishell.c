@@ -38,6 +38,10 @@ void	ft_exit(t_var *var, int exit_code)
 {
 	int	i;
 
+	close(STDIN_FILENO);
+	free(var->line);
+	if (!exit_code)
+		ft_printf("exit\n");
 	if (access("here_doc", F_OK) == 0)
 		unlink("here_doc");
 	if (var->pipes)
@@ -58,7 +62,7 @@ void	ft_exit(t_var *var, int exit_code)
 	exit(exit_code);
 }
 
-void	ft_exec_child(t_var *var, int i, int end, char **env)
+void	ft_exec_child(t_var *var, int i, int end)
 {
 	(void)end;
 	if (i < end)
@@ -73,11 +77,37 @@ void	ft_exec_child(t_var *var, int i, int end, char **env)
 //		ft_exit(var, 1);
 	if (var->cmds[i][0] == NULL)
 		ft_exit(var, ft_perror("", "permission denied: ", "", 126));
-	execve(var->cmds[i][0], var->cmds[i], env);
+	execve(var->cmds[i][0], var->cmds[i], var->env);
 	ft_exit(var, ft_perror(var->cmds[i][0], ": command not found", "", 127));
 }
 
-int	ft_pipex(t_var *var, int end, char **env, int exit_code)
+_Bool	ms_exec_builtins(t_var *var, int i)
+{
+/*	if (ft_strncmp(var->cmds[i][0], "echo", 5) == 0)
+	{
+		if (var->cmds[i][1] && ft_strncmp(var->cmds[i][1], "-n", 3) == 0)
+			ft_echo(var->cmds[i], 1);
+		else
+			ft_echo(var->cmds[i], 0);
+	}
+	else if (ft_strncmp(var->cmds[i][0], "cd", 3) == 0)
+		ft_cd(var, var->cmds[i]);
+	else if (ft_strncmp(var->cmds[i][0], "pwd", 4) == 0)
+		ft_pwd();
+	else if (ft_strncmp(var->cmds[i][0], "export", 7) == 0)
+		ft_export(var, var->cmds[i]);
+	else if (ft_strncmp(var->cmds[i][0], "unset", 6) == 0)
+		ft_unset(var, var->cmds[i]);
+	else if (ft_strncmp(var->cmds[i][0], "env", 4) == 0)
+		ft_env(var);
+	else */if (ft_strncmp(var->cmds[i][0], "exit", 5) == 0)
+		ft_exit(var, 0);
+	else
+		return (0);
+	return (1);
+}
+
+int	ms_pipex(t_var *var, int end, int exit_code)
 {
 	int		i;
 	int		status;
@@ -88,19 +118,22 @@ int	ft_pipex(t_var *var, int end, char **env, int exit_code)
 	{
 		if (i < end && pipe(&var->pipes[2 * i]) < 0)
 			ft_exit(var, ft_perror("", strerror(errno), "", errno));
-		child = fork();
-		if (child < 0)
-			ft_exit(var, ft_perror("", strerror(errno), "", errno));
-		else if (child == 0)
-			ft_exec_child(var, i, end, env);
+		if (var->cmds[i][0] && !ms_exec_builtins(var, i))
+		{
+			child = fork();
+			if (child < 0)
+				ft_exit(var, ft_perror("", strerror(errno), "", errno));
+			else if (child == 0)
+				ft_exec_child(var, i, end);
+		}
 		if (i < end)
 			close(var->pipes[2 * i + 1]);
 	}
-	while (i-- >= 0)
+	while (i-- > 0)
 	{
 		if (waitpid(-1, &status, 0) == child && WIFEXITED(status))
 			exit_code = WEXITSTATUS(status);
-		if (--i)
+		if (i > 0)
 			close(var->pipes[2 * (i - 1)]);
 	}
 	return (exit_code);
