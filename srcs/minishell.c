@@ -102,12 +102,15 @@ _Bool	ms_exec_builtins(t_var *var, int i)
 		ft_env(var);
 	else */if (ft_strncmp(var->cmds[i][0], "exit", 5) == 0)
 		ft_exit(var, 0);
+	else if (ft_strncmp(var->cmds[i][0], "$?", 3) == 0)
+		ft_printf("%d\n", var->exit_code);
 	else
 		return (0);
+	var->exit_code = 0;
 	return (1);
 }
 
-int	ms_pipex(t_var *var, int end, int exit_code)
+int	ms_pipex(t_var *var, int end)
 {
 	int		i;
 	int		status;
@@ -132,9 +135,9 @@ int	ms_pipex(t_var *var, int end, int exit_code)
 	while (i-- > 0)
 	{
 		if (waitpid(-1, &status, 0) == child && WIFEXITED(status))
-			exit_code = WEXITSTATUS(status);
+			var->exit_code = WEXITSTATUS(status);
 		if (i > 0)
 			close(var->pipes[2 * (i - 1)]);
 	}
-	return (exit_code);
+	return (var->exit_code);
 }

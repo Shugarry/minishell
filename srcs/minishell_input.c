@@ -146,7 +146,7 @@ void	ft_start_mini(t_var *var)
 				ft_exit(var, ft_perror("", strerror(errno), "", errno));
 			if (ms_start_args(var, pipe_count + 1))
 				continue ;
-			ms_pipex(var, pipe_count, 0);
+			ms_pipex(var, pipe_count);
 			if (var->pipes)
 				free(var->pipes);
 			var->pipes = NULL;
@@ -168,7 +168,6 @@ int	main(int ac, char **av, char **env)
 	t_var	var;
 
 	(void)av;
-	ft_printf("args: %d\n", ac);
 	ft_bzero(&var, sizeof(t_var));
 	if (ac != 1)
 		ft_exit(&var, ft_perror("", "usage: ./minishell", "", 1));

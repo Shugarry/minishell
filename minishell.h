@@ -39,6 +39,7 @@ typedef struct s_var
 	char	pwd[4096];
 	_Bool	s_quotes;
 	_Bool	d_quotes;
+	int		exit_code;
 }			t_var;
 
 // minishell_input.c
@@ -55,6 +56,6 @@ void	ft_clean(char **var_ptr);
 void	ft_exit(t_var *var, int exit_code);
 void	ft_exec_child(t_var *var, int i, int end);
 _Bool	ms_exec_builtins(t_var *var, int i);
-int		ms_pipex(t_var *var, int end, int exit_code);
+int		ms_pipex(t_var *var, int end);
 
 #endif
