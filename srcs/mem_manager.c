@@ -1,11 +1,11 @@
 #include "../minishell.h"
 
-void	*memlist_alloc(t_manager **head, size_t size)
+void	*memlist_alloc(t_manager **memlist, size_t size)
 {
 	t_manager	*node;
 	void		*ptr;
 
-	if (!head)
+	if (!memlist)
 		return (NULL);
 	ptr = malloc(size);
 	if (!ptr)
@@ -14,19 +14,20 @@ void	*memlist_alloc(t_manager **head, size_t size)
 	if (!node)
 	{
 		free(ptr);
+		memlist_free_all(memlist);
 		return (NULL);
 	}
 	node->ptr = ptr;
-	node->next = *head;
-	*head = node;
+	node->next = *memlist;
+	*memlist = node;
 	return (ptr);
 }
 
-void	*memlist_add(t_manager **head, void *ptr)
+void	*memlist_add(t_manager **memlist, void *ptr)
 {
 	t_manager	*node;
 
-	if (!head)
+	if (!memlist)
 		return (NULL);
 	if (!ptr)
 		return (NULL);
@@ -34,31 +35,32 @@ void	*memlist_add(t_manager **head, void *ptr)
 	if (!node)
 	{
 		free(ptr);
+		memlist_free_all(memlist);
 		return (NULL);
 	}
 	node->ptr = ptr;
-	node->next = *head;
-	*head = node;
+	node->next = *memlist;
+	*memlist = node;
 	return (ptr);
 }
 
-int	memlist_free_ptr(t_manager **head, void *ptr) //TODO: Make shorter for norminette
+int	memlist_free_ptr(t_manager **memlist, void *ptr) //TODO: Make shorter for norminette
 {
 	t_manager	*current;
 	t_manager	*prev;
 
-	if (!head || !ptr || !*head)
+	if (!memlist || !ptr || !*memlist)
 		return (0);
-	if ((*head)->ptr == ptr)
+	if ((*memlist)->ptr == ptr)
 	{
-		current = *head;
-		*head = (*head)->next;
+		current = *memlist;
+		*memlist = (*memlist)->next;
 		free(current->ptr);
 		free(current);
 		return (1);
 	}
-	prev = *head;
-	current = (*head)->next;
+	prev = *memlist;
+	current = (*memlist)->next;
 	while (current)
 	{
 		if (current->ptr == ptr)
@@ -74,16 +76,16 @@ int	memlist_free_ptr(t_manager **head, void *ptr) //TODO: Make shorter for normi
 	return (1);
 }
 
-int	memlist_free_all(t_manager **head)
+int	memlist_free_all(t_manager **memlist)
 {
 	t_manager	*current;
 	t_manager	*next;
 	int			i;
 
 	i = 0;
-	if (!head || !*head)
+	if (!memlist || !*memlist)
 		return (0);
-	current = *head;
+	current = *memlist;
 	while (current)
 	{
 		next = current->next;
@@ -92,6 +94,6 @@ int	memlist_free_all(t_manager **head)
 		i++;
 		current = next;
 	}
-	*head = NULL;
+	*memlist = NULL;
 	return (i);
 }

@@ -53,9 +53,9 @@ int		ft_perror(char *err1, char *err2, char *err3, int err_no);
 int		ft_pipex(t_var *var, int end, char **env, int exit_code);
 
 //mem_manager.c
-void	*memlist_alloc(t_manager **head, size_t size);
-void	*memlist_add(t_manager **head, void *ptr);
-int		memlist_free_all(t_manager **head);
-int		memlist_free_ptr(t_manager **head, void *ptr);
+void	*memlist_alloc(t_manager **memlist, size_t size);
+void	*memlist_add(t_manager **memlist, void *ptr);
+int		memlist_free_all(t_manager **memlist);
+int		memlist_free_ptr(t_manager **memlist, void *ptr);
 
 #endif
