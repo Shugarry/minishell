@@ -23,6 +23,10 @@
 # include <errno.h>
 # include <readline/readline.h>
 # include <readline/history.h>
+# include <signal.h>
+
+# define GREEN "\033[0;32m"
+# define RESET "\033[0m"
 
 typedef struct s_var
 {
@@ -57,5 +61,7 @@ void	ft_exit(t_var *var, int exit_code);
 void	ft_exec_child(t_var *var, int i, int end);
 _Bool	ms_exec_builtins(t_var *var, int i);
 int		ms_pipex(t_var *var, int end);
+void	ms_handle_signals(int sig);
+void	ms_handle_signals_child(int sig);
 
 #endif

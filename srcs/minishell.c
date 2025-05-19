@@ -77,6 +77,7 @@ void	ft_exec_child(t_var *var, int i, int end)
 //		ft_exit(var, 1);
 	if (var->cmds[i][0] == NULL)
 		ft_exit(var, ft_perror("", "permission denied: ", "", 126));
+	
 	execve(var->cmds[i][0], var->cmds[i], var->env);
 	ft_exit(var, ft_perror(var->cmds[i][0], ": command not found", "", 127));
 }
@@ -123,6 +124,8 @@ int	ms_pipex(t_var *var, int end)
 			ft_exit(var, ft_perror("", strerror(errno), "", errno));
 		if (var->cmds[i][0] && !ms_exec_builtins(var, i))
 		{
+			signal(SIGINT, ms_handle_signals_child);
+			signal(SIGQUIT, ms_handle_signals_child);
 			child = fork();
 			if (child < 0)
 				ft_exit(var, ft_perror("", strerror(errno), "", errno));
@@ -140,4 +143,29 @@ int	ms_pipex(t_var *var, int end)
 			close(var->pipes[2 * (i - 1)]);
 	}
 	return (var->exit_code);
+}
+
+void	ms_handle_signals(int sig)
+{
+	if (sig == SIGINT)
+	{
+		ft_printf("\n");
+		rl_on_new_line();
+		rl_replace_line("", 0);
+		rl_redisplay();
+	}
+	else if (sig == SIGQUIT)
+	{
+		ft_printf("\033[2D\033[2K");
+		rl_on_new_line();
+		rl_redisplay();
+	}
+}
+
+void	ms_handle_signals_child(int sig)
+{
+	if (sig == SIGINT)
+		ft_printf("\n");
+	else if (sig == SIGQUIT)
+		ft_printf("Quit (core dumped)\n");
 }

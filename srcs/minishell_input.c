@@ -106,6 +106,7 @@ _Bool	ms_quotes_check(t_var *var)
 			var->s_quotes = !var->s_quotes;
 		else if (var->line[i] == '\"' && !var->s_quotes)
 			var->d_quotes = !var->d_quotes;
+		
 	}
 	if (var->s_quotes || var->d_quotes)
 	{
@@ -132,9 +133,11 @@ void	ft_start_mini(t_var *var)
 
 	while (1)
 	{
-		var->line = readline("minishell$ ");
+		signal(SIGINT, ms_handle_signals);
+		signal(SIGQUIT, ms_handle_signals);
+		var->line = readline(GREEN "minishell$ " RESET);
 		if (!var->line)
-			ft_exit(var, ft_perror("", strerror(errno), "", errno));
+			ft_exit(var, 0);
 		if (*var->line != '\0')
 		{
 			add_history(var->line);
