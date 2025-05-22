@@ -95,34 +95,65 @@ _Bool	ms_start_args(t_var *var, int cmd_count)
 	return (0);
 }
 
-_Bool	ms_quotes_check(t_var *var)
+int	ms_is_set(char const *str, char const *set, int len)
 {
 	int	i;
+	int	j;
 
 	i = -1;
-	while (var->line[++i])
+	while (++i < len)
 	{
-		if (var->line[i] == '\'' && !var->d_quotes)
-			var->s_quotes = !var->s_quotes;
-		else if (var->line[i] == '\"' && !var->s_quotes)
-			var->d_quotes = !var->d_quotes;
-		
+		j = -1;
+		while (set[++j])
+			if (str[i] == set[j])
+				break ;
+		if (set[j] != '\0')
+			break ;
 	}
-	if (var->s_quotes || var->d_quotes)
-	{
-		ft_perror("", "syntax error quotes must be closed", "", 1);
-		var->s_quotes = 0;
-		var->d_quotes = 0;
-		free(var->line);
-		return (1);
-	}
-	return (0);
+	return (i);
 }
 
 _Bool	ms_tokenize(t_var *var)
 {
-	if (ms_quotes_check(var))
-		return (1);
+	int		token_count;
+	int		i;
+
+	i = 0;
+	token_count = 0;
+	while (var->line[i])
+	{
+		i += ms_is_set(&var->line[i], " \'\"|&<>", ft_strlen(&var->line[i]));
+		if (var->line[i] == '\'' || var->line[i] == '\"')
+		{
+			i++;
+			if (var->line[i - 1] == '\'')
+				i += ms_is_set(&var->line[i], "\'", ft_strlen(&var->line[i]));
+			else
+				i += ms_is_set(&var->line[i], "\"", ft_strlen(&var->line[i]));
+			if (!var->line[i])
+			{
+				ft_perror("", "syntax error quotes must be closed", "", 1);
+				free(var->line);
+				return (1);
+			}
+			if (ms_is_set(&var->line[++i], " |&<>", 1))
+				continue ;
+		}
+		if (var->line[i])
+			i++;
+		if ((var->line[i - 1] == '|' && var->line[i] == '|') || \
+			(var->line[i - 1] == '>' && var->line[i] == '>') || \
+			(var->line[i - 1] == '<' && var->line[i] == '<'))
+			i++;
+		else if (var->line[i] == '&' && var->line[i + 1] != '&')
+		{
+			ft_perror("", "syntax error near unexpected token `&'", "", 1);
+			free(var->line);
+			return (1);
+		}
+		if (var->line[i] != ' ')
+			token_count++;
+	}
 	return (0);
 }
 

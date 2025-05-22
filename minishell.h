@@ -41,15 +41,13 @@ typedef struct s_var
 	char	***cmds;
 	t_list	*token;
 	char	pwd[4096];
-	_Bool	s_quotes;
-	_Bool	d_quotes;
 	int		exit_code;
 }			t_var;
 
 // minishell_input.c
 int		ms_pipe_count(char const *s, char c);
 char	*ft_cmd_resolve(t_var *var, int i);
-_Bool	ms_quotes_check(t_var *var);
+int		ms_is_set(char const *str, char const *set, int len);
 _Bool	ms_tokenize(t_var *var);
 _Bool	ms_start_args(t_var *var, int cmd_count);
 void	ms_start_mini(t_var *var, int cmd_count);
