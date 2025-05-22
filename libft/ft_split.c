@@ -29,27 +29,6 @@ static size_t	ft_word_mem(char const *s, char c, char **split, int word)
 	return (len);
 }
 
-static int	ft_word_count(char const *s, char c)
-{
-	int	i;
-	int	count;
-
-	i = 0;
-	count = 0;
-	while (s && s[i])
-	{
-		if (s[i] != c)
-		{
-			count++;
-			while (s[i] && s[i] != c)
-				i++;
-		}
-		while (s[i] == c)
-			i++;
-	}
-	return (count);
-}
-
 static int	ft_fill_words(char const *s, char **split, char c, int size)
 {
 	int		word;
@@ -73,6 +52,27 @@ static int	ft_fill_words(char const *s, char **split, char c, int size)
 		j++;
 	}
 	return (0);
+}
+
+static int	ft_word_count(char const *s, char c)
+{
+	int	i;
+	int	count;
+
+	i = 0;
+	count = 0;
+	while (s && s[i])
+	{
+		if (s[i] != c)
+		{
+			count++;
+			while (s[i] && s[i] != c)
+				i++;
+		}
+		while (s[i] == c)
+			i++;
+	}
+	return (count);
 }
 
 char	**ft_split(char const *s, char c)

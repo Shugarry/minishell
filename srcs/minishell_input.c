@@ -95,24 +95,6 @@ _Bool	ms_start_args(t_var *var, int cmd_count)
 	return (0);
 }
 
-int	ms_is_set(char const *str, char const *set, int len)
-{
-	int	i;
-	int	j;
-
-	i = -1;
-	while (++i < len)
-	{
-		j = -1;
-		while (set[++j])
-			if (str[i] == set[j])
-				break ;
-		if (set[j] != '\0')
-			break ;
-	}
-	return (i);
-}
-
 _Bool	ms_tokenize(t_var *var)
 {
 	int		token_count;
@@ -122,38 +104,46 @@ _Bool	ms_tokenize(t_var *var)
 	token_count = 0;
 	while (var->line[i])
 	{
-		i += ms_is_set(&var->line[i], " \'\"|&<>", ft_strlen(&var->line[i]));
-		if (var->line[i] == '\'' || var->line[i] == '\"')
-		{
+		while (var->line[i] == ' ')
 			i++;
-			if (var->line[i - 1] == '\'')
-				i += ms_is_set(&var->line[i], "\'", ft_strlen(&var->line[i]));
-			else
-				i += ms_is_set(&var->line[i], "\"", ft_strlen(&var->line[i]));
-			if (!var->line[i])
-			{
-				ft_perror("", "syntax error quotes must be closed", "", 1);
-				free(var->line);
-				return (1);
-			}
-			if (ms_is_set(&var->line[++i], " |&<>", 1))
-				continue ;
-		}
-		if (var->line[i])
-			i++;
-		if ((var->line[i - 1] == '|' && var->line[i] == '|') || \
-			(var->line[i - 1] == '>' && var->line[i] == '>') || \
-			(var->line[i - 1] == '<' && var->line[i] == '<'))
-			i++;
-		else if (var->line[i] == '&' && var->line[i + 1] != '&')
+		if (var->line[i] == '&' && var->line[i + 1] != '&')
 		{
 			ft_perror("", "syntax error near unexpected token `&'", "", 1);
 			free(var->line);
 			return (1);
 		}
-		if (var->line[i] != ' ')
+		if (var->line[i])
 			token_count++;
+		if (var->line[i] && ft_strchr("|&<>()", var->line[i]))
+		{
+			if ((var->line[i] == '|' && var->line[i + 1] == '|') || \
+				(var->line[i] == '&' && var->line[i + 1] == '&') || \
+				(var->line[i] == '<' && var->line[i + 1] == '<') || \
+				(var->line[i] == '>' && var->line[i + 1] == '>'))
+				i++;
+			i++;
+			continue ;
+		}
+		while (!ft_strchr(" |&<>()", var->line[i]))
+		{
+			i++;
+			if (var->line[i - 1] == '\'' || var->line[i - 1] == '\"')
+			{
+				if (var->line[i - 1] == '\'' && ft_strchr(&var->line[i], '\''))
+					i += ft_strchr(&var->line[i], '\'') - &var->line[i];
+				else if (var->line[i - 1] == '\"' && ft_strchr(&var->line[i], '\"'))
+					i += ft_strchr(&var->line[i], '\"') - &var->line[i];
+				else
+				{
+					ft_perror("", "syntax error quotes must be closed", "", 1);
+					free(var->line);
+					return (1);
+				}
+				i++;
+			}
+		}
 	}
+	printf("token_count: %d\n", token_count);
 	return (0);
 }
 

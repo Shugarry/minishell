@@ -47,9 +47,8 @@ typedef struct s_var
 // minishell_input.c
 int		ms_pipe_count(char const *s, char c);
 char	*ft_cmd_resolve(t_var *var, int i);
-int		ms_is_set(char const *str, char const *set, int len);
-_Bool	ms_tokenize(t_var *var);
 _Bool	ms_start_args(t_var *var, int cmd_count);
+_Bool	ms_tokenize(t_var *var);
 void	ms_start_mini(t_var *var, int cmd_count);
 
 // minishell.c
