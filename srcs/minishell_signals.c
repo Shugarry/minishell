@@ -18,8 +18,7 @@ void	ms_signal_handle(int sig)
 {
 	if (sig == SIGINT)
 	{
-		if (write(STDOUT_FILENO, "\n", 1) < 0)
-			ft_exit(NULL, ft_perror("Error: ", strerror(errno), "", errno));
+		ft_putendl_fd("", STDOUT_FILENO);
 		rl_on_new_line();
 		rl_replace_line("", 0);
 		rl_redisplay();
@@ -29,14 +28,14 @@ void	ms_signal_handle(int sig)
 
 void	ms_signal_handle_child(int sig)
 {
-	if (sig == SIGINT && write(STDOUT_FILENO, "\n", 1) < 0)
+	if (sig == SIGINT)
 	{
-		ft_exit(NULL, ft_perror("Error: ", strerror(errno), "", errno));
+		ft_putendl_fd("", STDOUT_FILENO);
 		g_signal_code = 130;
 	}
-	else if (sig == SIGQUIT && printf("Quit (core dumped)\n") < 0)
+	else if (sig == SIGQUIT)
 	{
-		ft_exit(NULL, ft_perror("Error: ", strerror(errno), "", errno));
+		ft_putendl_fd("Quit (core dumped)", STDOUT_FILENO);
 		g_signal_code = 131;
 	}
 }

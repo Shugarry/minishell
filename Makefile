@@ -20,8 +20,8 @@ RM			= rm -f
 
 # ================================== SOURCES ================================== #
 
-SRC			= $(addprefix srcs/minishell_, main.c exec.c input.c signals.c \
-			utils.c)
+SRC			= $(addprefix srcs/minishell_, exec.c init.c signals.c tokens.c \
+				utils.c)
 
 OBJ			= $(SRC:.c=.o)
 
@@ -37,15 +37,15 @@ LIBFT		= $(LIBFT_DIR)/libft.a
 LIB_HDR		= $(LIBFT_DIR)/libft.h
 
 LIB_SRC		= $(addprefix libft/ft_, atoi.c bzero.c calloc.c isalnum.c isalpha.c \
-			isascii.c isdigit.c isprint.c itoa.c lstadd_back_bonus.c \
-			lstadd_front_bonus.c lstclear_bonus.c lstdelone_bonus.c \
-			lstiter_bonus.c lstlast_bonus.c lstmap_bonus.c lstnew_bonus.c \
-			lstsize_bonus.c memchr.c memcmp.c memcpy.c memmove.c memset.c \
-			printf_bonus.c printf_utils2_bonus.c printf_utils_bonus.c \
-			putchar_fd.c putendl_fd.c putnbr_fd.c putstr_fd.c split.c strchr.c \
-			strdup.c striteri.c strjoin.c strlcat.c strlcpy.c strlen.c \
-			strmapi.c strncmp.c strnstr.c strrchr.c strtrim.c substr.c \
-			tolower.c toupper.c) $(addprefix libft/, get_next_line_bonus.c)
+				isascii.c isdigit.c isprint.c itoa.c lstadd_back_bonus.c \
+				lstadd_front_bonus.c lstclear_bonus.c lstdelone_bonus.c \
+				lstiter_bonus.c lstlast_bonus.c lstmap_bonus.c lstnew_bonus.c \
+				lstsize_bonus.c memchr.c memcmp.c memcpy.c memmove.c memset.c \
+				printf_bonus.c printf_utils2_bonus.c printf_utils_bonus.c \
+				putchar_fd.c putendl_fd.c putnbr_fd.c putstr_fd.c split.c strchr.c \
+				strdup.c striteri.c strjoin.c strlcat.c strlcpy.c strlen.c \
+				strmapi.c strncmp.c strnstr.c strrchr.c strtrim.c substr.c \
+				tolower.c toupper.c) $(addprefix libft/, get_next_line_bonus.c)
 
 LIB_DEP = $(LIB_SRC) $(LIB_HDR) libft/Makefile 
 

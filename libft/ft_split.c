@@ -87,8 +87,8 @@ char	**ft_split(char const *s, char c)
 		size++;
 	split = (char **)ft_calloc(size + 1, sizeof(char *));
 	if (!split)
-		return (0);
-	split[size] = 0;
+		return (NULL);
+	split[size] = NULL;
 	if (ft_fill_words(s, split, c, size))
 	{
 		free(split);

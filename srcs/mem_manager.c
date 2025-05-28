@@ -1,10 +1,23 @@
-#include "../minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   mem_manager.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: miggarc2 <miggarc2@student.42barcelona.co  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/28 18:15:18 by miggarc2          #+#    #+#             */
+/*   Updated: 2025/05/28 18:15:23 by miggarc2         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-// This function seems to be a ft_lstnew but with malloc for content, can we use ft_lstnew instead?
+#include "minishell.h"
+
+// This function seems to be a ft_lstnew but with malloc for content, 
+//can we use ft_lstnew instead?
 void	*memlist_alloc(t_list **head, size_t size)
 {
 	t_list	*node;
-	void		*content;
+	void	*content;
 
 	if (!head)
 		return (NULL);
@@ -45,7 +58,8 @@ void	*memlist_add(t_list **head, void *content)
 }
 
 // I don't understand completely this function, ask Felix about it
-int	memlist_free_content(t_list **head, void *content) //TODO: Make shorter for norminette
+//TODO: Make shorter for norminette
+int	memlist_free_content(t_list **head, void *content)
 {
 	t_list	*current;
 	t_list	*prev;
@@ -82,7 +96,7 @@ int	memlist_free_all(t_list **head)
 {
 	t_list	*current;
 	t_list	*next;
-	int			i;
+	int		i;
 
 	i = 0;
 	if (!head || !*head)

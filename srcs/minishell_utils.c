@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-int	ft_perror(char *err1, char *err2, char *err3, int err_no)
+int	ms_perror(char *err1, char *err2, char *err3, int err_no)
 {
 	ft_putstr_fd(err1, STDERR_FILENO);
 	ft_putstr_fd(err2, STDERR_FILENO);
@@ -20,7 +20,7 @@ int	ft_perror(char *err1, char *err2, char *err3, int err_no)
 	return (err_no);
 }
 
-void	ft_clean(char **var_ptr)
+void	ms_clean(char **var_ptr)
 {
 	int	i;
 
@@ -33,30 +33,38 @@ void	ft_clean(char **var_ptr)
 	}
 }
 
-void	ft_exit(t_var *var, int exit_code)
+void	ms_free_ptrs(t_var *var)
 {
 	int	i;
 
-	close(STDIN_FILENO);
-	free(var->line);
-	if (!exit_code)
-		ft_printf("exit\n");
-	if (access(".here_doc", F_OK) == 0)
-		unlink(".here_doc");
-	if (var->pipes)
-		free(var->pipes);
-	if (var->fd_in > 0)
-		close(var->fd_in);
-	if (var->fd_out > 0)
-		close(var->fd_out);
 	i = 0;
 	if (var->cmds)
 	{
 		while (var->cmds[i])
-			ft_clean(var->cmds[i++]);
+			ms_clean(var->cmds[i++]);
 		free(var->cmds);
 	}
+	if (var->tokens)
+		ms_clean(var->tokens);
 	if (var->paths)
-		ft_clean(var->paths);
+		ms_clean(var->paths);
+	if (var->line)
+		free(var->line);
+	if (var->pipes)
+		free(var->pipes);
+}
+
+void	ms_exit(t_var *var, int exit_code)
+{
+	close(STDIN_FILENO);
+	if (access(".here_doc", F_OK) == 0)
+		unlink(".here_doc");
+	if (var->fd_in > 0)
+		close(var->fd_in);
+	if (var->fd_out > 0)
+		close(var->fd_out);
+	ms_free_ptrs(var);
+	if (!exit_code)
+		ft_putendl_fd("exit", STDOUT_FILENO);
 	exit(exit_code);
 }

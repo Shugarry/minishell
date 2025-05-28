@@ -18,18 +18,18 @@ void	ft_exec_child(t_var *var, int i, int end)
 	if (i < end)
 		close(var->pipes[2 * i]);
 /*	if (i == 0 && dup2(var->fd_in, STDIN_FILENO) < 0)
-		ft_exit(var, 1);
+		ms_exit(var, 1);
 	else */if (i > 0 && dup2(var->pipes[2 * i - 2], STDIN_FILENO) < 0)
-		ft_exit(var, 1);
+		ms_exit(var, 1);
 	if (i < end && dup2(var->pipes[2 * i + 1], STDOUT_FILENO) < 0)
-		ft_exit(var, 1);
+		ms_exit(var, 1);
 //	else if (i == end && dup2(var->fd_out, STDOUT_FILENO) < 0)
-//		ft_exit(var, 1);
+//		ms_exit(var, 1);
 	if (var->cmds[i][0] == NULL)
-		ft_exit(var, ft_perror("", "permission denied: ", "", 126));
+		ms_exit(var, ms_perror("", "permission denied: ", "", 126));
 	
 	execve(var->cmds[i][0], var->cmds[i], var->env);
-	ft_exit(var, ft_perror(var->cmds[i][0], ": command not found", "", 127));
+	ms_exit(var, ms_perror(var->cmds[i][0], ": command not found", "", 127));
 }
 
 _Bool	ms_exec_builtins(t_var *var, int i)
@@ -52,7 +52,7 @@ _Bool	ms_exec_builtins(t_var *var, int i)
 	else if (ft_strncmp(var->cmds[i][0], "env", 4) == 0)
 		ft_env(var);
 	else */if (ft_strncmp(var->cmds[i][0], "exit", 5) == 0)
-		ft_exit(var, 0);
+		ms_exit(var, 0);
 	else if (ft_strncmp(var->cmds[i][0], "$?", 3) == 0)
 		ft_printf("%d\n", var->exit_code);
 	else
@@ -71,14 +71,14 @@ int	ms_pipex(t_var *var, int end)
 	while (var->cmds[++i])
 	{
 		if (i < end && pipe(&var->pipes[2 * i]) < 0)
-			ft_exit(var, ft_perror("", strerror(errno), "", errno));
+			ms_exit(var, ms_perror("", strerror(errno), "", errno));
 		if (var->cmds[i][0] && !ms_exec_builtins(var, i))
 		{
 			signal(SIGINT, ms_signal_handle_child);
 			signal(SIGQUIT, ms_signal_handle_child);
 			child = fork();
 			if (child < 0)
-				ft_exit(var, ft_perror("", strerror(errno), "", errno));
+				ms_exit(var, ms_perror("", strerror(errno), "", errno));
 			else if (child == 0)
 				ft_exec_child(var, i, end);
 		}
