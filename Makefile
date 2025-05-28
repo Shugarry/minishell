@@ -15,12 +15,14 @@
 NAME		= minishell
 CC			= cc
 CFLAGS		= -Wall -Wextra -Werror -g #-fsanitize=address
+LFLAGS		= -lreadline
 
-SRC			= srcs/minishell.c srcs/minishell_input.c
+SRC			= $(addprefix srcs/minishell_, main.c exec.c input.c signals.c \
+			utils.c)
 
 OBJ			= $(SRC:.c=.o)
 
-INCLUDES 	= -Ilibft -I.
+INC 		= -Ilibft -I.
 
 HDR			= minishell.h
 
@@ -86,18 +88,21 @@ LIB_DEP = $(LIB_SRC) $(LIB_HDR) libft/Makefile
 
 all: $(NAME)
 
+# Linking
 $(NAME): $(OBJ) $(LIBFT)
 	@echo "\n==> Linking $(NAME)..."
-	@$(CC) $(CFLAGS) $(OBJ) -lreadline $(LIBFT) -o $(NAME)
+	@$(CC) $(CFLAGS) $(OBJ) $(LFLAGS) $(LIBFT) -o $(NAME)
 
-srcs/%.o: srcs/%.c $(HDR) $(LIB_HDR) Makefile
+# Compiling
+%.o: %.c $(HDR) $(LIB_HDR) Makefile
 	@echo " -> Compiling $<"
-	@$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+	@$(CC) $(CFLAGS) $(INC) -c $< -o $@
 
 $(LIBFT): $(LIB_DEP)
 	@echo "\n==> Building Libft..."
 	@$(MAKE) -C $(LIBFT_DIR)
 
+# Cleaning
 clean:
 	@echo "\n==> Cleaning project..."
 	@$(MAKE) -s clean -C $(LIBFT_DIR)
@@ -110,4 +115,4 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re bonus

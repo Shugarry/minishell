@@ -28,6 +28,8 @@
 # define GREEN "\033[0;32m"
 # define RESET "\033[0m"
 
+extern volatile sig_atomic_t	g_signal_code;
+
 typedef struct s_var
 {
 	_Bool	hdoc;
@@ -44,21 +46,26 @@ typedef struct s_var
 	int		exit_code;
 }			t_var;
 
+
 // minishell_input.c
 int		ms_pipe_count(char const *s, char c);
 char	*ft_cmd_resolve(t_var *var, int i);
 _Bool	ms_start_args(t_var *var, int cmd_count);
 _Bool	ms_tokenize(t_var *var);
-void	ms_start_mini(t_var *var, int cmd_count);
+void	ms_start_mini(t_var *var);
 
-// minishell.c
-int		ft_perror(char *err1, char *err2, char *err3, int err_no);
-void	ft_clean(char **var_ptr);
-void	ft_exit(t_var *var, int exit_code);
+// minishell_exec.c
 void	ft_exec_child(t_var *var, int i, int end);
 _Bool	ms_exec_builtins(t_var *var, int i);
 int		ms_pipex(t_var *var, int end);
-void	ms_handle_signals(int sig);
-void	ms_handle_signals_child(int sig);
+
+// minishell_signals.c
+void	ms_signal_handle(int sig);
+void	ms_signal_handle_child(int sig);
+
+// minishell_utils.c
+int		ft_perror(char *err1, char *err2, char *err3, int err_no);
+void	ft_clean(char **var_ptr);
+void	ft_exit(t_var *var, int exit_code);
 
 #endif

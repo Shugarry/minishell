@@ -12,56 +12,6 @@
 
 #include "minishell.h"
 
-int	ft_perror(char *err1, char *err2, char *err3, int err_no)
-{
-	ft_putstr_fd(err1, STDERR_FILENO);
-	ft_putstr_fd(err2, STDERR_FILENO);
-	ft_putstr_fd(err3, STDERR_FILENO);
-	ft_putstr_fd("\n", STDERR_FILENO);
-	return (err_no);
-}
-
-void	ft_clean(char **var_ptr)
-{
-	int	i;
-
-	if (var_ptr)
-	{
-		i = 0;
-		while (var_ptr[i])
-			free(var_ptr[i++]);
-		free(var_ptr);
-	}
-}
-
-void	ft_exit(t_var *var, int exit_code)
-{
-	int	i;
-
-	close(STDIN_FILENO);
-	free(var->line);
-	if (!exit_code)
-		ft_printf("exit\n");
-	if (access("here_doc", F_OK) == 0)
-		unlink("here_doc");
-	if (var->pipes)
-		free(var->pipes);
-	if (var->fd_in > 0)
-		close(var->fd_in);
-	if (var->fd_out > 0)
-		close(var->fd_out);
-	i = 0;
-	if (var->cmds)
-	{
-		while (var->cmds[i])
-			ft_clean(var->cmds[i++]);
-		free(var->cmds);
-	}
-	if (var->paths)
-		ft_clean(var->paths);
-	exit(exit_code);
-}
-
 void	ft_exec_child(t_var *var, int i, int end)
 {
 	(void)end;
@@ -124,8 +74,8 @@ int	ms_pipex(t_var *var, int end)
 			ft_exit(var, ft_perror("", strerror(errno), "", errno));
 		if (var->cmds[i][0] && !ms_exec_builtins(var, i))
 		{
-			signal(SIGINT, ms_handle_signals_child);
-			signal(SIGQUIT, ms_handle_signals_child);
+			signal(SIGINT, ms_signal_handle_child);
+			signal(SIGQUIT, ms_signal_handle_child);
 			child = fork();
 			if (child < 0)
 				ft_exit(var, ft_perror("", strerror(errno), "", errno));
@@ -143,29 +93,4 @@ int	ms_pipex(t_var *var, int end)
 			close(var->pipes[2 * (i - 1)]);
 	}
 	return (var->exit_code);
-}
-
-void	ms_handle_signals(int sig)
-{
-	if (sig == SIGINT)
-	{
-		ft_printf("\n");
-		rl_on_new_line();
-		rl_replace_line("", 0);
-		rl_redisplay();
-	}
-	else if (sig == SIGQUIT)
-	{
-		ft_printf("\033[2D\033[2K");
-		rl_on_new_line();
-		rl_redisplay();
-	}
-}
-
-void	ms_handle_signals_child(int sig)
-{
-	if (sig == SIGINT)
-		ft_printf("\n");
-	else if (sig == SIGQUIT)
-		ft_printf("Quit (core dumped)\n");
 }

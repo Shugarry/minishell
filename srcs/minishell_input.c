@@ -131,7 +131,8 @@ _Bool	ms_tokenize(t_var *var)
 			{
 				if (var->line[i - 1] == '\'' && ft_strchr(&var->line[i], '\''))
 					i += ft_strchr(&var->line[i], '\'') - &var->line[i];
-				else if (var->line[i - 1] == '\"' && ft_strchr(&var->line[i], '\"'))
+				else if (var->line[i - 1] == '\"' && \
+					ft_strchr(&var->line[i], '\"'))
 					i += ft_strchr(&var->line[i], '\"') - &var->line[i];
 				else
 				{
@@ -147,15 +148,15 @@ _Bool	ms_tokenize(t_var *var)
 	return (0);
 }
 
-void	ft_start_mini(t_var *var)
+void	ms_start_mini(t_var *var)
 {
 	int	pipe_count;
 	int	i;
 
 	while (1)
 	{
-		signal(SIGINT, ms_handle_signals);
-		signal(SIGQUIT, ms_handle_signals);
+		signal(SIGINT, ms_signal_handle);
+		signal(SIGQUIT, SIG_IGN);
 		var->line = readline(GREEN "minishell$ " RESET);
 		if (!var->line)
 			ft_exit(var, 0);
@@ -185,21 +186,4 @@ void	ft_start_mini(t_var *var)
 		}
 		free(var->line);
 	}
-}
-
-int	main(int ac, char **av, char **env)
-{
-	t_var	var;
-
-	(void)av;
-	ft_bzero(&var, sizeof(t_var));
-	if (ac != 1)
-		ft_exit(&var, ft_perror("", "usage: ./minishell", "", 1));
-	if (!env || !*env)
-		ft_exit(&var, ft_perror("", "env not found", "", 1));
-	var.env = env;
-	var.paths = ft_split(getenv("PATH"), ':');
-	if (!var.paths)
-		ft_exit(&var, ft_perror("", strerror(errno), "", errno));
-	ft_start_mini(&var);
 }
