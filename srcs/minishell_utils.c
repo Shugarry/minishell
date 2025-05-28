@@ -41,8 +41,8 @@ void	ft_exit(t_var *var, int exit_code)
 	free(var->line);
 	if (!exit_code)
 		ft_printf("exit\n");
-	if (access("here_doc", F_OK) == 0)
-		unlink("here_doc");
+	if (access(".here_doc", F_OK) == 0)
+		unlink(".here_doc");
 	if (var->pipes)
 		free(var->pipes);
 	if (var->fd_in > 0)

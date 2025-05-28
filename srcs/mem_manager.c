@@ -1,59 +1,62 @@
 #include "../minishell.h"
 
-void	*memlist_alloc(t_manager **head, size_t size)
+// This function seems to be a ft_lstnew but with malloc for content, can we use ft_lstnew instead?
+void	*memlist_alloc(t_list **head, size_t size)
 {
-	t_manager	*node;
-	void		*ptr;
+	t_list	*node;
+	void		*content;
 
 	if (!head)
 		return (NULL);
-	ptr = malloc(size);
-	if (!ptr)
+	content = malloc(size);
+	if (!content)
 		return (NULL);
-	node = (t_manager *)malloc(sizeof(t_manager));
+	node = (t_list *)malloc(sizeof(t_list));
 	if (!node)
 	{
-		free(ptr);
+		free(content);
 		return (NULL);
 	}
-	node->ptr = ptr;
+	node->content = content;
 	node->next = *head;
 	*head = node;
-	return (ptr);
+	return (content);
 }
 
-void	*memlist_add(t_manager **head, void *ptr)
+// This function seems too similar to ft_lstnew, can we use it instead?
+void	*memlist_add(t_list **head, void *content)
 {
-	t_manager	*node;
+	t_list	*node;
 
 	if (!head)
 		return (NULL);
-	if (!ptr)
+	if (!content)
 		return (NULL);
-	node = (t_manager *)malloc(sizeof(t_manager));
+	node = (t_list *)malloc(sizeof(t_list));
 	if (!node)
 	{
-		free(ptr);
+		free(content);
 		return (NULL);
 	}
-	node->ptr = ptr;
+	node->content = content;
 	node->next = *head;
 	*head = node;
-	return (ptr);
+	return (content);
 }
 
-int	memlist_free_ptr(t_manager **head, void *ptr) //TODO: Make shorter for norminette
+// I don't understand completely this function, ask Felix about it
+int	memlist_free_content(t_list **head, void *content) //TODO: Make shorter for norminette
 {
-	t_manager	*current;
-	t_manager	*prev;
+	t_list	*current;
+	t_list	*prev;
 
-	if (!head || !ptr || !*head)
+	if (!head || !content || !*head)
 		return (0);
-	if ((*head)->ptr == ptr)
+	if ((*head)->content == content)
 	{
 		current = *head;
 		*head = (*head)->next;
-		free(current->ptr);
+		free(current->content);
 		free(current);
 		return (1);
 	}
@@ -61,10 +64,10 @@ int	memlist_free_ptr(t_manager **head, void *ptr) //TODO: Make shorter for normi
 	current = (*head)->next;
 	while (current)
 	{
-		if (current->ptr == ptr)
+		if (current->content == content)
 		{
 			prev->next = current->next;
-			free(current->ptr);
+			free(current->content);
 			free(current);
 			return (1);
 		}
@@ -74,10 +77,11 @@ int	memlist_free_ptr(t_manager **head, void *ptr) //TODO: Make shorter for normi
 	return (1);
 }
 
-int	memlist_free_all(t_manager **head)
+// This function can be replaced using ft_lstclear(&head, free);
+int	memlist_free_all(t_list **head)
 {
-	t_manager	*current;
-	t_manager	*next;
+	t_list	*current;
+	t_list	*next;
 	int			i;
 
 	i = 0;
@@ -87,7 +91,7 @@ int	memlist_free_all(t_manager **head)
 	while (current)
 	{
 		next = current->next;
-		free(current->ptr);
+		free(current->content);
 		free(current);
 		i++;
 		current = next;
