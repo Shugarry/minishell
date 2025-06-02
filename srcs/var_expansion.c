@@ -12,31 +12,55 @@
 
 #include "../minishell.h"
 
-typedef struct s_varlist {
+typedef struct s_varlist
+{
+	char	*var_name;
 	char	*content;
-	bool	is_num;
 	struct s_varlist	*next;
 }	t_varlist;
 
-t_varlist	*add_var_node(t_manager **memlist, t_varlist **head, char *content)
+void	add_var_node(t_manager **memlist, t_varlist **head, char *var_name, char *content)
 {
-	t_manager	*node;
+	t_varlist	*node;
 
-	if (!memlist)
-		return (NULL);
-	content = (char *)memlist_add(memlist, ft_strdup(content));
-	if (!content)
-	{
-		memlist_free_all(memlist);
-		return (NULL);
-	}
 	node = (t_varlist *)memlist_alloc(memlist, sizeof(t_varlist));
 	if (!node)
+		kill_and_exit(memlist, errno, "malloc failure");
+	node->var_name = (char *)memlist_add(memlist, ft_strdup(var_name));
+	if (!node->content)
+		kill_and_exit(memlist, errno, "malloc failure");
+	node->content = (char *)memlist_add(memlist, ft_strdup(content));
+	if (!node->content)
+		kill_and_exit(memlist, errno, "malloc failure");
+	node->next = *head;
+	*head = node;
+}
+
+void	remove_var_node(t_manager **memlist, t_varlist **head, char *var_name)
+{
+	int			i;
+	t_varlist	*tmp;
+
+	i = 0;
+	tmp = *head;
+	while (tmp)
 	{
-		return (NULL);
+		if (str)
+		tmp = tmp->next;
 	}
-	node->ptr = ptr;
-	node->next = *memlist;
-	*memlist = node;
-	return (ptr);
+}
+
+t_varlist	*create_var_list(t_manager **memlist, char **env)
+{
+	t_varlist	*varlist;
+	int			i;
+
+	i = 0;
+	varlist = NULL;
+	while (env[i] != NULL)
+	{
+		add_var_node(memlist, &varlist, env[i]);
+		i++;
+	}
+	return (varlist);
 }

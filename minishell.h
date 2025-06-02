@@ -58,4 +58,7 @@ void	*memlist_add(t_manager **memlist, void *ptr);
 int		memlist_free_all(t_manager **memlist);
 int		memlist_free_ptr(t_manager **memlist, void *ptr);
 
+//error_handling.c
+void	kill_and_exit(t_manager **memlist, int status, char *message);
+
 #endif

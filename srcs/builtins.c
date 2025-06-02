@@ -93,15 +93,15 @@ void	builtin_cd(t_manager **memlist, char *path)
 // TODO: Incorporate home, cwd and prevcwd variables into main program struct
 // NOTE: This will make the function look way cleaner
 
-//void	builtin_export(t_manager **memlist, ) NOTE: NEED TO DO VARS
-//{
-//
-//}
+void	builtin_export(t_manager **memlist, ) NOTE: NEED TO DO VARS
+{
 
-//void	builtin_unset(t_manager **memlist, ) NOTE: Can't do it until shell variables are defined
-//{
-//
-//}
+}
+
+void	builtin_unset(t_manager **memlist, ) NOTE: Can't do it until shell variables are defined
+{
+	
+}
 
 void	builtin_env(t_manager **memlist, char **env)
 {
