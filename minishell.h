@@ -25,6 +25,13 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 
+typedef struct s_varlist
+{
+	char	*var_name;
+	char	*content;
+	struct s_varlist	*next;
+}	t_varlist;
+
 typedef struct s_manager
 {
 	void	*ptr;
