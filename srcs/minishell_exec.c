@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 void	ft_exec_child(t_var *var, int i, int end)
 {
@@ -51,7 +51,8 @@ _Bool	ms_exec_builtins(t_var *var, int i)
 		ft_unset(var, var->cmds[i]);
 	else if (ft_strncmp(var->cmds[i][0], "env", 4) == 0)
 		ft_env(var);
-	else */if (ft_strncmp(var->cmds[i][0], "exit", 5) == 0)
+	else */
+	if (ft_strncmp(var->cmds[i][0], "exit", 5) == 0)
 		ms_exit(var, 0);
 	else if (ft_strncmp(var->cmds[i][0], "$?", 3) == 0)
 		ft_printf("%d\n", var->exit_code);
