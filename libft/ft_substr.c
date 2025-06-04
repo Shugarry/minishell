@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdlib.h>
+#include "libft.h"
 
 char	*ft_substr(char const *s, unsigned int start, size_t len)
 {
@@ -24,10 +24,9 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 		len = 0;
 	else if (len > size - start)
 		len = size - start;
-	sub = (char *)malloc(sizeof(char) * (len + 1));
+	sub = (char *)ft_calloc(len + 1, sizeof(char));
 	if (!sub)
-		return (0);
-	sub[len] = 0;
+		return (NULL);
 	while (len-- > 0)
 		sub[len] = s[start + len];
 	return (sub);
