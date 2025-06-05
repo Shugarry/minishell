@@ -34,13 +34,10 @@ void	ft_exec_child(t_var *var, int i, int end)
 
 _Bool	ms_exec_builtins(t_var *var, int i)
 {
-/*	if (ft_strncmp(var->cmds[i][0], "echo", 5) == 0)
-	{
-		if (var->cmds[i][1] && ft_strncmp(var->cmds[i][1], "-n", 3) == 0)
-			ft_echo(var->cmds[i], 1);
-		else
-			ft_echo(var->cmds[i], 0);
-	}
+	if (ft_strncmp(var->cmds[i][0], "echo", 5) == 0
+		|| ft_strncmp(var->cmds[i][0], "/usr/bin/echo", 5) == 0)
+		ft_echo(var->cmds[i]);
+/*
 	else if (ft_strncmp(var->cmds[i][0], "cd", 3) == 0)
 		ft_cd(var, var->cmds[i]);
 	else if (ft_strncmp(var->cmds[i][0], "pwd", 4) == 0)
@@ -53,7 +50,12 @@ _Bool	ms_exec_builtins(t_var *var, int i)
 		ft_env(var);
 	else */
 	if (ft_strncmp(var->cmds[i][0], "exit", 5) == 0)
-		ms_exit(var, 0);
+	{
+		if (var->cmds[i][1])
+			ms_exit(var, ft_atoi(var->cmds[i][1]));
+		else
+			ms_exit(var, 0);
+	}
 	else if (ft_strncmp(var->cmds[i][0], "$?", 3) == 0)
 		ft_printf("%d\n", var->exit_code);
 	else

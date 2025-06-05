@@ -57,6 +57,7 @@ typedef struct s_var
 	char	**paths;
 	char	***cmds;
 	t_manager	*memlist;
+	t_varlist	*varlist;
 	char	pwd[4096];
 	int		exit_code;
 }			t_var;
@@ -87,13 +88,20 @@ int		ms_perror(char *err1, char *err2, char *err3, int err_no);
 void	ms_clean(char **var_ptr);
 void	ms_exit(t_var *var, int exit_code);
 
-//mem_manager.c
+// minishell_memory.c
 void	*memlist_alloc(t_manager **memlist, size_t size);
 void	*memlist_add(t_manager **memlist, void *ptr);
 int		memlist_free_all(t_manager **memlist);
 int		memlist_free_ptr(t_manager **memlist, void *ptr);
 
-//error_handling.c
-void	kill_and_exit(t_manager **memlist, int status, char *message);
+// minishell_builtins.c
+void	ft_echo(char **tokens);
+//void	ft_cd(t_manager **memlist, char *path);
+//void	ft_pwd(t_manager **memlist, t_varlist **varlist);
+//void	ft_export(t_manager **memlist, char *tokens, t_varlist **varlist);
+//void	ft_unset(t_manager **memlist, t_varlist **varlist);
+
+// temporary function for exiting program, gotta join it with miguels
+//void	kill_and_exit(t_manager **memlist, int status, char *message);
 
 #endif

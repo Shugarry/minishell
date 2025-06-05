@@ -21,7 +21,7 @@ RM			= rm -f
 # ================================== SOURCES ================================== #
 
 SRC			= $(addprefix srcs/minishell_, exec.c init.c signals.c tokens.c \
-				utils.c)
+				utils.c builtins.c memory.c)
 
 OBJ			= $(SRC:.c=.o)
 

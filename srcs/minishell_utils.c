@@ -66,5 +66,6 @@ void	ms_exit(t_var *var, int exit_code)
 	ms_free_ptrs(var);
 	if (!exit_code)
 		ft_putendl_fd("exit", STDOUT_FILENO);
+	memlist_free_all(&var->memlist);
 	exit(exit_code);
 }

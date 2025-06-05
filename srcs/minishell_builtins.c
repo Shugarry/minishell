@@ -12,13 +12,35 @@
 
 #include "../minishell.h"
 
-void	builtin_echo(t_manager **memlist, char *str, bool add_nl) // NOTE: maybe exchange str for token
+void	ft_echo(char **tokens)
 {
-	printf("%s", str);
+	bool	add_nl;
+	int		i;
+	int		j;
+
+	i = 1;
+	add_nl = true;
+	while (tokens && tokens[i] != NULL && ft_strncmp(tokens[i], "-n", 2) == 0)
+	{
+		j = 1;
+		while (tokens[i][j] == 'n')
+			j++;
+		if (tokens[i][j] == '\0')
+			add_nl = false;
+		else
+			printf("%s", tokens[i]);
+		i++;
+	}
+	while (tokens && tokens[i] != NULL)
+	{
+		printf("%s", tokens[i]);
+		i++;
+	}
 	if (add_nl == true)
 		printf("\n");
 }
 
+/*
 char	*getenv_plus(t_manager **memlist, char *var)
 {
 	char	*env_var;
@@ -45,7 +67,7 @@ char	*getcwd_plus(t_manager **memlist)
 	return (path);
 }
 
-void	builtin_pwd(t_manager **memlist, )
+void	ft_pwd(t_manager **memlist, )
 {
 	char	*cwd = getcwd_plus();
 
@@ -54,7 +76,7 @@ void	builtin_pwd(t_manager **memlist, )
 	printf("%s\n" cwd);
 }
 
-void	builtin_cd(t_manager **memlist, char *path)
+void	ft_cd(t_manager **memlist, char *path)
 {
 	char	*home;
 	char	*abs_argument;
@@ -93,17 +115,17 @@ void	builtin_cd(t_manager **memlist, char *path)
 // TODO: Incorporate home, cwd and prevcwd variables into main program struct
 // NOTE: This will make the function look way cleaner
 
-void	builtin_export(t_manager **memlist, char *tokens) NOTE: NEED TO DO VARS
+void	ft_export(t_manager **memlist, char *tokens) //NOTE: NEED TO DO VARS
 {
 	
 }
 
-void	builtin_unset(t_manager **memlist, ) NOTE: Can't do it until shell variables are defined
+void	ft_unset(t_manager **memlist, ) // NOTE: Can't do it until shell variables are defined
 {
 	
 }
 
-void	builtin_env(t_manager **memlist, char **env)
+void	ft_env(t_manager **memlist, char **env)
 {
 	int	i;
 
@@ -116,3 +138,4 @@ void	builtin_exit(t_manager **memlist)
 {
 	kill_and_exit(memlist, EXIT_SUCCESS, NULL);
 }
+*/
