@@ -79,26 +79,28 @@ int		ft_pwd(t_var *var)
 	return (1);
 }
 
+int	bad_status(int status)
+{
+	return (status == EACCES || status == EFAULT || status == EIO
+			|| status == ELOOP || status == ENAMETOOLONG || status == ENOENT
+			|| status == ENOMEM || status == ENOTDIR || status == -1);
+}
+
 int	ft_cd(t_var *var, char **tokens)
 {
-	int		status;
 	char	*home;
 	char	*pwd;
+	char	*tmp;
 
-	if (!tokens[1])
+	if (!tokens[1] || (tokens[1] && ft_strcmp(tokens[1], "--") == 0))
 	{
 		home = get_var_content(var, "HOME");
 		if (!home)
 			return (ms_perror("minishell: ", "cd: ", "HOME not set", 1));
-		status = chdir(home);
-		if (status == EACCES || status == EFAULT || status == EIO
-			|| status == ELOOP || status == ENAMETOOLONG || status == ENOENT
-			|| status == ENOMEM || status == ENOTDIR || status == -1)
+		if (bad_status(chdir(home)))
 			return (ms_perror("", strerror(errno), "", errno));
 		pwd = get_var_content(var, "PWD");
-		if (!pwd)
-			ms_exit(var, ms_perror("", strerror(errno), "", errno));
-		modify_var_content(var, "OLD_PWD", pwd);
+		modify_var_content(var, "OLDPWD", pwd);
 		modify_var_content(var, "PWD", home);
 		memlist_free_ptr(&var->memlist, home);
 		memlist_free_ptr(&var->memlist, pwd);
@@ -106,17 +108,27 @@ int	ft_cd(t_var *var, char **tokens)
 	}
 	else if (tokens[2] != NULL)
 		return (ms_perror("minishell: ", "cd: ", "too many arguments", 1));
+	else if (ft_strcmp(tokens[1], "-") == 0)
+	{
+		if (!get_var_content(var, "OLDPWD"))
+			return (ms_perror("minishell: ", "cd: ", "OLDPWD not set", 1));
+		if (bad_status(chdir(get_var_content(var, "OLDPWD"))))
+			return (ms_perror("minishell:", "cd:", strerror(errno), errno));
+		tmp = memlist_add(&var->memlist, ft_strdup(get_var_content(var, "OLDPWD")));
+		if (!tmp)
+			ms_exit(var, ms_perror("", strerror(errno), "", errno));
+		modify_var_content(var, "OLDPWD", get_var_content(var, "PWD"));
+		modify_var_content(var, "PWD", tmp);
+		memlist_free_ptr(&var->memlist, tmp);
+}
 	else
 	{
-		status = chdir(tokens[1]);
-		if (status == EACCES || status == EFAULT || status == EIO
-			|| status == ELOOP || status == ENAMETOOLONG || status == ENOENT
-			|| status == ENOMEM || status == ENOTDIR || status == -1)
-			return (ms_perror("", strerror(errno), "", errno));
+		if (bad_status(chdir(tokens[1])))
+			return (ms_perror("minishell:", "cd:", strerror(errno), errno));
 		pwd = get_var_content(var, "PWD");
 		if (!pwd)
 			ms_exit(var, ms_perror("", strerror(errno), "", errno));
-		modify_var_content(var, "OLD_PWD", pwd);
+		modify_var_content(var, "OLDPWD", pwd);
 		modify_var_content(var, "PWD", tokens[1]);
 		memlist_free_ptr(&var->memlist, pwd);
 	}

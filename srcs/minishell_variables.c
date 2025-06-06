@@ -72,7 +72,7 @@ char	*get_var_content(t_var *var, char *variable)
 	head = var->varlist;
 	while (head != NULL)
 	{
-		if (ft_strcmp(head->var_name, variable))
+		if (ft_strcmp(head->var_name, variable) == 0)
 			return (head->content);
 		head = head->next;
 	}
