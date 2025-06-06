@@ -52,6 +52,7 @@ void	ms_free_ptrs(t_var *var)
 		free(var->line);
 	if (var->pipes)
 		free(var->pipes);
+	memlist_free_all(&var->memlist);
 }
 
 void	ms_exit(t_var *var, int exit_code)
@@ -66,6 +67,5 @@ void	ms_exit(t_var *var, int exit_code)
 	ms_free_ptrs(var);
 	if (!exit_code)
 		ft_putendl_fd("exit", STDOUT_FILENO);
-	memlist_free_all(&var->memlist);
 	exit(exit_code);
 }

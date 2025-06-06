@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   builtins.c                                         :+:      :+:    :+:   */
+/*   minishell_builtins.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: frey-gal <frey-gal@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 18:46:47 by frey-gal          #+#    #+#             */
-/*   Updated: 2025/05/14 22:55:45 by frey-gal         ###   ########.fr       */
+/*   Updated: 2025/06/06 04:43:39 by frey-gal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,9 +49,9 @@ char	*getenv_plus(t_manager **memlist, char *var)
 	if (env_var)
 		return (env_var);
 	return (NULL);
-}
+}*/
 
-char	*getcwd_plus(t_manager **memlist)
+char	*getcwd_plus(t_var *var)
 {
 	char	cwd[4096];
 	char	*path;
@@ -59,62 +59,71 @@ char	*getcwd_plus(t_manager **memlist)
 	if (!getcwd(cwd, sizeof(cwd)))
 		return (NULL);
 	if (ft_strlen(cwd) == 1 && *cwd == '/')
-		path = memlist_add(memlist, ft_strdup(cwd));
+		path = memlist_add(&var->memlist, ft_strdup(cwd));
 	else
-		path = memlist_add(memlist, ft_strjoin(cwd, "/"));
+		path = memlist_add(&var->memlist, ft_strjoin(cwd, "/"));
 	if (!path)
 		return (NULL);
 	return (path);
 }
 
-void	ft_pwd(t_manager **memlist, )
+int		ft_pwd(t_var *var)
 {
-	char	*cwd = getcwd_plus();
-
-	if (!cwd)
-		kill_and_exit(memlist, EXIT_FAILURE, "getcwd failure: ");
-	printf("%s\n" cwd);
-}
-
-void	ft_cd(t_manager **memlist, char *path)
-{
-	char	*home;
-	char	*abs_argument;
 	char	*cwd;
-	char	*prev_cwd;
-	int		status;
-
-	cwd = getcwd_plus(memlist);
+	
+	cwd = getcwd_plus(var);
 	if (!cwd)
-		kill_and_exit(memlist, EXIT_FAILURE, "getcwd failure: ");
-	prev_cwd = ft_strdup(cwd);
-	if (!prev_cwd)
-		kill_and_exit(memlist, EXIT_FAILURE, "Malloc failure: ");
-	home = getenv_plus("HOME");
-	if (!home)
-		home = memlist_add(t_manager **memlist, ft_strdup("/home/frey-gal"));
-	if (!home)
-		kill_and_exit(memlist, EXIT_FAILURE, "Malloc failure: ");
-	if (argument == NULL)
-		status = chdir(home);
-	else if (ft_strncmp(argument, "-\0", 2) == 0)
-		status = chdir(prev_cwd);
-	else
-		status = chdir(argument);
-	if (status = EACCESS || EFAULT || EIO || ELOOP || ENAMETOOLONG || ENOENT
-		|| ENOMEM || ENOTDIR || -1)
-		kill_and_exit(memlist, EXIT_FAILURE, "cd: ");
-	prev_cwd = ft_strdup(cwd);
-	if (!prev_cwd)
-		kill_and_exit(memlist, EXIT_FAILURE, "Malloc failure: ");
-	cwd = getcwd_plus(memlist);
-	if (!cwd)
-		kill_and_exit(memlist, EXIT_FAILURE, "getcwd failure: ");
-	memlist_free_ptr(home);
+		return (0);
+	printf("mine %s\n", cwd);
+	memlist_free_ptr(&var->memlist, cwd);
+	return (1);
 }
-// TODO: Incorporate home, cwd and prevcwd variables into main program struct
-// NOTE: This will make the function look way cleaner
 
+int	ft_cd(t_var *var, char **tokens)
+{
+	int		status;
+	char	*home;
+	char	*pwd;
+
+	if (!tokens[1])
+	{
+		home = get_var(var, "HOME");
+		if (!home)
+			return (ms_perror("minishell: ", "cd: ", "HOME not set", 1));
+		status = chdir(home);
+		if (/*status == EACCESS || */status == EFAULT || status == EIO
+			|| status == ELOOP || status == ENAMETOOLONG || status == ENOENT
+			|| status == ENOMEM || status == ENOTDIR || status == -1)
+			return (ms_perror("", strerror(errno), "", errno));
+		pwd = get_var(var, "PWD");
+		if (!pwd)
+			ms_exit(var, ms_perror("", strerror(errno), "", errno));
+		modify_var(var, "OLD_PWD", pwd);
+		modify_var(var, "PWD", home);
+		memlist_free_ptr(&var->memlist, home);
+		memlist_free_ptr(&var->memlist, pwd);
+		return (1);
+	}
+	else if (tokens[3])
+		return (ms_perror("minishell: ", "cd: ", "too many arguments", 1));
+	else
+	{
+		status = chdir(tokens[2]);
+		if (/*status == EACCESS || */status == EFAULT || status == EIO
+			|| status == ELOOP || status == ENAMETOOLONG || status == ENOENT
+			|| status == ENOMEM || status == ENOTDIR || status == -1)
+			return (ms_perror("", strerror(errno), "", errno));
+		pwd = get_var(var, "PWD");
+		if (!pwd)
+			ms_exit(var, ms_perror("", strerror(errno), "", errno));
+		modify_var(var, "OLD_PWD", pwd);
+		modify_var(var, "PWD", tokens[2]);
+		memlist_free_ptr(&var->memlist, pwd);
+	}
+	return (1);
+}
+
+/*
 void	ft_export(t_manager **memlist, char *tokens) //NOTE: NEED TO DO VARS
 {
 	

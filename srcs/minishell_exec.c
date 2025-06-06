@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   minishell.c                                        :+:      :+:    :+:   */
+/*   minishell_exec.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: miggarc2 <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 19:02:08 by miggarc2          #+#    #+#             */
-/*   Updated: 2025/05/07 22:34:38 by miggarc2         ###   ########.fr       */
+/*   Updated: 2025/06/06 04:44:30 by frey-gal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,11 +37,14 @@ _Bool	ms_exec_builtins(t_var *var, int i)
 	if (ft_strncmp(var->cmds[i][0], "echo", 5) == 0
 		|| ft_strncmp(var->cmds[i][0], "/usr/bin/echo", 5) == 0)
 		ft_echo(var->cmds[i]);
-/*
 	else if (ft_strncmp(var->cmds[i][0], "cd", 3) == 0)
 		ft_cd(var, var->cmds[i]);
 	else if (ft_strncmp(var->cmds[i][0], "pwd", 4) == 0)
-		ft_pwd();
+	{
+	printf("hello");
+		ft_pwd(var);
+}
+	/*
 	else if (ft_strncmp(var->cmds[i][0], "export", 7) == 0)
 		ft_export(var, var->cmds[i]);
 	else if (ft_strncmp(var->cmds[i][0], "unset", 6) == 0)

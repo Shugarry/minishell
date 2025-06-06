@@ -6,7 +6,7 @@
 /*   By: miggarc2 <miggarc2@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 17:10:44 by miggarc2          #+#    #+#             */
-/*   Updated: 2025/05/07 21:16:01 by miggarc2         ###   ########.fr       */
+/*   Updated: 2025/06/06 04:37:40 by frey-gal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,10 +56,10 @@ typedef struct s_var
 	char	**env;
 	char	**paths;
 	char	***cmds;
-	t_manager	*memlist;
-	t_varlist	*varlist;
 	char	pwd[4096];
 	int		exit_code;
+	t_manager	*memlist;
+	t_varlist	*varlist;
 }			t_var;
 
 // minishell_exec.c
@@ -96,10 +96,17 @@ int		memlist_free_ptr(t_manager **memlist, void *ptr);
 
 // minishell_builtins.c
 void	ft_echo(char **tokens);
-//void	ft_cd(t_manager **memlist, char *path);
-//void	ft_pwd(t_manager **memlist, t_varlist **varlist);
+int		ft_cd(t_var *var, char **tokens);
+int		ft_pwd(t_var *var);
 //void	ft_export(t_manager **memlist, char *tokens, t_varlist **varlist);
 //void	ft_unset(t_manager **memlist, t_varlist **varlist);
+
+// minishell_variables.c
+void	add_var_node(t_var *var, char *var_name, char *content);
+int		remove_var_node(t_var *var, char *var_name);
+void	create_var_list(t_var *var, char **env);
+char	*get_var(t_var *var, char *variable);
+int		modify_var(t_var *var, char *var_name, char *new_content);
 
 // temporary function for exiting program, gotta join it with miguels
 //void	kill_and_exit(t_manager **memlist, int status, char *message);
