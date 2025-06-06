@@ -12,7 +12,7 @@
 
 #include "../minishell.h"
 
-void	add_var_node(t_var *var, char *var_name, char *content)
+int	add_var_node(t_var *var, char *var_name, char *content)
 {
 	t_varlist	*node;
 
@@ -32,6 +32,7 @@ void	add_var_node(t_var *var, char *var_name, char *content)
 		node->content = NULL;
 	node->next = var->varlist;
 	var->varlist = node;
+	return (1);
 }
 
 int	remove_var_node(t_var *var, char *var_name)
@@ -40,7 +41,7 @@ int	remove_var_node(t_var *var, char *var_name)
 	t_varlist	*curr;
 
 	prev = var->varlist;
-	if (ft_strncmp(prev->var_name, var_name, ft_strlen(var_name) + 1 == 0))
+	if (ft_strcmp(prev->var_name, var_name) == 0)
 	{
 		var->varlist = var->varlist->next;
 		memlist_free_ptr(&var->memlist, prev->content);
@@ -50,7 +51,7 @@ int	remove_var_node(t_var *var, char *var_name)
 	curr = var->varlist->next;
 	while (curr)
 	{
-		if (ft_strncmp(curr->var_name, var_name, ft_strlen(var_name) + 1 == 0))
+		if (ft_strcmp(curr->var_name, var_name) == 0)
 		{
 			prev->next = curr->next;
 			memlist_free_ptr(&var->memlist, curr->var_name);
@@ -64,29 +65,30 @@ int	remove_var_node(t_var *var, char *var_name)
 	return (0);
 }
 
-char	*get_var(t_var *var, char *variable)
+char	*get_var_content(t_var *var, char *variable)
 {
 	t_varlist *head;
 
 	head = var->varlist;
 	while (head != NULL)
 	{
-		if (ft_strncmp(head->var_name, variable, ft_strlen(head->var_name)) == 0)
+		if (ft_strcmp(head->var_name, variable))
 			return (head->content);
+		head = head->next;
 	}
 	return (NULL);
 }
 
-int		modify_var(t_var *var, char *var_name, char *new_content)
+int		modify_var_content(t_var *var, char *var_name, char *new_content)
 {
 	t_varlist	*curr;
 
 	curr = var->varlist;
 	while (curr)
 	{
-		if (ft_strncmp(curr->var_name, var_name, ft_strlen(var_name) + 1 == 0))
+		if (ft_strcmp(curr->var_name, var_name) == 0)
 		{
-			free(curr->content);
+			memlist_free_ptr(&var->memlist, curr->content);
 			curr->content = NULL;
 			if (new_content)
 				curr->content = (char *)memlist_add(&var->memlist, ft_strdup(new_content));
@@ -96,7 +98,7 @@ int		modify_var(t_var *var, char *var_name, char *new_content)
 		}
 		curr = curr->next;
 	}
-	return 0;
+	return (add_var_node(var, var_name, new_content));
 }
 
 void	create_var_list(t_var *var, char **env)
@@ -106,6 +108,7 @@ void	create_var_list(t_var *var, char **env)
 	int			i;
 
 	i = 0;
+	var->varlist = NULL;
 	while (env[i] != NULL)
 	{
 		env_var = (char *)memlist_add(&var->memlist, ft_strdup(env[i]));

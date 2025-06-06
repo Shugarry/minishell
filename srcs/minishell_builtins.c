@@ -40,7 +40,7 @@ void	ft_echo(char **tokens)
 		printf("\n");
 }
 
-/*
+/* // NOTE: Probably wont use considering i have get_var_content from my own linked list
 char	*getenv_plus(t_manager **memlist, char *var)
 {
 	char	*env_var;
@@ -74,7 +74,7 @@ int		ft_pwd(t_var *var)
 	cwd = getcwd_plus(var);
 	if (!cwd)
 		return (0);
-	printf("mine %s\n", cwd);
+	printf("%s\n", cwd);
 	memlist_free_ptr(&var->memlist, cwd);
 	return (1);
 }
@@ -87,64 +87,107 @@ int	ft_cd(t_var *var, char **tokens)
 
 	if (!tokens[1])
 	{
-		home = get_var(var, "HOME");
+		home = get_var_content(var, "HOME");
 		if (!home)
 			return (ms_perror("minishell: ", "cd: ", "HOME not set", 1));
 		status = chdir(home);
-		if (/*status == EACCESS || */status == EFAULT || status == EIO
+		if (status == EACCES || status == EFAULT || status == EIO
 			|| status == ELOOP || status == ENAMETOOLONG || status == ENOENT
 			|| status == ENOMEM || status == ENOTDIR || status == -1)
 			return (ms_perror("", strerror(errno), "", errno));
-		pwd = get_var(var, "PWD");
+		pwd = get_var_content(var, "PWD");
 		if (!pwd)
 			ms_exit(var, ms_perror("", strerror(errno), "", errno));
-		modify_var(var, "OLD_PWD", pwd);
-		modify_var(var, "PWD", home);
+		modify_var_content(var, "OLD_PWD", pwd);
+		modify_var_content(var, "PWD", home);
 		memlist_free_ptr(&var->memlist, home);
 		memlist_free_ptr(&var->memlist, pwd);
 		return (1);
 	}
-	else if (tokens[3])
+	else if (tokens[2] != NULL)
 		return (ms_perror("minishell: ", "cd: ", "too many arguments", 1));
 	else
 	{
-		status = chdir(tokens[2]);
-		if (/*status == EACCESS || */status == EFAULT || status == EIO
+		status = chdir(tokens[1]);
+		if (status == EACCES || status == EFAULT || status == EIO
 			|| status == ELOOP || status == ENAMETOOLONG || status == ENOENT
 			|| status == ENOMEM || status == ENOTDIR || status == -1)
 			return (ms_perror("", strerror(errno), "", errno));
-		pwd = get_var(var, "PWD");
+		pwd = get_var_content(var, "PWD");
 		if (!pwd)
 			ms_exit(var, ms_perror("", strerror(errno), "", errno));
-		modify_var(var, "OLD_PWD", pwd);
-		modify_var(var, "PWD", tokens[2]);
+		modify_var_content(var, "OLD_PWD", pwd);
+		modify_var_content(var, "PWD", tokens[1]);
 		memlist_free_ptr(&var->memlist, pwd);
 	}
 	return (1);
 }
 
-/*
-void	ft_export(t_manager **memlist, char *tokens) //NOTE: NEED TO DO VARS
+
+void	ft_export(t_var *var, char **tokens)
 {
-	
+	int			i;
+	char		*var_name;
+	char		*content;
+	t_varlist	*tmp;
+
+	i = 1;
+	if (!tokens[i])
+	{
+		tmp = var->varlist;
+		while(tmp != NULL)
+		{
+			if (tmp->content != NULL)
+				printf("declare -x %s=\"%s\"\n", tmp->var_name, tmp->content);
+			else
+				printf("declare -x %s\n", tmp->var_name);
+			tmp = tmp->next;
+		}
+	}
+	while (tokens[i])
+	{
+		var_name = memlist_add(&var->memlist, ft_strdup(tokens[i]));
+		if (!var_name)
+			ms_exit(var, ms_perror("", strerror(errno), "", errno));
+		content = ft_strchr(var_name, '=');
+		if (!content)
+			modify_var_content(var, var_name, NULL);
+		content[0] = '\0';
+		if (content[1] == '\0')
+		{
+			printf("content %s\n", content);
+			modify_var_content(var, var_name, "\0");
+		}
+		else
+		{
+			content++;
+			modify_var_content(var, var_name, content);
+		}
+		i++;
+	}
 }
 
-void	ft_unset(t_manager **memlist, ) // NOTE: Can't do it until shell variables are defined
-{
-	
-}
-
-void	ft_env(t_manager **memlist, char **env)
+void	ft_unset(t_var *var, char **tokens)
 {
 	int	i;
 
-	i = 0;
-	// TODO: Make function to create own ENV
-	while(env && env[i])
-		printf("%s\n", env[i]);
+	i = 1;
+	while (tokens[i])
+	{
+		remove_var_node(var, tokens[i]);
+		i++;
+	}
 }
-void	builtin_exit(t_manager **memlist)
+
+void	ft_env(t_var *var)
 {
-	kill_and_exit(memlist, EXIT_SUCCESS, NULL);
+	t_varlist	*tmp;
+
+	tmp = var->varlist;
+	while(tmp != NULL)
+	{
+		if (tmp->content)
+			printf("%s=%s\n", tmp->var_name, tmp->content);
+		tmp = tmp->next;
+	}
 }
-*/

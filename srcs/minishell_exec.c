@@ -34,25 +34,26 @@ void	ft_exec_child(t_var *var, int i, int end)
 
 _Bool	ms_exec_builtins(t_var *var, int i)
 {
-	if (ft_strncmp(var->cmds[i][0], "echo", 5) == 0
-		|| ft_strncmp(var->cmds[i][0], "/usr/bin/echo", 5) == 0)
+	char	*stripped_cmd;
+
+	stripped_cmd = ft_strrchr(var->cmds[i][0], '/');
+	if (!stripped_cmd)
+		stripped_cmd = var->cmds[i][0];
+	else
+		stripped_cmd++;
+	if (ft_strncmp(stripped_cmd, "echo", 5) == 0)
 		ft_echo(var->cmds[i]);
-	else if (ft_strncmp(var->cmds[i][0], "cd", 3) == 0)
+	else if (ft_strncmp(stripped_cmd, "cd", 3) == 0)
 		ft_cd(var, var->cmds[i]);
-	else if (ft_strncmp(var->cmds[i][0], "pwd", 4) == 0)
-	{
-	printf("hello");
+	else if (ft_strncmp(stripped_cmd, "pwd", 3) == 0)
 		ft_pwd(var);
-}
-	/*
-	else if (ft_strncmp(var->cmds[i][0], "export", 7) == 0)
+	else if (ft_strncmp(stripped_cmd, "export", 7) == 0)
 		ft_export(var, var->cmds[i]);
-	else if (ft_strncmp(var->cmds[i][0], "unset", 6) == 0)
+	else if (ft_strncmp(stripped_cmd, "unset", 6) == 0)
 		ft_unset(var, var->cmds[i]);
-	else if (ft_strncmp(var->cmds[i][0], "env", 4) == 0)
+	else if (ft_strncmp(stripped_cmd, "env", 4) == 0)
 		ft_env(var);
-	else */
-	if (ft_strncmp(var->cmds[i][0], "exit", 5) == 0)
+	else if (ft_strncmp(stripped_cmd, "exit", 5) == 0)
 	{
 		if (var->cmds[i][1])
 			ms_exit(var, ft_atoi(var->cmds[i][1]));

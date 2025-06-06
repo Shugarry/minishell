@@ -98,15 +98,16 @@ int		memlist_free_ptr(t_manager **memlist, void *ptr);
 void	ft_echo(char **tokens);
 int		ft_cd(t_var *var, char **tokens);
 int		ft_pwd(t_var *var);
-//void	ft_export(t_manager **memlist, char *tokens, t_varlist **varlist);
-//void	ft_unset(t_manager **memlist, t_varlist **varlist);
+void	ft_export(t_var *var, char **tokens);
+void	ft_unset(t_var *var, char **tokens);
+void	ft_env(t_var *var);
 
 // minishell_variables.c
-void	add_var_node(t_var *var, char *var_name, char *content);
+int		add_var_node(t_var *var, char *var_name, char *content);
 int		remove_var_node(t_var *var, char *var_name);
 void	create_var_list(t_var *var, char **env);
-char	*get_var(t_var *var, char *variable);
-int		modify_var(t_var *var, char *var_name, char *new_content);
+char	*get_var_content(t_var *var, char *variable);
+int		modify_var_content(t_var *var, char *var_name, char *new_content);
 
 // temporary function for exiting program, gotta join it with miguels
 //void	kill_and_exit(t_manager **memlist, int status, char *message);
