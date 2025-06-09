@@ -101,6 +101,13 @@ int		modify_var_content(t_var *var, char *var_name, char *new_content)
 	return (add_var_node(var, var_name, new_content));
 }
 
+/*
+void	var_sh_lvl(t_var *var, int sh_lvl)
+{
+	
+}
+*/
+
 void	create_var_list(t_var *var, char **env)
 {
 	char		*env_var;
@@ -114,6 +121,8 @@ void	create_var_list(t_var *var, char **env)
 		env_var = (char *)memlist_add(&var->memlist, ft_strdup(env[i]));
 		if (!env_var)
 			ms_exit(var, ms_perror("", strerror(errno), "", errno));
+	//	else if (ft_strcmp(env_var, "SHLVL"))
+	//		var_sh_lvl(var, ft_atoi(var_content));
 		var_content = ft_strchr(env_var, '=');
 		var_content[0] = '\0';
 		var_content++;

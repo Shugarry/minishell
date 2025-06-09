@@ -28,7 +28,10 @@ void	ms_clean(char **var_ptr)
 	{
 		i = 0;
 		while (var_ptr[i])
-			free(var_ptr[i++]);
+		{
+			free(var_ptr[i]);
+			i++;
+		}
 		free(var_ptr);
 	}
 }

@@ -95,6 +95,8 @@ void	ms_start_mini(t_var *var)
 				add_history(var->line);
 			if (token_count <= 0)
 				continue ;
+			if (var->tokens)
+				ms_clean(var->tokens);
 			var->tokens = (char **)ft_calloc(token_count + 1, sizeof(char *));
 			if (!var->tokens)
 				ms_exit(var, ms_perror("", strerror(errno), "", errno));
@@ -136,6 +138,7 @@ int	main(int ac, char **av, char **env)
 		ms_exit(&var, ms_perror("", "usage: ./minishell", "", 1));
 	if (!env || !*env)
 		ms_exit(&var, ms_perror("", "env not found", "", 1));
+	var.tokens = NULL;
 	var.env = env;
 	var.paths = ft_split(getenv("PATH"), ':');
 	create_var_list(&var, env);
