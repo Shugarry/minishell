@@ -75,6 +75,8 @@ int	ms_pipex(t_var *var, int end)
 	pid_t	child;
 
 	i = -1;
+	child = -1;
+	status = 0;
 	while (var->cmds[++i])
 	{
 		if (i < end && pipe(&var->pipes[2 * i]) < 0)
