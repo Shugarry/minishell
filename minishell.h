@@ -38,11 +38,14 @@ typedef struct s_var
 	int		*pipes;
 	int		fd_in;
 	int		fd_out;
+	int		pipe_count;
+	int		cmd_count;
+	int		token_count;
+	char	***cmds;
+	char	**cmd_splitters;
 	char	**tokens;
-	char	**args;
 	char	**env;
 	char	**paths;
-	char	***cmds;
 	char	pwd[4096];
 	int		exit_code;
 }			t_var;
@@ -53,9 +56,9 @@ _Bool	ms_exec_builtins(t_var *var, int i);
 int		ms_pipex(t_var *var, int end);
 
 // minishell_init.c
-char	*ft_cmd_resolve(t_var *var, int i);
-_Bool	ms_start_args(t_var *var, int cmd_count);
-void	ms_start_mini(t_var *var);
+void	ms_cmd_resolve(t_var *var, int i);
+_Bool	ms_cmd_filler(t_var *var);
+_Bool	ms_start_args(t_var *va);
 int		main(int ac, char **av, char **env);
 
 // minishell_signals.c
@@ -63,13 +66,14 @@ void	ms_signal_handle(int sig);
 void	ms_signal_handle_child(int sig);
 
 // minishell_tokens.c
-int		ms_special_token_len(char *line, int i);
-int		ms_regular_token_len(char *line, int i);
-int		ms_fill_tokens(char *line, char **tokens);
-int		ms_token_counter(t_var *var);
+int		ms_regular_token_check(char *line);
+int		ms_special_token_check(char *line, t_var *var);
+_Bool	ms_token_counter(char *line, t_var *var);
+_Bool		ms_token_filler(char *line, char **tokens);
 
 // minishell_utils.c
 int		ms_perror(char *err1, char *err2, char *err3, int err_no);
+void	ms_free_ptrs(t_var *var);
 void	ms_clean(char **var_ptr);
 void	ms_exit(t_var *var, int exit_code);
 

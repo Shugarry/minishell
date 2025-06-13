@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-int	ms_regular_token_len(char *line, int i)
+int	ms_regular_token_check(char *line)
 {
 	int		len;
 	char	quote;
@@ -28,7 +28,6 @@ int	ms_regular_token_len(char *line, int i)
 			if (!line[len])
 			{
 				ms_perror(&quote, ": error quotes must be closed", "", 1);
-				free(line - i);
 				return (-1);
 			}
 		}
@@ -37,7 +36,7 @@ int	ms_regular_token_len(char *line, int i)
 	return (&line[len] - line);
 }
 
-int	ms_special_token_len(char *line, int i)
+int	ms_special_token_check(char *line, t_var *var)
 {
 	char	token;
 
@@ -46,13 +45,16 @@ int	ms_special_token_len(char *line, int i)
 		token == '\\' || token == ';' || token == '`')
 	{
 		ms_perror("syntax error near unexpected token `", &token, "'", 1);
-		free(line - i);
 		return (-1);
 	}
 	if (token == '|' || token == '&' || token == '<' || token == '>')
 	{
+		if (var && (token == '|' || token == '&'))
+			var->cmd_count++;
 		if (line[0] == line[1])
 			return (2);
+		if (var && token == '|')
+			var->pipe_count++;
 		return (1);
 	}
 	if (line[0] == '(' || line[0] == ')')
@@ -60,7 +62,36 @@ int	ms_special_token_len(char *line, int i)
 	return (0);
 }
 
-int	ms_fill_tokens(char *line, char **tokens)
+_Bool	ms_token_counter(char *line, t_var *var)
+{
+	int	i;
+	int	token_len;
+
+	i = 0;
+	var->token_count = 0;
+	if (var->pipe_count)
+		var->pipe_count = 0;
+	while (line[i])
+	{
+		while (line[i] == ' ')
+			i++;
+		if (line[i])
+			var->token_count++;
+		token_len = ms_special_token_check(&line[i], var);
+		if (token_len < 0)
+			return (1);
+		i += token_len;
+		if (token_len > 0)
+			continue ;
+		token_len = ms_regular_token_check(&line[i]);
+		if (token_len < 0)
+			return (1);
+		i += token_len;
+	}
+	return (0);
+}
+
+_Bool	ms_token_filler(char *line, char **tokens)
 {
 	int	token_len;
 
@@ -70,48 +101,20 @@ int	ms_fill_tokens(char *line, char **tokens)
 			line++;
 		if (!*line)
 			break ;
-		token_len = ms_special_token_len(line, 0);
+		token_len = ms_special_token_check(line, NULL);
 		if (token_len < 0)
-			return (-1);
+			return (1);
 		else if (token_len > 0)
 		{
 			*tokens++ = ft_substr(line, 0, token_len);
 			line += token_len;
 			continue ;
 		}
-		token_len = ms_regular_token_len(line, 0);
+		token_len = ms_regular_token_check(line);
 		if (token_len < 0)
-			return (-1);
+			return (1);
 		*tokens++ = ft_substr(line, 0, token_len);
 		line += token_len;
 	}
 	return (0);
-}
-
-int	ms_token_counter(t_var *var)
-{
-	int	i;
-	int	token_len;
-	int	token_count;
-
-	i = 0;
-	token_count = 0;
-	while (var->line[i])
-	{
-		while (var->line[i] == ' ')
-			i++;
-		if (var->line[i])
-			token_count++;
-		token_len = ms_special_token_len(&var->line[i], i);
-		if (token_len < 0)
-			return (-1);
-		i += token_len;
-		if (token_len > 0)
-			continue ;
-		token_len = ms_regular_token_len(&var->line[i], i);
-		if (token_len < 0)
-			return (-1);
-		i += token_len;
-	}
-	return (token_count);
 }

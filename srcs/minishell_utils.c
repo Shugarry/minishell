@@ -37,21 +37,26 @@ void	ms_free_ptrs(t_var *var)
 {
 	int	i;
 
-	i = 0;
+	if (var->pipes)
+		free(var->pipes);
+	if (var->tokens)
+		free(var->tokens);
 	if (var->cmds)
 	{
+		i = 0;
 		while (var->cmds[i])
 			ms_clean(var->cmds[i++]);
 		free(var->cmds);
 	}
-	if (var->tokens)
-		ms_clean(var->tokens);
-	if (var->paths)
-		ms_clean(var->paths);
+	if (var->cmd_splitters)
+		ms_clean(var->cmd_splitters);
 	if (var->line)
 		free(var->line);
-	if (var->pipes)
-		free(var->pipes);
+	var->pipes = NULL;
+	var->tokens = NULL;
+	var->cmds = NULL;
+	var->cmd_splitters = NULL;
+	var->line = NULL;
 }
 
 void	ms_exit(t_var *var, int exit_code)
@@ -64,7 +69,10 @@ void	ms_exit(t_var *var, int exit_code)
 	if (var->fd_out > 0)
 		close(var->fd_out);
 	ms_free_ptrs(var);
+	if (var->paths)
+		ms_clean(var->paths);
 	if (!exit_code)
 		ft_putendl_fd("exit", STDOUT_FILENO);
+	rl_clear_history();
 	exit(exit_code);
 }
