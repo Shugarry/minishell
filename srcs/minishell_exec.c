@@ -12,19 +12,18 @@
 
 #include "minishell.h"
 
-void	ft_exec_child(t_var *var, int i, int end)
+void	ft_exec_child(t_var *var, int i, int pipes)
 {
-	(void)end;
-	if (i < end)
+	if (i < pipes)
 		close(var->pipes[2 * i]);
-/*	if (i == 0 && dup2(var->fd_in, STDIN_FILENO) < 0)
+	if (var->fd_in && dup2(var->fd_in, STDIN_FILENO) < 0)
 		ms_exit(var, 1);
-	else */if (i > 0 && dup2(var->pipes[2 * i - 2], STDIN_FILENO) < 0)
+	if (i > 0 && dup2(var->pipes[2 * i - 2], STDIN_FILENO) < 0)
 		ms_exit(var, 1);
-	if (i < end && dup2(var->pipes[2 * i + 1], STDOUT_FILENO) < 0)
+	if (var->fd_out && dup2(var->fd_out, STDOUT_FILENO) < 0)
 		ms_exit(var, 1);
-//	else if (i == end && dup2(var->fd_out, STDOUT_FILENO) < 0)
-//		ms_exit(var, 1);
+	if (i < pipes && dup2(var->pipes[2 * i + 1], STDOUT_FILENO) < 0)
+		ms_exit(var, 1);
 	if (var->cmds[i][0] == NULL)
 		ms_exit(var, ms_perror("", "permission denied: ", "", 126));
 	
@@ -34,43 +33,44 @@ void	ft_exec_child(t_var *var, int i, int end)
 
 _Bool	ms_exec_builtins(t_var *var, int i)
 {
-/*	if (ft_strncmp(var->cmds[i][0], "echo", 5) == 0)
-	{
-		if (var->cmds[i][1] && ft_strncmp(var->cmds[i][1], "-n", 3) == 0)
-			ft_echo(var->cmds[i], 1);
-		else
-			ft_echo(var->cmds[i], 0);
-	}
-	else if (ft_strncmp(var->cmds[i][0], "cd", 3) == 0)
+	char	*stripped_cmd;
+
+	stripped_cmd = ft_strrchr(var->cmds[i][0], '/');
+	if (!stripped_cmd)
+		stripped_cmd = var->cmds[i][0];
+	else
+		stripped_cmd++;
+	if (ft_strncmp(stripped_cmd, "echo", 5) == 0)
+		ms_echo(var->cmds[i]);
+/*	else if (ft_strncmp(stripped_cmd, "cd", 3) == 0)
 		ft_cd(var, var->cmds[i]);
-	else if (ft_strncmp(var->cmds[i][0], "pwd", 4) == 0)
+	else if (ft_strncmp(stripped_cmd, "pwd", 4) == 0)
 		ft_pwd();
-	else if (ft_strncmp(var->cmds[i][0], "export", 7) == 0)
+	else if (ft_strncmp(stripped_cmd, "export", 7) == 0)
 		ft_export(var, var->cmds[i]);
-	else if (ft_strncmp(var->cmds[i][0], "unset", 6) == 0)
+	else if (ft_strncmp(stripped_cmd, "unset", 6) == 0)
 		ft_unset(var, var->cmds[i]);
-	else if (ft_strncmp(var->cmds[i][0], "env", 4) == 0)
+	else if (ft_strncmp(stripped_cmd, "env", 4) == 0)
 		ft_env(var);
-	else */if (ft_strncmp(var->cmds[i][0], "exit", 5) == 0)
+*/	else if (ft_strncmp(stripped_cmd, "exit", 5) == 0)
 		ms_exit(var, 0);
-	else if (ft_strncmp(var->cmds[i][0], "$?", 3) == 0)
-		ft_printf("%d\n", var->exit_code);
 	else
 		return (0);
 	var->exit_code = 0;
 	return (1);
 }
 
-int	ms_pipex(t_var *var, int end)
+int	ms_pipex(t_var *var)
 {
 	int		i;
 	int		status;
 	pid_t	child;
 
 	i = -1;
+	child = 0;
 	while (var->cmds[++i])
 	{
-		if (i < end && pipe(&var->pipes[2 * i]) < 0)
+		if (i < var->pipe_count && pipe(&var->pipes[2 * i]) < 0)
 			ms_exit(var, ms_perror("", strerror(errno), "", errno));
 		if (var->cmds[i][0] && !ms_exec_builtins(var, i))
 		{
@@ -80,9 +80,9 @@ int	ms_pipex(t_var *var, int end)
 			if (child < 0)
 				ms_exit(var, ms_perror("", strerror(errno), "", errno));
 			else if (child == 0)
-				ft_exec_child(var, i, end);
+				ft_exec_child(var, i, var->pipe_count);
 		}
-		if (i < end)
+		if (i < var->pipe_count)
 			close(var->pipes[2 * i + 1]);
 	}
 	while (i-- > 0)
@@ -91,6 +91,80 @@ int	ms_pipex(t_var *var, int end)
 			var->exit_code = WEXITSTATUS(status);
 		if (i > 0)
 			close(var->pipes[2 * (i - 1)]);
+	}
+	return (var->exit_code);
+}
+
+void	ms_open_heredoc(t_var *var, char *limit, size_t limit_len)
+{
+	char	*line;
+	int		here_fd;
+
+	here_fd = open(".here_doc", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (here_fd < 0)
+		ms_exit(var, ms_perror("", strerror(errno), "\n", errno));
+	while (1)
+	{
+		ft_putstr_fd("> ", STDOUT_FILENO);
+		line = get_next_line(STDIN_FILENO);
+		if (!line)
+			break ;
+		if (ft_strncmp(line, limit, limit_len) == 0 && line[limit_len] == '\n')
+		{
+			close(STDIN_FILENO);
+			free(line);
+			line = get_next_line(STDIN_FILENO);
+			break ;
+		}
+		else
+			ft_putstr_fd(line, here_fd);
+		free(line);
+	}
+	close(here_fd);
+	var->fd_in = open(".here_doc", O_RDONLY);
+}
+
+int	ms_exec_cmds(t_var *var)
+{
+	int	i;
+	int	j;
+
+	i = -1;
+	while (var->cmds[++i])
+	{
+		j = -1;
+		while (var->cmds[i][++j])
+		{
+			if (!ft_strncmp(var->cmds[i][j], ">", 1))
+			{
+				if (var->fd_out > 0)
+					close(var->fd_out);
+				if (!ft_strncmp(var->cmds[i][j], ">", 2))
+					var->fd_out = open(var->cmds[i][j + 1], \
+						O_WRONLY | O_CREAT | O_TRUNC, 0644);
+				else
+					var->fd_out = open(var->cmds[i][j + 1], \
+						O_WRONLY | O_CREAT | O_APPEND, 0644);
+				if (var->fd_out < 0)
+					ms_perror(strerror(errno), ": ", var->cmds[i][j + 1], 1);
+				var->cmds[i][j] = NULL;
+				var->cmds[i][j + 1] = NULL;
+			}
+			else if (!ft_strncmp(var->cmds[i][j], "<", 1))
+			{
+				if (access(".here_doc", F_OK) == 0)
+					unlink(".here_doc");
+				if (var->fd_in > 0)
+					close(var->fd_in);
+				if (!ft_strncmp(var->cmds[i][j], "<", 2))
+					var->fd_in = open(var->cmds[i][j + 1], O_RDONLY);
+				else
+					ms_open_heredoc(var, var->cmds[i][j + 1], ft_strlen(var->cmds[i][j + 1]));
+				if (var->fd_in < 0)
+					ms_perror(strerror(errno), ": ", var->cmds[i][j + 1], 1);
+				var->cmds[i][j] = NULL;
+			}
+		}
 	}
 	return (var->exit_code);
 }

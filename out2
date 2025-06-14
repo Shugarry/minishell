@@ -1,3 +1,9 @@
+hola
+adios
+exit
+exit
+exit
+hola3
 # **************************************************************************** #
 #                                                                              #
 #                                                         :::      ::::::::    #
@@ -20,8 +26,8 @@ RM			= rm -f
 
 # ================================== SOURCES ================================== #
 
-SRC			= $(addprefix srcs/minishell_, exec.c builtins.c init.c signals.c \
-				tokens.c utils.c)
+SRC			= $(addprefix srcs/minishell_, exec.c init.c signals.c tokens.c \
+				utils.c)
 
 OBJ			= $(SRC:.c=.o)
 

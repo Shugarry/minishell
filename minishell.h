@@ -33,7 +33,6 @@ extern volatile sig_atomic_t	g_signal_code;
 
 typedef struct s_var
 {
-	_Bool	hdoc;
 	char	*line;
 	int		*pipes;
 	int		fd_in;
@@ -51,9 +50,12 @@ typedef struct s_var
 }			t_var;
 
 // minishell_exec.c
-void	ft_exec_child(t_var *var, int i, int end);
+void	ft_exec_child(t_var *var, int i, int pipes);
 _Bool	ms_exec_builtins(t_var *var, int i);
-int		ms_pipex(t_var *var, int end);
+int		ms_pipex(t_var *var);
+
+// minishell_builtins.c
+void	ms_echo(char **tokens);
 
 // minishell_init.c
 void	ms_cmd_resolve(t_var *var, int i);
@@ -69,7 +71,7 @@ void	ms_signal_handle_child(int sig);
 int		ms_regular_token_check(char *line);
 int		ms_special_token_check(char *line, t_var *var);
 _Bool	ms_token_counter(char *line, t_var *var);
-_Bool		ms_token_filler(char *line, char **tokens);
+_Bool	ms_token_filler(char *line, char **tokens);
 
 // minishell_utils.c
 int		ms_perror(char *err1, char *err2, char *err3, int err_no);

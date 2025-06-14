@@ -112,7 +112,7 @@ int	main(int ac, char **av, char **env)
 		if (*var.line)
 			add_history(var.line);
 		if (!ms_token_counter(var.line, &var) && !ms_start_args(&var))
-			ms_pipex(&var, var.pipe_count);
+			ms_pipex(&var);
 		ms_free_ptrs(&var);
 	}
 }
