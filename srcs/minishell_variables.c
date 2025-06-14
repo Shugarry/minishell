@@ -131,3 +131,41 @@ void	create_var_list(t_var *var, char **env)
 		i++;
 	}
 }
+
+/*
+char	*join_tokens(char **tokens, int	*i)
+{
+	char	*joint_tokens;
+
+		if (var->tokens[i][0] == '\'' || var->tokens[i][0] == '\"')
+			join_tokens(var->tokens + i, &i);
+		i++;
+	return (joint_tokens);
+}
+*/
+
+bool	is_token_var(char	*token)
+{
+	int	i;
+
+	i = 0;
+	while (token[i])
+	{
+		
+	}
+}
+
+void	expand_variables(t_var *var)
+{
+	char	**new_tokens;
+	char	*tmp;
+	int	i;
+
+	i = 0;
+	while (var->tokens[i])
+	{
+		if (is_token_var(var->tokens[i]))
+	}
+
+}
+

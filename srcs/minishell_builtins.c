@@ -30,14 +30,14 @@ void	ft_echo(char **tokens)
 		else
 			printf("%s", tokens[i]);
 		if (tokens[i + 1])
-			printf(" ");
+			printf("\n");
 		i++;
 	}
 	while (tokens && tokens[i] != NULL)
 	{
 		printf("%s", tokens[i]);
 		if (tokens[i + 1])
-			printf(" ");
+			printf("\n");
 		i++;
 	}
 	if (add_nl == true)
