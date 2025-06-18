@@ -29,11 +29,15 @@ void	ms_echo(char **tokens)
 			add_nl = false;
 		else
 			printf("%s", tokens[i]);
+		if (tokens[i + 1])
+			printf(" ");
 		i++;
 	}
 	while (tokens && tokens[i] != NULL)
 	{
 		printf("%s", tokens[i]);
+		if (tokens[i + 1])
+			printf(" ");
 		i++;
 	}
 	if (add_nl == true)

@@ -89,18 +89,18 @@ void	ms_clean(char **var_ptr);
 void	ms_exit(t_var *var, int exit_code);
 
 // minishell_memory.c
-void	*memlist_alloc(t_manager **memlist, size_t size);
-void	*memlist_add(t_manager **memlist, void *ptr);
-int		memlist_free_all(t_manager **memlist);
-int		memlist_free_ptr(t_manager **memlist, void *ptr);
+void	*memlist_alloc(t_list **memlist, size_t size);
+void	*memlist_add(t_list **memlist, void *ptr);
+int		memlist_free_all(t_list **memlist);
+int		memlist_free_ptr(t_list **memlist, void *ptr);
 
 // minishell_builtins.c
-void	ft_echo(char **tokens);
-int		ft_cd(t_var *var, char **tokens);
-int		ft_pwd(t_var *var);
-void	ft_export(t_var *var, char **tokens);
-void	ft_unset(t_var *var, char **tokens);
-void	ft_env(t_var *var);
+void	ms_echo(char **tokens);
+int		ms_cd(t_var *var, char **tokens);
+int		ms_pwd(t_var *var);
+void	ms_export(t_var *var, char **tokens);
+void	ms_unset(t_var *var, char **tokens);
+void	ms_env(t_var *var);
 
 // minishell_variables.c
 int		add_var_node(t_var *var, char *var_name, char *content);
@@ -108,8 +108,5 @@ int		remove_var_node(t_var *var, char *var_name);
 void	create_var_list(t_var *var, char **env);
 char	*get_var_content(t_var *var, char *variable);
 int		modify_var_content(t_var *var, char *var_name, char *new_content);
-
-// temporary function for exiting program, gotta join it with miguels
-//void	kill_and_exit(t_manager **memlist, int status, char *message);
 
 #endif

@@ -42,16 +42,16 @@ _Bool	ms_exec_builtins(t_var *var, int i)
 		stripped_cmd++;
 	if (ft_strncmp(stripped_cmd, "echo", 5) == 0)
 		ms_echo(var->cmds[i]);
-	else if (ms_strncmp(stripped_cmd, "cd", 3) == 0)
-		ft_cd(var, var->cmds[i]);
-	else if (ms_strncmp(stripped_cmd, "pwd", 4) == 0)
-		ft_pwd();
+	else if (ft_strncmp(stripped_cmd, "cd", 3) == 0)
+		ms_cd(var, var->cmds[i]);
+	else if (ft_strncmp(stripped_cmd, "pwd", 4) == 0)
+		ms_pwd(var);
 	else if (ft_strncmp(stripped_cmd, "export", 7) == 0)
-		ft_export(var, var->cmds[i]);
+		ms_export(var, var->cmds[i]);
 	else if (ft_strncmp(stripped_cmd, "unset", 6) == 0)
-		ft_unset(var, var->cmds[i]);
+		ms_unset(var, var->cmds[i]);
 	else if (ft_strncmp(stripped_cmd, "env", 4) == 0)
-		ft_env(var);
+		ms_env(var);
 	else if (ft_strncmp(stripped_cmd, "exit", 5) == 0)
 	{
 		if (var->cmds[i][1])
@@ -78,15 +78,18 @@ int	ms_pipex(t_var *var)
 	{
 		if (i < var->pipe_count && pipe(&var->pipes[2 * i]) < 0)
 			ms_exit(var, ms_perror("", strerror(errno), "", errno));
-		if (var->cmds[i][0] && !ms_exec_builtins(var, i))
+		if (var->cmds[i][0])
 		{
+			//
 			signal(SIGINT, ms_signal_handle_child);
 			signal(SIGQUIT, ms_signal_handle_child);
 			child = fork();
 			if (child < 0)
 				ms_exit(var, ms_perror("", strerror(errno), "", errno));
 			else if (child == 0)
-				ft_exec_child(var, i, var->pipe_count);
+				if (!ms_exec_builtins(var, i))
+					ft_exec_child(var, i, var->pipe_count);
+			// Pend redirect builtins to pipes
 		}
 		if (i < var->pipe_count)
 			close(var->pipes[2 * i + 1]);
