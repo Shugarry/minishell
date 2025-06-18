@@ -28,7 +28,10 @@ void	ms_clean(char **var_ptr)
 	{
 		i = 0;
 		while (var_ptr[i])
-			free(var_ptr[i++]);
+		{
+			free(var_ptr[i]);
+			i++;
+		}
 		free(var_ptr);
 	}
 }
@@ -74,5 +77,6 @@ void	ms_exit(t_var *var, int exit_code)
 	if (!exit_code)
 		ft_putendl_fd("exit", STDOUT_FILENO);
 	rl_clear_history();
+	memlist_free_all(&var->memlist);
 	exit(exit_code);
 }

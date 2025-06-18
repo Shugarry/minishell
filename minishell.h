@@ -6,7 +6,7 @@
 /*   By: miggarc2 <miggarc2@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 17:10:44 by miggarc2          #+#    #+#             */
-/*   Updated: 2025/05/07 21:16:01 by miggarc2         ###   ########.fr       */
+/*   Updated: 2025/06/06 04:37:40 by frey-gal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,13 @@
 
 extern volatile sig_atomic_t	g_signal_code;
 
+typedef struct s_varlist
+{
+	char	*var_name;
+	char	*content;
+	struct s_varlist	*next;
+}	t_varlist;
+
 typedef struct s_var
 {
 	char	*line;
@@ -47,6 +54,8 @@ typedef struct s_var
 	char	**paths;
 	char	pwd[4096];
 	int		exit_code;
+	t_list	*memlist;
+	t_varlist	*varlist;
 }			t_var;
 
 // minishell_exec.c
@@ -78,5 +87,29 @@ int		ms_perror(char *err1, char *err2, char *err3, int err_no);
 void	ms_free_ptrs(t_var *var);
 void	ms_clean(char **var_ptr);
 void	ms_exit(t_var *var, int exit_code);
+
+// minishell_memory.c
+void	*memlist_alloc(t_manager **memlist, size_t size);
+void	*memlist_add(t_manager **memlist, void *ptr);
+int		memlist_free_all(t_manager **memlist);
+int		memlist_free_ptr(t_manager **memlist, void *ptr);
+
+// minishell_builtins.c
+void	ft_echo(char **tokens);
+int		ft_cd(t_var *var, char **tokens);
+int		ft_pwd(t_var *var);
+void	ft_export(t_var *var, char **tokens);
+void	ft_unset(t_var *var, char **tokens);
+void	ft_env(t_var *var);
+
+// minishell_variables.c
+int		add_var_node(t_var *var, char *var_name, char *content);
+int		remove_var_node(t_var *var, char *var_name);
+void	create_var_list(t_var *var, char **env);
+char	*get_var_content(t_var *var, char *variable);
+int		modify_var_content(t_var *var, char *var_name, char *new_content);
+
+// temporary function for exiting program, gotta join it with miguels
+//void	kill_and_exit(t_manager **memlist, int status, char *message);
 
 #endif

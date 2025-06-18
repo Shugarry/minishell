@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   minishell.c                                        :+:      :+:    :+:   */
+/*   minishell_exec.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: miggarc2 <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 19:02:08 by miggarc2          #+#    #+#             */
-/*   Updated: 2025/05/07 22:34:38 by miggarc2         ###   ########.fr       */
+/*   Updated: 2025/06/06 04:44:30 by frey-gal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,9 +42,9 @@ _Bool	ms_exec_builtins(t_var *var, int i)
 		stripped_cmd++;
 	if (ft_strncmp(stripped_cmd, "echo", 5) == 0)
 		ms_echo(var->cmds[i]);
-/*	else if (ft_strncmp(stripped_cmd, "cd", 3) == 0)
+	else if (ms_strncmp(stripped_cmd, "cd", 3) == 0)
 		ft_cd(var, var->cmds[i]);
-	else if (ft_strncmp(stripped_cmd, "pwd", 4) == 0)
+	else if (ms_strncmp(stripped_cmd, "pwd", 4) == 0)
 		ft_pwd();
 	else if (ft_strncmp(stripped_cmd, "export", 7) == 0)
 		ft_export(var, var->cmds[i]);
@@ -52,8 +52,13 @@ _Bool	ms_exec_builtins(t_var *var, int i)
 		ft_unset(var, var->cmds[i]);
 	else if (ft_strncmp(stripped_cmd, "env", 4) == 0)
 		ft_env(var);
-*/	else if (ft_strncmp(stripped_cmd, "exit", 5) == 0)
-		ms_exit(var, 0);
+	else if (ft_strncmp(stripped_cmd, "exit", 5) == 0)
+	{
+		if (var->cmds[i][1])
+			ms_exit(var, ft_atoi(var->cmds[i][1]));
+		else
+			ms_exit(var, 0);
+	}
 	else
 		return (0);
 	var->exit_code = 0;
@@ -67,7 +72,8 @@ int	ms_pipex(t_var *var)
 	pid_t	child;
 
 	i = -1;
-	child = 0;
+	child = -1;
+	status = 0;
 	while (var->cmds[++i])
 	{
 		if (i < var->pipe_count && pipe(&var->pipes[2 * i]) < 0)

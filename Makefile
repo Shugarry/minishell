@@ -6,7 +6,7 @@
 #    By: frey-gal <frey-gal@student.42barcelona.co  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/04/20 02:23:03 by frey-gal          #+#    #+#              #
-#    Updated: 2025/05/14 23:51:38 by miggarc2         ###   ########.fr        #
+#    Updated: 2025/06/06 04:42:47 by frey-gal         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,8 +20,8 @@ RM			= rm -f
 
 # ================================== SOURCES ================================== #
 
-SRC			= $(addprefix srcs/minishell_, exec.c builtins.c init.c signals.c \
-				tokens.c utils.c)
+SRC			= $(addprefix srcs/minishell_, exec.c init.c signals.c tokens.c \
+				utils.c builtins.c memory.c variables.c)
 
 OBJ			= $(SRC:.c=.o)
 
@@ -45,7 +45,7 @@ LIB_SRC		= $(addprefix libft/ft_, atoi.c bzero.c calloc.c isalnum.c isalpha.c \
 				putchar_fd.c putendl_fd.c putnbr_fd.c putstr_fd.c split.c strchr.c \
 				strdup.c striteri.c strjoin.c strlcat.c strlcpy.c strlen.c \
 				strmapi.c strncmp.c strnstr.c strrchr.c strtrim.c substr.c \
-				tolower.c toupper.c) $(addprefix libft/, get_next_line_bonus.c)
+				tolower.c toupper.c strcmp.c) $(addprefix libft/, get_next_line_bonus.c)
 
 LIB_DEP = $(LIB_SRC) $(LIB_HDR) libft/Makefile 
 

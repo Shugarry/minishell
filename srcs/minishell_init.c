@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   minishell_input.c                                  :+:      :+:    :+:   */
+/*   minishell_init.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: miggarc2 <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 19:02:08 by miggarc2          #+#    #+#             */
-/*   Updated: 2025/05/08 20:29:16 by miggarc2         ###   ########.fr       */
+/*   Updated: 2025/06/06 03:52:58 by frey-gal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,8 +97,10 @@ int	main(int ac, char **av, char **env)
 		ms_exit(&var, ms_perror("", "arguments are not supported yet", "", 1));
 	if (!env || !*env)
 		ms_exit(&var, ms_perror("", "env not found", "", 1));
+	var.tokens = NULL;
 	var.env = env;
 	var.paths = ft_split(getenv("PATH"), ':');
+	create_var_list(&var, env);
 	if (!var.paths)
 		ms_exit(&var, ms_perror("", strerror(errno), "", errno));
 	while (1)

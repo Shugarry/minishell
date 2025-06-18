@@ -40,17 +40,6 @@ void	ms_echo(char **tokens)
 		printf("\n");
 }
 
-/* // NOTE: Probably wont use considering i have get_var_content from my own linked list
-char	*getenv_plus(t_manager **memlist, char *var)
-{
-	char	*env_var;
-
-	env_var = getenv(var);
-	if (env_var)
-		return (env_var);
-	return (NULL);
-}*/
-/*
 char	*getcwd_plus(t_var *var)
 {
 	char	cwd[4096];
@@ -67,7 +56,7 @@ char	*getcwd_plus(t_var *var)
 	return (path);
 }
 
-int		ft_pwd(t_var *var)
+int		ms_pwd(t_var *var)
 {
 	char	*cwd;
 	
@@ -86,7 +75,7 @@ int	bad_status(int status)
 			|| status == ENOMEM || status == ENOTDIR || status == -1);
 }
 
-int	ft_cd(t_var *var, char **tokens)
+int	ms_cd(t_var *var, char **tokens)
 {
 	char	*home;
 	char	*pwd;
@@ -135,7 +124,7 @@ int	ft_cd(t_var *var, char **tokens)
 	return (1);
 }
 
-void	ft_export(t_var *var, char **tokens)
+void	ms_export(t_var *var, char **tokens)
 {
 	int			i;
 	char		*var_name;
@@ -177,7 +166,8 @@ void	ft_export(t_var *var, char **tokens)
 		i++;
 	}
 }
-void	ft_unset(t_var *var, char **tokens)
+
+void	ms_unset(t_var *var, char **tokens)
 {
 	int	i;
 
@@ -188,7 +178,8 @@ void	ft_unset(t_var *var, char **tokens)
 		i++;
 	}
 }
-void	ft_env(t_var *var)
+
+void	ms_env(t_var *var)
 {
 	t_varlist	*tmp;
 
@@ -200,4 +191,3 @@ void	ft_env(t_var *var)
 		tmp = tmp->next;
 	}
 }
-*/
