@@ -52,16 +52,8 @@ _Bool	ms_exec_builtins(t_var *var, int i)
 		ms_unset(var, var->cmds[i]);
 	else if (ft_strncmp(stripped_cmd, "env", 4) == 0)
 		ms_env(var);
-	else if (ft_strncmp(stripped_cmd, "exit", 5) == 0)
-	{
-		if (var->cmds[i][1])
-			ms_exit(var, ft_atoi(var->cmds[i][1]));
-		else
-			ms_exit(var, 0);
-	}
 	else
 		return (0);
-	var->exit_code = 0;
 	return (1);
 }
 
@@ -80,16 +72,29 @@ int	ms_pipex(t_var *var)
 			ms_exit(var, ms_perror("", strerror(errno), "", errno));
 		if (var->cmds[i][0])
 		{
-			//
+			if (ft_strncmp(var->cmds[0][0], "exit", 5) == 0)
+			{
+				if (var->cmds[0][1])
+					ms_exit(var, ft_atoi(var->cmds[i][1]));
+				else
+					ms_exit(var, 0);
+			}
 			signal(SIGINT, ms_signal_handle_child);
 			signal(SIGQUIT, ms_signal_handle_child);
 			child = fork();
 			if (child < 0)
 				ms_exit(var, ms_perror("", strerror(errno), "", errno));
 			else if (child == 0)
+			{
 				if (!ms_exec_builtins(var, i))
 					ft_exec_child(var, i, var->pipe_count);
-			// Pend redirect builtins to pipes
+				else
+				{
+					var->exit_code = 0;
+					ms_exit(var, -1);
+				}
+			}
+			// Pend redirect builtins to pipes and improve their exit
 		}
 		if (i < var->pipe_count)
 			close(var->pipes[2 * i + 1]);
