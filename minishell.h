@@ -62,6 +62,8 @@ typedef struct s_var
 void	ft_exec_child(t_var *var, int i, int pipes);
 _Bool	ms_exec_builtins(t_var *var, int i);
 int		ms_pipex(t_var *var);
+void	ms_open_heredoc(t_var *var, char *limit, size_t limit_len);
+int		ms_exec_cmds(t_var *var, int i);
 
 // minishell_builtins.c
 void	ms_echo(char **tokens);

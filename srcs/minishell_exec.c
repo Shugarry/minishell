@@ -14,6 +14,7 @@
 
 void	ft_exec_child(t_var *var, int i, int pipes)
 {
+	ms_exec_cmds(var, i);
 	if (i < pipes)
 		close(var->pipes[2 * i]);
 	if (var->fd_in && dup2(var->fd_in, STDIN_FILENO) < 0)
@@ -72,12 +73,16 @@ int	ms_pipex(t_var *var)
 			ms_exit(var, ms_perror("", strerror(errno), "", errno));
 		if (var->cmds[i][0])
 		{
+			//Pend separete exit function and fix non numeric second argument
 			if (ft_strncmp(var->cmds[0][0], "exit", 5) == 0)
 			{
-				if (var->cmds[0][1])
+				if (var->cmds[0][2])
+					ms_perror("minishell: ", "exit: ", "too may arguments", 127);
+				else if (var->cmds[0][1])
 					ms_exit(var, ft_atoi(var->cmds[i][1]));
 				else
 					ms_exit(var, 0);
+				return (0);
 			}
 			signal(SIGINT, ms_signal_handle_child);
 			signal(SIGQUIT, ms_signal_handle_child);
@@ -138,46 +143,74 @@ void	ms_open_heredoc(t_var *var, char *limit, size_t limit_len)
 	var->fd_in = open(".here_doc", O_RDONLY);
 }
 
-int	ms_exec_cmds(t_var *var)
+char	**ms_cmd_trim(char **cmd, int pos)
 {
-	int	i;
-	int	j;
+	int		i;
+	int		j;
+	char	**new_cmd;
 
 	i = -1;
-	while (var->cmds[++i])
+	while (cmd[++i])
+		continue ;
+	new_cmd = (char **)ft_calloc(i - 1, sizeof(char *));
+	if (!new_cmd)
 	{
-		j = -1;
-		while (var->cmds[i][++j])
+		return (NULL);
+		ms_perror("", strerror(errno), "", errno);
+	}
+	i = -1;
+	j = 0;
+	while (cmd[++i])
+	{
+		if (j == pos)
 		{
-			if (!ft_strncmp(var->cmds[i][j], ">", 1))
-			{
-				if (var->fd_out > 0)
-					close(var->fd_out);
-				if (!ft_strncmp(var->cmds[i][j], ">", 2))
-					var->fd_out = open(var->cmds[i][j + 1], \
-						O_WRONLY | O_CREAT | O_TRUNC, 0644);
-				else
-					var->fd_out = open(var->cmds[i][j + 1], \
-						O_WRONLY | O_CREAT | O_APPEND, 0644);
-				if (var->fd_out < 0)
-					ms_perror(strerror(errno), ": ", var->cmds[i][j + 1], 1);
-				var->cmds[i][j] = NULL;
-				var->cmds[i][j + 1] = NULL;
-			}
-			else if (!ft_strncmp(var->cmds[i][j], "<", 1))
-			{
-				if (access(".here_doc", F_OK) == 0)
-					unlink(".here_doc");
-				if (var->fd_in > 0)
-					close(var->fd_in);
-				if (!ft_strncmp(var->cmds[i][j], "<", 2))
-					var->fd_in = open(var->cmds[i][j + 1], O_RDONLY);
-				else
-					ms_open_heredoc(var, var->cmds[i][j + 1], ft_strlen(var->cmds[i][j + 1]));
-				if (var->fd_in < 0)
-					ms_perror(strerror(errno), ": ", var->cmds[i][j + 1], 1);
-				var->cmds[i][j] = NULL;
-			}
+			free (cmd[j++]);
+			free (cmd[j++]);
+		}
+		new_cmd[i] = cmd[j++];
+	}
+	free(cmd);
+	return (new_cmd);
+}
+
+int	ms_exec_cmds(t_var *var, int i)
+{
+	int	j;
+
+	j = -1;
+	while (var->cmds[i][++j])
+	{
+		if (!ft_strncmp(var->cmds[i][j], ">", 1))
+		{
+			if (!var->cmds[i][j + 1])
+				ms_exit(var, ms_perror("minishell: ", "syntax error near unexpected token `'", "'", 2));
+			if (var->fd_out > 0)
+				close(var->fd_out);
+			if (!ft_strncmp(var->cmds[i][j], ">", 2))
+				var->fd_out = open(var->cmds[i][j + 1],
+								   O_WRONLY | O_CREAT | O_TRUNC, 0644);
+			else if (!ft_strncmp(var->cmds[i][j], ">>", 3))
+				var->fd_out = open(var->cmds[i][j + 1],
+								   O_WRONLY | O_CREAT | O_APPEND, 0644);
+			if (var->fd_out < 0)
+				ms_perror(strerror(errno), ": ", var->cmds[i][j + 1], 1);
+			var->cmds[i] = ms_cmd_trim(var->cmds[i], j);
+		}
+		else if (!ft_strncmp(var->cmds[i][j], "<", 1))
+		{
+			if (!var->cmds[i][j + 1])
+				ms_exit(var, ms_perror("minishell: ", "syntax error near unexpected token `'", "'", 2));
+			if (access(".here_doc", F_OK) == 0)
+				unlink(".here_doc");
+			if (var->fd_in > 0)
+				close(var->fd_in);
+			if (!ft_strncmp(var->cmds[i][j], "<", 2))
+				var->fd_in = open(var->cmds[i][j + 1], O_RDONLY);
+			else if (!ft_strncmp(var->cmds[i][j], "<<", 3))
+				ms_open_heredoc(var, var->cmds[i][j + 1], ft_strlen(var->cmds[i][j + 1]));
+			if (var->fd_in < 0)
+				ms_perror(strerror(errno), ": ", var->cmds[i][j + 1], 1);
+			var->cmds[i] = ms_cmd_trim(var->cmds[i], j);
 		}
 	}
 	return (var->exit_code);
