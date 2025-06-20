@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 void	ms_cmd_resolve(t_var *var, int i)
 {
@@ -69,6 +69,45 @@ _Bool	ms_cmd_filler(t_var *var)
 	return (0);
 }
 
+char	**dup_str_arr(t_var *var)
+{
+	char	**new_arr;
+	int	i;
+
+	i = 0;
+	while (var->cmds[i])
+		i++;
+	new_arr = memlist_alloc(&var->memlist, i * (sizeof(char *) + 1));
+	if (!new_arr)
+		ms_exit(var, ms_perror("", strerror(errno), "", errno));
+	i = 0;
+	while (var->cmds[i])
+	{
+		new_arr[i] = memlist_add(&var->memlist, ft_strdup(var->cmds[i]));
+		i++;
+	}
+	return (new_arr);
+}
+
+char	**clean_cmd(char	**arr)
+{
+
+}
+
+_Bool	ms_cmd_cleaner(t_var *var)
+{
+	int		i;
+	char	***tmp;
+
+	tmp = var->cmds;
+	while(var->cmds[i])
+	{
+		var->cmds[i] = clean_cmd(var->cmds[i]);
+		ms_clean(var->cmds[i]);
+	}
+	return false;
+}
+
 _Bool	ms_start_args(t_var *var)
 {
 	int		i;
@@ -80,7 +119,8 @@ _Bool	ms_start_args(t_var *var)
 	if (!var->tokens || !var->cmds || !var->cmd_splitters || \
 		(var->pipe_count && !var->pipes))
 		return (ms_perror("", strerror(errno), "", errno));
-	if (ms_token_filler(var->line, var->tokens) || ms_cmd_filler(var))
+	if (ms_token_filler(var->line, var->tokens) || ms_cmd_filler(var) ||
+		ms_cmd_cleaner(var))
 		return (1);
 	i = -1;
 	while (var->cmds[++i])
