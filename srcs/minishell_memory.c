@@ -16,7 +16,7 @@
 void	*memlist_alloc(t_list **memlist, size_t size)
 {
 	t_list	*node;
-	void		*ptr;
+	void	*ptr;
 
 	if (!memlist)
 		return (NULL);
@@ -61,7 +61,7 @@ void	*memlist_add(t_list **memlist, void *ptr)
 }
 
 // ft_lstdelone
-int	memlist_free_ptr(t_list **memlist, void *ptr) //TODO: Make shorter for norminette
+int	memlist_free_ptr(t_list **memlist, void *ptr) //TODO: Make shorter
 {
 	t_list	*current;
 	t_list	*prev;
@@ -98,7 +98,7 @@ int	memlist_free_all(t_list **memlist)
 {
 	t_list	*current;
 	t_list	*next;
-	int			i;
+	int		i;
 
 	i = 0;
 	if (!memlist || !*memlist)

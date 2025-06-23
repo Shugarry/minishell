@@ -71,7 +71,8 @@ _Bool	ms_cmd_filler(t_var *var)
 
 _Bool	ms_start_args(t_var *var)
 {
-	int		i;
+	int	i;
+	int	j;
 
 	var->tokens = (char **)ft_calloc(var->token_count + 1, sizeof(char *));
 	var->cmds = (char ***)ft_calloc(var->cmd_count + 1, sizeof(char **));
@@ -84,7 +85,13 @@ _Bool	ms_start_args(t_var *var)
 		return (1);
 	i = -1;
 	while (var->cmds[++i])
+	{
+		j = 0;
+		while (var->cmds[i][j])
+			if (!ft_strncmp(var->cmds[i][j++], "<<", 3))
+				ms_open_heredoc(var->cmds[i][j], ft_strlen(var->cmds[i][j]));
 		ms_cmd_resolve(var, i);
+	}
 	return (0);
 }
 
@@ -97,7 +104,6 @@ int	main(int ac, char **av, char **env)
 		ms_exit(&var, ms_perror("", "arguments are not supported yet", "", 1));
 	if (!env || !*env)
 		ms_exit(&var, ms_perror("", "env not found", "", 1));
-	var.tokens = NULL;
 	var.env = env;
 	var.paths = ft_split(getenv("PATH"), ':');
 	create_var_list(&var, env);

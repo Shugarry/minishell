@@ -60,10 +60,10 @@ char	*getcwd_plus(t_var *var)
 	return (path);
 }
 
-int		ms_pwd(t_var *var)
+int	ms_pwd(t_var *var)
 {
 	char	*cwd;
-	
+
 	cwd = getcwd_plus(var);
 	if (!cwd)
 		return (0);
@@ -75,8 +75,8 @@ int		ms_pwd(t_var *var)
 int	bad_status(int status)
 {
 	return (status == EACCES || status == EFAULT || status == EIO
-			|| status == ELOOP || status == ENAMETOOLONG || status == ENOENT
-			|| status == ENOMEM || status == ENOTDIR || status == -1);
+		|| status == ELOOP || status == ENAMETOOLONG || status == ENOENT
+		|| status == ENOMEM || status == ENOTDIR || status == -1);
 }
 
 int	ms_cd(t_var *var, char **tokens)
@@ -107,13 +107,14 @@ int	ms_cd(t_var *var, char **tokens)
 			return (ms_perror("minishell: ", "cd: ", "OLDPWD not set", 1));
 		if (bad_status(chdir(get_var_content(var, "OLDPWD"))))
 			return (ms_perror("minishell:", "cd:", strerror(errno), errno));
-		tmp = memlist_add(&var->memlist, ft_strdup(get_var_content(var, "OLDPWD")));
+		tmp = memlist_add(&var->memlist, \
+			ft_strdup(get_var_content(var, "OLDPWD")));
 		if (!tmp)
 			ms_exit(var, ms_perror("", strerror(errno), "", errno));
 		modify_var_content(var, "OLDPWD", get_var_content(var, "PWD"));
 		modify_var_content(var, "PWD", tmp);
 		memlist_free_ptr(&var->memlist, tmp);
-}
+	}
 	else
 	{
 		if (bad_status(chdir(tokens[1])))
@@ -139,7 +140,7 @@ void	ms_export(t_var *var, char **tokens)
 	if (!tokens[i])
 	{
 		tmp = var->varlist;
-		while(tmp != NULL)
+		while (tmp != NULL)
 		{
 			if (tmp->content != NULL)
 				printf("declare -x %s=\"%s\"\n", tmp->var_name, tmp->content);
@@ -188,7 +189,7 @@ void	ms_env(t_var *var)
 	t_varlist	*tmp;
 
 	tmp = var->varlist;
-	while(tmp != NULL)
+	while (tmp != NULL)
 	{
 		if (tmp->content)
 			printf("%s=%s\n", tmp->var_name, tmp->content);

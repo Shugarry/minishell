@@ -67,7 +67,7 @@ int	remove_var_node(t_var *var, char *var_name)
 
 char	*get_var_content(t_var *var, char *variable)
 {
-	t_varlist *head;
+	t_varlist	*head;
 
 	head = var->varlist;
 	while (head != NULL)
@@ -79,7 +79,7 @@ char	*get_var_content(t_var *var, char *variable)
 	return (NULL);
 }
 
-int		modify_var_content(t_var *var, char *var_name, char *new_content)
+int	modify_var_content(t_var *var, char *var_name, char *new_content)
 {
 	t_varlist	*curr;
 
@@ -91,7 +91,8 @@ int		modify_var_content(t_var *var, char *var_name, char *new_content)
 			memlist_free_ptr(&var->memlist, curr->content);
 			curr->content = NULL;
 			if (new_content)
-				curr->content = (char *)memlist_add(&var->memlist, ft_strdup(new_content));
+				curr->content = (char *)\
+				memlist_add(&var->memlist, ft_strdup(new_content));
 			if (!curr->content && new_content)
 				ms_exit(var, ms_perror("", "malloc fail()", "", errno));
 			return (1);
