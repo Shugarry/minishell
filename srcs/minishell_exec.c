@@ -6,11 +6,11 @@
 /*   By: miggarc2 <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 19:02:08 by miggarc2          #+#    #+#             */
-/*   Updated: 2025/06/06 04:44:30 by frey-gal         ###   ########.fr       */
+/*   Updated: 2025/06/23 07:41:43 by frey-gal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 void	ft_exec_child(t_var *var, int i, int pipes)
 {

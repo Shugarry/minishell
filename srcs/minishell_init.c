@@ -6,7 +6,7 @@
 /*   By: miggarc2 <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 19:02:08 by miggarc2          #+#    #+#             */
-/*   Updated: 2025/06/06 03:52:58 by frey-gal         ###   ########.fr       */
+/*   Updated: 2025/06/23 07:21:23 by frey-gal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,45 +67,6 @@ _Bool	ms_cmd_filler(t_var *var)
 		var->cmd_splitters[var->cmd_count - 1] = var->tokens[i];
 	}
 	return (0);
-}
-
-char	**dup_str_arr(t_var *var)
-{
-	char	**new_arr;
-	int	i;
-
-	i = 0;
-	while (var->cmds[i])
-		i++;
-	new_arr = memlist_alloc(&var->memlist, i * (sizeof(char *) + 1));
-	if (!new_arr)
-		ms_exit(var, ms_perror("", strerror(errno), "", errno));
-	i = 0;
-	while (var->cmds[i])
-	{
-		new_arr[i] = memlist_add(&var->memlist, ft_strdup(var->cmds[i]));
-		i++;
-	}
-	return (new_arr);
-}
-
-char	**clean_cmd(char	**arr)
-{
-
-}
-
-_Bool	ms_cmd_cleaner(t_var *var)
-{
-	int		i;
-	char	***tmp;
-
-	tmp = var->cmds;
-	while(var->cmds[i])
-	{
-		var->cmds[i] = clean_cmd(var->cmds[i]);
-		ms_clean(var->cmds[i]);
-	}
-	return false;
 }
 
 _Bool	ms_start_args(t_var *var)

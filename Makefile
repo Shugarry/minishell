@@ -6,7 +6,7 @@
 #    By: frey-gal <frey-gal@student.42barcelona.co  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/04/20 02:23:03 by frey-gal          #+#    #+#              #
-#    Updated: 2025/06/06 04:42:47 by frey-gal         ###   ########.fr        #
+#    Updated: 2025/06/23 07:16:49 by frey-gal         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -21,7 +21,7 @@ RM			= rm -f
 # ================================== SOURCES ================================== #
 
 SRC			= $(addprefix srcs/minishell_, exec.c init.c signals.c tokens.c \
-				utils.c builtins.c memory.c variables.c)
+				utils.c builtins.c memory.c variables.c processing.c)
 
 OBJ			= $(SRC:.c=.o)
 

@@ -6,7 +6,7 @@
 /*   By: miggarc2 <miggarc2@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 17:10:44 by miggarc2          #+#    #+#             */
-/*   Updated: 2025/06/06 04:37:40 by frey-gal         ###   ########.fr       */
+/*   Updated: 2025/06/23 07:21:23 by frey-gal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,5 +108,14 @@ int		remove_var_node(t_var *var, char *var_name);
 void	create_var_list(t_var *var, char **env);
 char	*get_var_content(t_var *var, char *variable);
 int		modify_var_content(t_var *var, char *var_name, char *new_content);
+
+// minishell_processing.c
+bool	is_escape_char(char c);
+int		var_len_diff(t_var *var, char *str);
+char	*var_finder(t_var *var, char *str);
+int		new_token_size(t_var *var, char *token);
+char	*token_builder(t_var *var, char *token);
+char	**clean_cmd(t_var *var, char **cmd);
+_Bool	ms_cmd_cleaner(t_var *var);
 
 #endif
