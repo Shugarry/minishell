@@ -18,7 +18,7 @@ int	var_len_diff(t_var *var, char *str)
 	while (ft_isalnum(var_name[i]))
 		i++;
 	var_name[i] = '\0';
-	len = ft_strlen(get_var_content(var, var_name)) - ft_strlen(var_name);
+	len = ft_strlen(get_env_var(var, var_name)) - ft_strlen(var_name);
 	free(var_name);
 	return (len - 1);
 }
@@ -36,7 +36,7 @@ char	*var_finder(t_var *var, char *str)
 	while (ft_isalnum(var_name[i]))
 		i++;
 	var_name[i] = '\0';
-	content = get_var_content(var, var_name);
+	content = get_env_var(var, var_name);
 	free(var_name);
 	return (content);
 }

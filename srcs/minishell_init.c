@@ -101,7 +101,8 @@ int	main(int ac, char **av, char **env)
 	var.tokens = NULL;
 	var.env = env;
 	var.paths = ft_split(getenv("PATH"), ':');
-	create_var_list(&var, env);
+	var.varlist_len = 0;
+	create_env(&var, env);
 	if (!var.paths)
 		ms_exit(&var, ms_perror("", strerror(errno), "", errno));
 	while (1)

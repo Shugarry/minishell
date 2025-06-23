@@ -12,122 +12,154 @@
 
 #include "../minishell.h"
 
-int	add_var_node(t_var *var, char *var_name, char *content)
+void	varlist_clean(t_var	*var)
 {
-	t_varlist	*node;
+	int	i;
 
-	node = (t_varlist *)memlist_alloc(&var->memlist, sizeof(t_varlist));
-	if (!node)
-		ms_exit(var, ms_perror("", strerror(errno), "", errno));
-	node->var_name = (char *)memlist_add(&var->memlist, ft_strdup(var_name));
-	if (!node->var_name)
-		ms_exit(var, ms_perror("", strerror(errno), "", errno));
-	if (content)
+	i = 0;
+	if (!var->varlist)
+		return ;
+	while (var->varlist[i])
 	{
-		node->content = (char *)memlist_add(&var->memlist, ft_strdup(content));
-		if (!node->content)
-			ms_exit(var, ms_perror("", strerror(errno), "", errno));
+		memlist_free_ptr(&var->memlist, var->varlist[i]);
+		var->varlist[i] = NULL;
+		i++;
 	}
-	else
-		node->content = NULL;
-	node->next = var->varlist;
-	var->varlist = node;
-	return (1);
+	memlist_free_ptr(&var->memlist, var->varlist);
+	var->varlist = NULL;
 }
 
-int	remove_var_node(t_var *var, char *var_name)
+void	add_env_var(t_var *var, char *variable)
 {
-	t_varlist	*prev;
-	t_varlist	*curr;
-
-	prev = var->varlist;
-	if (ft_strcmp(prev->var_name, var_name) == 0)
+	char	**new_varlist;
+	int		i;
+	
+	var->varlist_len++;
+	new_varlist = (char **)memlist_alloc(&var->memlist, (var->varlist_len + 1) * sizeof(char *));
+	if (!new_varlist)
+		ms_exit(var, ms_perror("", "malloc fail()", "", errno));
+	i = 0;
+	while (var->varlist && var->varlist[i])
 	{
-		var->varlist = var->varlist->next;
-		memlist_free_ptr(&var->memlist, prev->content);
-		memlist_free_ptr(&var->memlist, prev->var_name);
-		return (1);
+		new_varlist[i] = (char *)memlist_add(&var->memlist, ft_strdup(var->varlist[i]));
+		if (!new_varlist[i])
+			ms_exit(var, ms_perror("", "malloc fail()", "", errno));
+		i++;
 	}
-	curr = var->varlist->next;
-	while (curr)
+	new_varlist[i] = (char *)memlist_add(&var->memlist, ft_strdup(variable));
+	if (!new_varlist[i])
+		ms_exit(var, ms_perror("", "malloc fail()", "", errno));
+	i++;
+	new_varlist[i] = NULL;
+	varlist_clean(var);
+	var->varlist = new_varlist;
+}
+
+bool	find_env_var(t_var *var, char *var_name)
+{
+	int	i;
+	int	len;
+
+	i = 0;
+
+	len = ft_strlen(var_name);
+	while (var->varlist[i])
 	{
-		if (ft_strcmp(curr->var_name, var_name) == 0)
+		if (ft_strncmp(var_name, var->varlist[i], len) == 0 &&
+			(var->varlist[i][len] == '=' || var->varlist[i][len] == '\0'))
+			return (true);
+		i++;
+	}
+	return (false);
+}
+
+void	remove_env_var(t_var *var, char *var_name)
+{
+	char	**new_varlist;
+	int		len;
+	int		i;
+	int		j;
+	
+	if (!find_env_var(var, var_name))
+		return ;
+	var->varlist_len--;
+	new_varlist = (char **)memlist_alloc(&var->memlist, (var->varlist_len + 1) * sizeof(char *));
+	if (!new_varlist)
+		ms_exit(var, ms_perror("", "malloc fail()", "", errno));
+	i = 0;
+	j = 0;
+	len = ft_strlen(var_name);
+	while (var->varlist && var->varlist[i])
+	{
+		if (ft_strncmp(var_name, var->varlist[i], len) == 0 &&
+			(var->varlist[i][len] == '=' || var->varlist[i][len] == '\0'))
 		{
-			prev->next = curr->next;
-			memlist_free_ptr(&var->memlist, curr->var_name);
-			memlist_free_ptr(&var->memlist, curr->content);
-			memlist_free_ptr(&var->memlist, curr);
-			return (1);
+			i++;
+			continue ;
 		}
-		prev = curr;
-		curr = curr->next;
+		new_varlist[j] = (char *)memlist_add(&var->memlist, ft_strdup(var->varlist[i]));
+		if (!new_varlist[j])
+			ms_exit(var, ms_perror("", "malloc fail()", "", errno));
+		j++;
+		i++;
 	}
-	return (0);
+	new_varlist[j] = NULL;
+	varlist_clean(var);
+	var->varlist = new_varlist;
 }
 
-char	*get_var_content(t_var *var, char *variable)
+char	*get_env_var(t_var *var, char *var_name)
 {
-	t_varlist *head;
+	int		i;
+	int		len;
+	char	*tmp;
 
-	head = var->varlist;
-	while (head != NULL)
+	i = 0;
+	len = ft_strlen(var_name);
+	while (var->varlist && var->varlist[i])
 	{
-		if (ft_strcmp(head->var_name, variable) == 0)
-			return (head->content);
-		head = head->next;
+		if (ft_strncmp(var_name, var->varlist[i], len) == 0 &&
+			(var->varlist[i][len] == '=' || var->varlist[i][len] == '\0'))
+		{
+			tmp = ft_strchr(var->varlist[i], '=');
+			if (!tmp || !tmp[1])
+				return (NULL);
+			else
+				return (tmp + 1);
+		}
+		i++;
 	}
 	return (NULL);
 }
 
-int		modify_var_content(t_var *var, char *var_name, char *new_content)
+void	modify_env_var(t_var *var, char *var_name, char *new_content)
 {
-	t_varlist	*curr;
+	char	*new_var;
 
-	curr = var->varlist;
-	while (curr)
-	{
-		if (ft_strcmp(curr->var_name, var_name) == 0)
-		{
-			memlist_free_ptr(&var->memlist, curr->content);
-			curr->content = NULL;
-			if (new_content)
-				curr->content = (char *)memlist_add(&var->memlist, ft_strdup(new_content));
-			if (!curr->content && new_content)
-				ms_exit(var, ms_perror("", "malloc fail()", "", errno));
-			return (1);
-		}
-		curr = curr->next;
-	}
-	return (add_var_node(var, var_name, new_content));
+	new_var = memlist_add(&var->memlist, ft_strjoin(var_name, new_content));
+	if (!new_var)
+		ms_exit(var, ms_perror("", "malloc fail()", "", errno));
+	remove_env_var(var, var_name);
+	add_env_var(var, new_var);
+	memlist_free_ptr(&var->memlist, new_var);
 }
 
-void	create_var_list(t_var *var, char **env)
+void    create_env(t_var *var, char **env)
 {
-	char		*env_var;
-	char		*var_content;
-	int			i;
+    int i;
 
 	i = 0;
 	var->varlist = NULL;
-	while (env[i] != NULL)
+	while (env && env[i])
 	{
-		env_var = (char *)memlist_add(&var->memlist, ft_strdup(env[i]));
-		if (!env_var)
-			ms_exit(var, ms_perror("", strerror(errno), "", errno));
-		else if (ft_strcmp(env_var, "SHLVL") == 0)
+		if (ft_strncmp(env[i], "SHLVL=", ft_strlen("SHLVL=")) == 0)
 		{
-			add_var_node(var, "SHLVL", "1");
-			memlist_free_ptr(&var->memlist, env_var);
+			add_env_var(var, "SHLVL=1");
+			i++;
 			continue ;
 		}
-		var_content = ft_strchr(env_var, '=');
-		var_content[0] = '\0';
-		var_content++;
-		if (*var_content == '\0')
-			add_var_node(var, env_var, NULL);
 		else
-			add_var_node(var, env_var, var_content);
-		memlist_free_ptr(&var->memlist, env_var);
+			add_env_var(var, env[i]);
 		i++;
 	}
 }
