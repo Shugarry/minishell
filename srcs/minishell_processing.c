@@ -120,12 +120,7 @@ _Bool	ms_cmd_expander(t_var *var)
 	i = 0;
 	while(var->cmds[i])
 	{
-		for (int j = 0; var->cmds[i][j]; j++)
-			printf("%d %s\n", j, var->cmds[i][j]);
-		var->cmds[i] = expand_cmd(var, var->cmds[i]); //NOTE: do something for malloc failure
-		printf("\n\nmis tokens:\n\n");
-		for (int j = 0; var->cmds[i][j]; j++)
-			printf("%d %s\n", j, var->cmds[i][j]);
+		var->cmds[i] = expand_cmd(var, var->cmds[i]); 
 		i++;
 	}
 	return false;
