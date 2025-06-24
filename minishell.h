@@ -40,35 +40,36 @@ typedef struct s_varlist
 
 typedef struct s_var
 {
-	char	*line;
-	int		*pipes;
-	int		fd_in;
-	int		fd_out;
-	int		pipe_count;
-	int		cmd_count;
-	int		token_count;
-	char	***cmds;
-	char	**cmd_splitters;
-	char	**tokens;
-	char	**env;
-	char	**paths;
-	char	pwd[4096];
-	int		exit_code;
-	t_list	*memlist;
-	t_varlist	*varlist;
-}			t_var;
+	char			*line;
+	int				*pipes;
+	int				hd_int;
+	int				fd_in;
+	int				fd_out;
+	int				pipe_count;
+	int				cmd_count;
+	int				token_count;
+	char			***cmds;
+	char			**cmd_splitters;
+	char			**tokens;
+	char			**env;
+	char			**paths;
+	char			pwd[4096];
+	unsigned char	exit_code;
+	t_list			*memlist;
+	t_varlist		*varlist;
+}					t_var;
 
 // minishell_exec.c
 _Bool	ms_exec_builtins(t_var *var, int i);
 void	ft_exec_child(t_var *var, int i, int pipes);
 int		ms_pipex(t_var *var);
-void	ms_open_heredoc(char *limit, size_t limit_len);
 int		ms_redirect_cmds(t_var *var, int i);
 
 // minishell_builtins.c
 void	ms_echo(char **tokens);
 
 // minishell_init.c
+void	ms_open_heredoc(char *limit, size_t limit_len, int *hd_int);
 void	ms_cmd_resolve(t_var *var, int i);
 _Bool	ms_cmd_filler(t_var *var);
 _Bool	ms_start_args(t_var *va);

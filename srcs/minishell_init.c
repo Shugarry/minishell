@@ -12,6 +12,42 @@
 
 #include "minishell.h"
 
+void	ms_open_heredoc(char *limit, size_t limit_len, int *hd_int)
+{
+	char	*line;
+	int		here_fd;
+	char	*hd_no;
+	char	*hd_name;
+
+	hd_no = ft_itoa((*hd_int)++);
+	hd_name = ft_strjoin(".here_doc_", hd_no);
+	if (!hd_no || !hd_name)
+		ms_perror("", strerror(errno), "\n", errno);
+	free(hd_no);
+	if (access(hd_name, F_OK) == 0)
+		unlink(hd_name);
+	here_fd = open(hd_name, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (here_fd < 0)
+		ms_perror("", strerror(errno), "\n", errno);
+	free(hd_name);
+	while (1)
+	{
+		ft_putstr_fd("> ", STDOUT_FILENO);
+		line = get_next_line(STDIN_FILENO);
+		if (!line)
+			break ;
+		if (ft_strncmp(line, limit, limit_len) == 0 && line[limit_len] == '\n')
+		{
+			free(line);
+			break ;
+		}
+		else
+			ft_putstr_fd(line, here_fd);
+		free(line);
+	}
+	close(here_fd);
+}
+
 void	ms_cmd_resolve(t_var *var, int i)
 {
 	int		j;
@@ -89,7 +125,9 @@ _Bool	ms_start_args(t_var *var)
 		j = 0;
 		while (var->cmds[i][j])
 			if (!ft_strncmp(var->cmds[i][j++], "<<", 3))
-				ms_open_heredoc(var->cmds[i][j], ft_strlen(var->cmds[i][j]));
+				ms_open_heredoc(var->cmds[i][j], \
+					ft_strlen(var->cmds[i][j]), &var->hd_int);
+		var->hd_int = 0;
 		ms_cmd_resolve(var, i);
 	}
 	return (0);
@@ -106,9 +144,9 @@ int	main(int ac, char **av, char **env)
 		ms_exit(&var, ms_perror("", "env not found", "", 1));
 	var.env = env;
 	var.paths = ft_split(getenv("PATH"), ':');
-	create_var_list(&var, env);
 	if (!var.paths)
 		ms_exit(&var, ms_perror("", strerror(errno), "", errno));
+	create_var_list(&var, env);
 	while (1)
 	{
 		signal(SIGINT, ms_signal_handle);
@@ -122,5 +160,6 @@ int	main(int ac, char **av, char **env)
 		if (!ms_token_counter(var.line, &var) && !ms_start_args(&var))
 			ms_pipex(&var);
 		ms_free_ptrs(&var);
+		var.hd_int = 0;
 	}
 }

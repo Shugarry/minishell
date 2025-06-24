@@ -106,34 +106,6 @@ int	ms_pipex(t_var *var)
 	return (var->exit_code);
 }
 
-void	ms_open_heredoc(char *limit, size_t limit_len)
-{
-	char	*line;
-	int		here_fd;
-
-	if (access(".here_doc", F_OK) == 0)
-		unlink(".here_doc");
-	here_fd = open(".here_doc", O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (here_fd < 0)
-		ms_perror("", strerror(errno), "\n", errno);
-	while (1)
-	{
-		ft_putstr_fd("> ", STDOUT_FILENO);
-		line = get_next_line(STDIN_FILENO);
-		if (!line)
-			break ;
-		if (ft_strncmp(line, limit, limit_len) == 0 && line[limit_len] == '\n')
-		{
-			free(line);
-			break ;
-		}
-		else
-			ft_putstr_fd(line, here_fd);
-		free(line);
-	}
-	close(here_fd);
-}
-
 char	**ms_cmd_trim(char **cmd, int pos)
 {
 	int		size;
@@ -167,7 +139,9 @@ char	**ms_cmd_trim(char **cmd, int pos)
 
 int	ms_redirect_cmds(t_var *var, int i)
 {
-	int	j;
+	int			j;
+	char		*hd_no;
+	char		*hd_name;
 
 	j = 0;
 	while (var->cmds[i][j])
@@ -197,7 +171,15 @@ int	ms_redirect_cmds(t_var *var, int i)
 			if (!ft_strncmp(var->cmds[i][j], "<", 2))
 				var->fd_in = open(var->cmds[i][j + 1], O_RDONLY);
 			else if (!ft_strncmp(var->cmds[i][j], "<<", 3))
-				var->fd_in = open(".here_doc", O_RDONLY);
+			{
+				hd_no = ft_itoa(var->hd_int++);
+				hd_name = ft_strjoin(".here_doc_", hd_no);
+				if (!hd_no || !hd_name)
+					ms_perror("", strerror(errno), "\n", errno);
+				free(hd_no);
+				var->fd_in = open(hd_name, O_RDONLY);
+				free(hd_name);
+			}
 			if (var->fd_in < 0)
 				ms_perror(strerror(errno), ": ", var->cmds[i][j + 1], 1);
 			var->cmds[i] = ms_cmd_trim(var->cmds[i], j);

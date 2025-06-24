@@ -64,9 +64,29 @@ void	ms_free_ptrs(t_var *var)
 
 void	ms_exit(t_var *var, int exit_code)
 {
+	char	*hd_no;
+	char	*hd_name;
+	int		hd_int;
+
+	hd_int = 0;
 	close(STDIN_FILENO);
-	if (access(".here_doc", F_OK) == 0)
-		unlink(".here_doc");
+	while (1)
+	{
+		hd_no = ft_itoa(hd_int++);
+		hd_name = ft_strjoin(".here_doc_", hd_no);
+		if (!hd_no || !hd_name)
+			ms_perror("", strerror(errno), "\n", errno);
+		if (hd_no)
+			free(hd_no);
+		if (access(hd_name, F_OK) == 0)
+			unlink(hd_name);
+		else
+			break ;
+		if (hd_name)
+			free(hd_name);
+	}
+	if (hd_name)
+		free(hd_name);
 	if (var->fd_in > 0)
 		close(var->fd_in);
 	if (var->fd_out > 0)
@@ -79,4 +99,13 @@ void	ms_exit(t_var *var, int exit_code)
 	rl_clear_history();
 	memlist_free_all(&var->memlist);
 	exit(exit_code);
+}
+
+ms_export{
+	while (env[i])
+		i++;
+	malloc(i + 2 )
+	while (env[i]
+		newenvv[i] = env[i])
+	newen[i] = nuevoo var;
 }
