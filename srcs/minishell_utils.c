@@ -69,7 +69,6 @@ void	ms_exit(t_var *var, int exit_code)
 	int		hd_int;
 
 	hd_int = 0;
-	close(STDIN_FILENO);
 	while (1)
 	{
 		hd_no = ft_itoa(hd_int++);
@@ -95,7 +94,10 @@ void	ms_exit(t_var *var, int exit_code)
 	if (var->paths)
 		ms_clean(var->paths);
 	if (!exit_code)
+	{
+		close(STDIN_FILENO);
 		ft_putendl_fd("exit", STDOUT_FILENO);
+	}
 	rl_clear_history();
 	memlist_free_all(&var->memlist);
 	exit(exit_code);

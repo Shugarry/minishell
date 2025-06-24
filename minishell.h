@@ -56,7 +56,7 @@ typedef struct s_var
 _Bool	ms_exec_builtins(t_var *var, int i);
 void	ft_exec_child(t_var *var, int i, int pipes);
 int		ms_pipex(t_var *var);
-int		ms_redirect_cmds(t_var *var, int i);
+int		ms_open_fds(t_var *var, int i);
 
 // minishell_builtins.c
 void	ms_echo(char **tokens);

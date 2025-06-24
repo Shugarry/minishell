@@ -16,6 +16,14 @@ _Bool	ms_exec_builtins(t_var *var, int i)
 {
 	char	*stripped_cmd;
 
+	if (!var->pipe_count)
+	{
+		ms_open_fds(var, i);
+		if (var->fd_in && dup2(var->fd_in, STDIN_FILENO) < 0)
+			ms_exit(var, 1);
+		if (var->fd_out && dup2(var->fd_out, STDOUT_FILENO) < 0)
+			ms_exit(var, 1);
+	}
 	stripped_cmd = ft_strrchr(var->cmds[i][0], '/');
 	if (!stripped_cmd)
 		stripped_cmd = var->cmds[i][0];
@@ -52,7 +60,7 @@ _Bool	ms_exec_builtins(t_var *var, int i)
 
 void	ft_exec_child(t_var *var, int i, int pipes)
 {
-	ms_redirect_cmds(var, i);
+	ms_open_fds(var, i);
 	if (i < pipes)
 		close(var->pipes[2 * i]);
 	if (i > 0 && dup2(var->pipes[2 * i - 2], STDIN_FILENO) < 0)
@@ -86,8 +94,8 @@ int	ms_pipex(t_var *var)
 			return (ms_perror("", strerror(errno), "", errno), errno);
 		if (var->cmds[i][0])
 		{
-			if (!var->pipe_count && !ms_exec_builtins(var, i))
-			{
+			if (!var->pipe_count && ms_exec_builtins(var, i))
+				return (0);
 			signal(SIGINT, ms_signal_handle_child);
 			signal(SIGQUIT, ms_signal_handle_child);
 			child = fork();
@@ -95,7 +103,6 @@ int	ms_pipex(t_var *var)
 				return (ms_perror("", strerror(errno), "", errno), errno);
 			else if (child == 0)
 				ft_exec_child(var, i, var->pipe_count);
-			}
 		}
 		if (i < var->pipe_count)
 			close(var->pipes[2 * i + 1]);
@@ -141,7 +148,7 @@ char	**ms_cmd_trim(char **cmd, int pos)
 	return (new_cmd);
 }
 
-int	ms_redirect_cmds(t_var *var, int i)
+int	ms_open_fds(t_var *var, int i)
 {
 	int			j;
 	char		*hd_no;
@@ -192,5 +199,5 @@ int	ms_redirect_cmds(t_var *var, int i)
 			j++;
 	}
 	ms_cmd_resolve(var, i);
-	return (var->exit_code);
+	return (0);
 }
