@@ -100,12 +100,3 @@ void	ms_exit(t_var *var, int exit_code)
 	memlist_free_all(&var->memlist);
 	exit(exit_code);
 }
-
-ms_export{
-	while (env[i])
-		i++;
-	malloc(i + 2 )
-	while (env[i]
-		newenvv[i] = env[i])
-	newen[i] = nuevoo var;
-}

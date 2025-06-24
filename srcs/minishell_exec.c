@@ -6,11 +6,11 @@
 /*   By: miggarc2 <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 19:02:08 by miggarc2          #+#    #+#             */
-/*   Updated: 2025/06/06 04:44:30 by frey-gal         ###   ########.fr       */
+/*   Updated: 2025/06/23 07:41:43 by frey-gal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 _Bool	ms_exec_builtins(t_var *var, int i)
 {
@@ -21,7 +21,19 @@ _Bool	ms_exec_builtins(t_var *var, int i)
 		stripped_cmd = var->cmds[i][0];
 	else
 		stripped_cmd++;
-	if (ft_strncmp(stripped_cmd, "echo", 5) == 0)
+
+	// Pend separete exit function and fix non numeric second argument
+	if (ft_strncmp(var->cmds[0][0], "exit", 5) == 0)
+	{
+		if (!var->cmds[0][1])
+			ms_exit(var, 0);
+		else if (var->cmds[0][1] && !var->cmds[0][2])
+			ms_exit(var, ft_atoi(var->cmds[i][1]));
+		else
+			ms_perror("", "exit: ", "too many arguments", 127);
+		return (0);
+	}
+	else if (ft_strncmp(stripped_cmd, "echo", 5) == 0)
 		ms_echo(var->cmds[i]);
 	else if (ft_strncmp(stripped_cmd, "cd", 3) == 0)
 		ms_cd(var, var->cmds[i]);
@@ -74,17 +86,8 @@ int	ms_pipex(t_var *var)
 			return (ms_perror("", strerror(errno), "", errno), errno);
 		if (var->cmds[i][0])
 		{
-			//Pend separete exit function and fix non numeric second argument
-			if (ft_strncmp(var->cmds[0][0], "exit", 5) == 0)
+			if (!var->pipe_count && !ms_exec_builtins(var, i))
 			{
-				if (!var->cmds[0][1])
-					ms_exit(var, 0);
-				else if (var->cmds[0][1] && !var->cmds[0][2])
-					ms_exit(var, ft_atoi(var->cmds[i][1]));
-				else
-					ms_perror("", "exit: ", "too may arguments", 127);
-				return (0);
-			}
 			signal(SIGINT, ms_signal_handle_child);
 			signal(SIGQUIT, ms_signal_handle_child);
 			child = fork();
@@ -92,6 +95,7 @@ int	ms_pipex(t_var *var)
 				return (ms_perror("", strerror(errno), "", errno), errno);
 			else if (child == 0)
 				ft_exec_child(var, i, var->pipe_count);
+			}
 		}
 		if (i < var->pipe_count)
 			close(var->pipes[2 * i + 1]);

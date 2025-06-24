@@ -6,11 +6,11 @@
 /*   By: miggarc2 <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 19:02:08 by miggarc2          #+#    #+#             */
-/*   Updated: 2025/06/06 03:52:58 by frey-gal         ###   ########.fr       */
+/*   Updated: 2025/06/23 07:21:23 by frey-gal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 void	ms_open_heredoc(char *limit, size_t limit_len, int *hd_int)
 {
@@ -117,7 +117,8 @@ _Bool	ms_start_args(t_var *var)
 	if (!var->tokens || !var->cmds || !var->cmd_splitters || \
 		(var->pipe_count && !var->pipes))
 		return (ms_perror("", strerror(errno), "", errno));
-	if (ms_token_filler(var->line, var->tokens) || ms_cmd_filler(var))
+	if (ms_token_filler(var->line, var->tokens) || ms_cmd_filler(var) ||
+		ms_cmd_expander(var))
 		return (1);
 	i = -1;
 	while (var->cmds[++i])
@@ -142,11 +143,11 @@ int	main(int ac, char **av, char **env)
 		ms_exit(&var, ms_perror("", "arguments are not supported yet", "", 1));
 	if (!env || !*env)
 		ms_exit(&var, ms_perror("", "env not found", "", 1));
-	var.env = env;
-	var.paths = ft_split(getenv("PATH"), ':');
+	create_env(&var, env);
+	var.paths = ft_split(get_env_var(&var, "PATH"), ':');
 	if (!var.paths)
 		ms_exit(&var, ms_perror("", strerror(errno), "", errno));
-	create_var_list(&var, env);
+	create_env(&var, env);
 	while (1)
 	{
 		signal(SIGINT, ms_signal_handle);
