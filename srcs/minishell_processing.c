@@ -18,7 +18,7 @@ int	var_len_diff(t_var *var, char *str)
 	return (len - 1);
 }
 
-char	*var_finder(t_var *var, char *str)
+char	*var_finder(t_var *var, char *str, char *new_token)
 {
 	int		i;
 	char	*var_name;
@@ -27,7 +27,10 @@ char	*var_finder(t_var *var, char *str)
 	i = 1;
 	var_name = ft_strdup(str + 1);
 	if (!var_name)
+	{
+		free(new_token);
 		ms_exit(var, ms_perror("", "malloc fail()", "", errno));
+	}
 	while (ft_isalnum(var_name[i]))
 		i++;
 	var_name[i] = '\0';
@@ -65,7 +68,7 @@ char	*token_builder(t_var *var, char *token)
 	int		j;
 
 	len = new_token_size(var, token);
-	new_token = (char *)malloc(sizeof(char) * (len + 1)); //NOTE: do something for malloc failure
+	new_token = (char *)malloc(sizeof(char) * (len + 1));
 	if (!new_token)
 		return (NULL);
 	i = 0;
@@ -79,7 +82,7 @@ char	*token_builder(t_var *var, char *token)
 	{
 		if (token[j] == '$' && (ft_isalpha(token[j + 1]) || token[j + 1] == '_'))
 		{
-			tmp = var_finder(var, token + j);
+			tmp = var_finder(var, token + j, new_token);
 			i += ft_strlcpy(new_token + i, tmp, ft_strlen(tmp) + 1);
 			j++;
 			while (ft_isalnum(token[j]) || token[j] == '_')
@@ -106,7 +109,10 @@ char	**expand_cmd(t_var *var, char **cmd)
 		tmp = cmd[i];
 		cmd[i] = token_builder(var, cmd[i]);
 		if (!cmd[i])
-			ms_exit(var, 1);//NOTE: do something for malloc failure
+		{
+			ms_clean(cmd);
+			ms_exit(var, ms_perror("", "malloc() fail", "", errno));
+		}
 		free(tmp);
 		i++;
 	}

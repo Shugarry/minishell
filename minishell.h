@@ -58,9 +58,6 @@ void	ft_exec_child(t_var *var, int i, int pipes);
 int		ms_pipex(t_var *var);
 int		ms_redirect_cmds(t_var *var, int i);
 
-// minishell_builtins.c
-void	ms_echo(char **tokens);
-
 // minishell_init.c
 void	ms_open_heredoc(char *limit, size_t limit_len, int *hd_int);
 void	ms_cmd_resolve(t_var *var, int i);
@@ -92,8 +89,8 @@ int		memlist_free_ptr(t_list **memlist, void *ptr);
 
 // minishell_builtins.c
 void	ms_echo(char **tokens);
-int		ms_cd(t_var *var, char **tokens);
-int		ms_pwd(t_var *var);
+void	ms_cd(t_var *var, char **tokens);
+void	ms_pwd(t_var *var);
 void	ms_export(t_var *var, char **tokens);
 void	ms_unset(t_var *var, char **tokens);
 void	ms_env(t_var *var);
@@ -108,7 +105,7 @@ char	*get_env_var(t_var *var, char *variable);
 // minishell_processing.c
 bool	is_escape_char(char c);
 int		var_len_diff(t_var *var, char *str);
-char	*var_finder(t_var *var, char *str);
+char	*var_finder(t_var *var, char *str, char *new_token);
 int		new_token_size(t_var *var, char *token);
 char	*token_builder(t_var *var, char *token);
 char	**expand_cmd(t_var *var, char **cmd);

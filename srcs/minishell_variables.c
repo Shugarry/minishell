@@ -134,9 +134,13 @@ char	*get_env_var(t_var *var, char *var_name)
 
 void	modify_env_var(t_var *var, char *var_name, char *new_content)
 {
+	char	*tmp;
 	char	*new_var;
 
-	new_var = memlist_add(&var->memlist, ft_strjoin(var_name, new_content));
+	tmp = memlist_add(&var->memlist, ft_strjoin(var_name, "="));
+	if (!tmp)
+		ms_exit(var, ms_perror("", "malloc fail()", "", errno));
+	new_var = memlist_add(&var->memlist, ft_strjoin(tmp, new_content));
 	if (!new_var)
 		ms_exit(var, ms_perror("", "malloc fail()", "", errno));
 	remove_env_var(var, var_name);

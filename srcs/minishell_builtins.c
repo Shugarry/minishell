@@ -60,64 +60,73 @@ char	*getcwd_plus(t_var *var)
 	return (path);
 }
 
-int	ms_pwd(t_var *var)
+void	ms_pwd(t_var *var)
 {
 	char	*cwd;
 
 	cwd = getcwd_plus(var);
 	if (!cwd)
-		return (0);
+		ms_exit(var, ms_perror("", "malloc() fail", "", errno));
 	printf("%s\n", cwd);
 	memlist_free_ptr(&var->memlist, cwd);
-	return (1);
 }
 
 int	bad_status(int status)
 {
 	return (status == EACCES || status == EFAULT || status == EIO
-		|| status == ELOOP || status == ENAMETOOLONG || status == ENOENT
-		|| status == ENOMEM || status == ENOTDIR || status == -1);
+	|| status == ELOOP || status == ENAMETOOLONG || status == ENOENT
+	|| status == ENOMEM || status == ENOTDIR || status == -1);
 }
 
-int	ms_cd(t_var *var, char **tokens)
+static void	cd_home(t_var *var)
+{
+	char	*home;
+	char	*pwd;
+
+	home = get_env_var(var, "HOME");
+	if (!home)
+		ms_perror("minishell: ", "cd: ", "HOME not set", 1);
+	if (bad_status(chdir(home)))
+		ms_perror("", strerror(errno), "", errno);
+	pwd = get_env_var(var, "PWD");
+	modify_env_var(var, "OLDPWD", pwd);
+	modify_env_var(var, "PWD", home);
+	memlist_free_ptr(&var->memlist, home);
+	memlist_free_ptr(&var->memlist, pwd);
+}
+
+static void	cd_previous(t_var *var)
+{
+	char	*tmp;
+
+	if (!get_env_var(var, "OLDPWD"))
+		ms_perror("minishell: ", "cd: ", "OLDPWD not set", 1);
+	if (bad_status(chdir(get_env_var(var, "OLDPWD"))))
+		ms_perror("minishell:", "cd:", strerror(errno), errno);
+	tmp = memlist_add(&var->memlist, ft_strdup(get_env_var(var, "OLDPWD")));
+	if (!tmp)
+		ms_exit(var, ms_perror("", strerror(errno), "", errno));
+	modify_env_var(var, "OLDPWD", get_env_var(var, "PWD"));
+	modify_env_var(var, "PWD", tmp);
+	memlist_free_ptr(&var->memlist, tmp);
+}
+
+void	ms_cd(t_var *var, char **tokens)
 {
 	char	*home;
 	char	*pwd;
 	char	*tmp;
 
 	if (!tokens[1] || (tokens[1] && ft_strcmp(tokens[1], "--") == 0))
-	{
-		home = get_env_var(var, "HOME");
-		if (!home)
-			return (ms_perror("minishell: ", "cd: ", "HOME not set", 1));
-		if (bad_status(chdir(home)))
-			return (ms_perror("", strerror(errno), "", errno));
-		pwd = get_env_var(var, "PWD");
-		modify_env_var(var, "OLDPWD", pwd);
-		modify_env_var(var, "PWD", home);
-		memlist_free_ptr(&var->memlist, home);
-		memlist_free_ptr(&var->memlist, pwd);
-		return (1);
-	}
+		cd_home(var);
 	else if (tokens[2] != NULL)
-		return (ms_perror("minishell: ", "cd: ", "too many arguments", 1));
+		ms_perror("minishell: ", "cd: ", "too many arguments", 1);
 	else if (ft_strcmp(tokens[1], "-") == 0)
-	{
-		if (!get_env_var(var, "OLDPWD"))
-			return (ms_perror("minishell: ", "cd: ", "OLDPWD not set", 1));
-		if (bad_status(chdir(get_env_var(var, "OLDPWD"))))
-			return (ms_perror("minishell:", "cd:", strerror(errno), errno));
-		tmp = memlist_add(&var->memlist, ft_strdup(get_env_var(var, "OLDPWD")));
-		if (!tmp)
-			ms_exit(var, ms_perror("", strerror(errno), "", errno));
-		modify_env_var(var, "OLDPWD", get_env_var(var, "PWD"));
-		modify_env_var(var, "PWD", tmp);
-		memlist_free_ptr(&var->memlist, tmp);
-	}
+		cd_previous(var);
 	else
 	{
 		if (bad_status(chdir(tokens[1])))
-			return (ms_perror("minishell:", "cd:", strerror(errno), errno));
+			ms_perror("minishell:", "cd:", strerror(errno), errno);
 		pwd = get_env_var(var, "PWD");
 		if (!pwd)
 			ms_exit(var, ms_perror("", strerror(errno), "", errno));
@@ -125,41 +134,53 @@ int	ms_cd(t_var *var, char **tokens)
 		modify_env_var(var, "PWD", tokens[1]);
 		memlist_free_ptr(&var->memlist, pwd);
 	}
-	return (1);
+}
+
+static void	export_print(t_var *var, char **tokens)
+{
+	int		j;
+	char	*variable;
+	char	*content;
+
+	j = 0;
+	while(var->env[j])
+	{
+		variable = (char *)memlist_add(&var->memlist, ft_strdup(var->env[j]));
+		content = ft_strchr(variable, '=');
+		if (content)
+		{
+			content[0] = '\0';
+			content++;
+			printf("declare -x %s=\"%s\"\n", variable, content);
+		}
+		else if (!content)
+			printf("declare -x %s\n", variable);
+		j++;
+		memlist_free_ptr(&var->memlist, variable);
+	}
 }
 
 void	ms_export(t_var *var, char **tokens)
 {
 	int		i;
-	int		j;
 	char	*variable;
 	char	*content;
 
 	i = 1;
 	if (!tokens[i])
-	{
-		j = 0;
-		while(var->env[j])
-		{
-			variable = (char *)memlist_add(&var->memlist, ft_strdup(var->env[j]));
-			content = ft_strchr(variable, '=');
-			if (content)
-			{
-				content[0] = '\0';
-				content++;
-				printf("declare -x %s=\"%s\"\n", variable, content);
-			}
-			else if (!content)
-				printf("declare -x %s\n", variable);
-			j++;
-		}
-	}
+		export_print(var, tokens);
 	while (tokens[i])
 	{
-		variable = memlist_add(&var->memlist, ft_strdup(tokens[i]));
-		if (!variable)
-			ms_exit(var, ms_perror("", strerror(errno), "", errno));
+		variable = (char *)memlist_add(&var->memlist, ft_strdup(tokens[i]));
+		content = ft_strchr(variable, '=');
+		if (content)
+		{
+			content[0] = '\0';
+			content++;
+		}
+		modify_env_var(var, variable, content);
 		i++;
+		memlist_free_ptr(&var->memlist, variable);
 	}
 }
 
@@ -182,7 +203,8 @@ void	ms_env(t_var *var)
 	i = 0;
 	while(var->env[i] != NULL)
 	{
-		printf("%s\n", var->env[i]);
+		if (ft_strchr(var->env[i], '='))
+			printf("%s\n", var->env[i]);
 		i++;
 	}
 }
