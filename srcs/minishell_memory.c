@@ -12,106 +12,78 @@
 
 #include "../minishell.h"
 
-// ft_lstnew
-void	*memlist_alloc(t_list **memlist, size_t size)
+#include "../minishell.h"
+
+void	*memlist_alloc(t_var *var, size_t size)
 {
 	t_list	*node;
 	void	*ptr;
-
-	if (!memlist)
+	
+	if (!var)
 		return (NULL);
 	ptr = malloc(size);
 	if (!ptr)
-		return (NULL);
-	node = (t_list *)malloc(sizeof(t_list));
+		ms_exit(var, ms_perror("", "malloc() fail", "", errno));
+	node = ft_lstnew(ptr);
 	if (!node)
 	{
 		free(ptr);
-		memlist_free_all(memlist);
-		return (NULL);
-		// pend ms_exit o ms_perror
+		ms_exit(var, ms_perror("", "malloc() fail", "", errno));
 	}
-	node->content = ptr;
-	node->next = *memlist;
-	*memlist = node;
+	ft_lstadd_front(&var->memlist, node);
 	return (ptr);
 }
 
-//ft_lstadd_front or ft_lstadd_back + ft_lstnew
-void	*memlist_add(t_list **memlist, void *ptr)
+void	*memlist_add(t_var *var, void *ptr)
 {
 	t_list	*node;
-
-	if (!memlist)
+	
+	if (!var)
 		return (NULL);
 	if (!ptr)
 		return (NULL);
-	node = (t_list *)malloc(sizeof(t_list));
+	node = ft_lstnew(ptr);
 	if (!node)
 	{
 		free(ptr);
-		memlist_free_all(memlist);
-		return (NULL);
-		// pend ms_exit o ms_perror
+		ms_exit(var, ms_perror("", "malloc() fail", "", errno));
 	}
-	node->content = ptr;
-	node->next = *memlist;
-	*memlist = node;
+	ft_lstadd_front(&var->memlist, node);
 	return (ptr);
 }
 
-// ft_lstdelone
-int	memlist_free_ptr(t_list **memlist, void *ptr) //TODO: Make shorter
+void	memlist_free_ptr(t_var *var, void *ptr)
 {
 	t_list	*current;
 	t_list	*prev;
-
-	if (!memlist || !ptr || !*memlist)
-		return (0);
-	if ((*memlist)->content == ptr)
+	
+	if (!var || !ptr || !var->memlist)
+		return ;
+	if ((var->memlist)->content == ptr)
 	{
-		current = *memlist;
-		*memlist = (*memlist)->next;
-		free(current->content);
-		free(current);
-		return (1);
+		current = var->memlist;
+		var->memlist = (var->memlist)->next;
+		ft_lstdelone(current, free);
+		return ;
 	}
-	prev = *memlist;
-	current = (*memlist)->next;
+	prev = var->memlist;
+	current = (var->memlist)->next;
 	while (current)
 	{
 		if (current->content == ptr)
 		{
 			prev->next = current->next;
-			free(current->content);
-			free(current);
-			return (1);
+			ft_lstdelone(current, free);
+			return ;
 		}
 		prev = current;
 		current = current->next;
 	}
-	return (1);
 }
 
-// use ft_lstclear(t_list **memlist, free);
-int	memlist_free_all(t_list **memlist)
+void	memlist_free_all(t_var *var)
 {
-	t_list	*current;
-	t_list	*next;
-	int		i;
-
-	i = 0;
-	if (!memlist || !*memlist)
-		return (0);
-	current = *memlist;
-	while (current)
-	{
-		next = current->next;
-		free(current->content);
-		free(current);
-		i++;
-		current = next;
-	}
-	*memlist = NULL;
-	return (i);
+	if (!var || !var->memlist)
+		return ;
+	ft_lstclear(&var->memlist, free);
 }

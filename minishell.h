@@ -82,10 +82,10 @@ void	ms_clean(char **var_ptr);
 void	ms_exit(t_var *var, int exit_code);
 
 // minishell_memory.c
-void	*memlist_alloc(t_list **memlist, size_t size);
-void	*memlist_add(t_list **memlist, void *ptr);
-int		memlist_free_all(t_list **memlist);
-int		memlist_free_ptr(t_list **memlist, void *ptr);
+void	*memlist_alloc(t_var *var, size_t size);
+void	*memlist_add(t_var *var, void *ptr);
+void	memlist_free_all(t_var *var);
+void	memlist_free_ptr(t_var *var, void *ptr);
 
 // minishell_builtins.c
 void	ms_echo(char **tokens);

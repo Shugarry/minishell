@@ -97,6 +97,6 @@ void	ms_exit(t_var *var, int exit_code)
 	if (!exit_code)
 		ft_putendl_fd("exit", STDOUT_FILENO);
 	rl_clear_history();
-	memlist_free_all(&var->memlist);
+	memlist_free_all(var);
 	exit(exit_code);
 }

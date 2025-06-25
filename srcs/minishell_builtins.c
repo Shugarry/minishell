@@ -52,9 +52,9 @@ char	*getcwd_plus(t_var *var)
 	if (!getcwd(cwd, sizeof(cwd)))
 		return (NULL);
 	if (ft_strlen(cwd) == 1 && *cwd == '/')
-		path = memlist_add(&var->memlist, ft_strdup(cwd));
+		path = memlist_add(var, ft_strdup(cwd));
 	else
-		path = memlist_add(&var->memlist, ft_strjoin(cwd, "/"));
+		path = memlist_add(var, ft_strjoin(cwd, "/"));
 	if (!path)
 		return (NULL);
 	return (path);
@@ -68,7 +68,7 @@ void	ms_pwd(t_var *var)
 	if (!cwd)
 		ms_exit(var, ms_perror("", "malloc() fail", "", errno));
 	printf("%s\n", cwd);
-	memlist_free_ptr(&var->memlist, cwd);
+	memlist_free_ptr(var, cwd);
 }
 
 int	bad_status(int status)
@@ -91,8 +91,8 @@ static void	cd_home(t_var *var)
 	pwd = get_env_var(var, "PWD");
 	modify_env_var(var, "OLDPWD", pwd);
 	modify_env_var(var, "PWD", home);
-	memlist_free_ptr(&var->memlist, home);
-	memlist_free_ptr(&var->memlist, pwd);
+	memlist_free_ptr(var, home);
+	memlist_free_ptr(var, pwd);
 }
 
 static void	cd_previous(t_var *var)
@@ -103,19 +103,17 @@ static void	cd_previous(t_var *var)
 		ms_perror("minishell: ", "cd: ", "OLDPWD not set", 1);
 	if (bad_status(chdir(get_env_var(var, "OLDPWD"))))
 		ms_perror("minishell:", "cd:", strerror(errno), errno);
-	tmp = memlist_add(&var->memlist, ft_strdup(get_env_var(var, "OLDPWD")));
+	tmp = memlist_add(var, ft_strdup(get_env_var(var, "OLDPWD")));
 	if (!tmp)
 		ms_exit(var, ms_perror("", strerror(errno), "", errno));
 	modify_env_var(var, "OLDPWD", get_env_var(var, "PWD"));
 	modify_env_var(var, "PWD", tmp);
-	memlist_free_ptr(&var->memlist, tmp);
+	memlist_free_ptr(var, tmp);
 }
 
 void	ms_cd(t_var *var, char **tokens)
 {
-	char	*home;
 	char	*pwd;
-	char	*tmp;
 
 	if (!tokens[1] || (tokens[1] && ft_strcmp(tokens[1], "--") == 0))
 		cd_home(var);
@@ -132,11 +130,11 @@ void	ms_cd(t_var *var, char **tokens)
 			ms_exit(var, ms_perror("", strerror(errno), "", errno));
 		modify_env_var(var, "OLDPWD", pwd);
 		modify_env_var(var, "PWD", tokens[1]);
-		memlist_free_ptr(&var->memlist, pwd);
+		memlist_free_ptr(var, pwd);
 	}
 }
 
-static void	export_print(t_var *var, char **tokens)
+static void	export_print(t_var *var)
 {
 	int		j;
 	char	*variable;
@@ -145,7 +143,7 @@ static void	export_print(t_var *var, char **tokens)
 	j = 0;
 	while(var->env[j])
 	{
-		variable = (char *)memlist_add(&var->memlist, ft_strdup(var->env[j]));
+		variable = (char *)memlist_add(var, ft_strdup(var->env[j]));
 		content = ft_strchr(variable, '=');
 		if (content)
 		{
@@ -156,7 +154,7 @@ static void	export_print(t_var *var, char **tokens)
 		else if (!content)
 			printf("declare -x %s\n", variable);
 		j++;
-		memlist_free_ptr(&var->memlist, variable);
+		memlist_free_ptr(var, variable);
 	}
 }
 
@@ -168,10 +166,10 @@ void	ms_export(t_var *var, char **tokens)
 
 	i = 1;
 	if (!tokens[i])
-		export_print(var, tokens);
+		export_print(var);
 	while (tokens[i])
 	{
-		variable = (char *)memlist_add(&var->memlist, ft_strdup(tokens[i]));
+		variable = (char *)memlist_add(var, ft_strdup(tokens[i]));
 		content = ft_strchr(variable, '=');
 		if (content)
 		{
@@ -180,7 +178,7 @@ void	ms_export(t_var *var, char **tokens)
 		}
 		modify_env_var(var, variable, content);
 		i++;
-		memlist_free_ptr(&var->memlist, variable);
+		memlist_free_ptr(var, variable);
 	}
 }
 
