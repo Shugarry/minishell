@@ -6,7 +6,7 @@
 /*   By: frey-gal <frey-gal@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 18:46:47 by frey-gal          #+#    #+#             */
-/*   Updated: 2025/06/23 07:41:25 by frey-gal         ###   ########.fr       */
+/*   Updated: 2025/06/26 01:10:39 by frey-gal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,8 +74,8 @@ void	ms_pwd(t_var *var)
 int	bad_status(int status)
 {
 	return (status == EACCES || status == EFAULT || status == EIO
-	|| status == ELOOP || status == ENAMETOOLONG || status == ENOENT
-	|| status == ENOMEM || status == ENOTDIR || status == -1);
+		|| status == ELOOP || status == ENAMETOOLONG || status == ENOENT
+		|| status == ENOMEM || status == ENOTDIR || status == -1);
 }
 
 static void	cd_home(t_var *var)
@@ -141,7 +141,7 @@ static void	export_print(t_var *var)
 	char	*content;
 
 	j = 0;
-	while(var->env[j])
+	while (var->env[j])
 	{
 		variable = (char *)memlist_add(var, ft_strdup(var->env[j]));
 		content = ft_strchr(variable, '=');
@@ -199,7 +199,7 @@ void	ms_env(t_var *var)
 	int	i;
 
 	i = 0;
-	while(var->env[i] != NULL)
+	while (var->env[i] != NULL)
 	{
 		if (ft_strchr(var->env[i], '='))
 			printf("%s\n", var->env[i]);

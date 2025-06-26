@@ -1,16 +1,14 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   mem_manager.c                                      :+:      :+:    :+:   */
+/*   minishell_memory.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: frey-gal <frey-gal@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 19:50:38 by frey-gal          #+#    #+#             */
-/*   Updated: 2025/06/04 19:50:39 by frey-gal         ###   ########.fr       */
+/*   Updated: 2025/06/26 01:06:39 by frey-gal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-#include "../minishell.h"
 
 #include "../minishell.h"
 
@@ -18,7 +16,7 @@ void	*memlist_alloc(t_var *var, size_t size)
 {
 	t_list	*node;
 	void	*ptr;
-	
+
 	if (!var)
 		return (NULL);
 	ptr = malloc(size);
@@ -37,7 +35,7 @@ void	*memlist_alloc(t_var *var, size_t size)
 void	*memlist_add(t_var *var, void *ptr)
 {
 	t_list	*node;
-	
+
 	if (!var)
 		return (NULL);
 	if (!ptr)
@@ -56,7 +54,7 @@ void	memlist_free_ptr(t_var *var, void *ptr)
 {
 	t_list	*current;
 	t_list	*prev;
-	
+
 	if (!var || !ptr || !var->memlist)
 		return ;
 	if ((var->memlist)->content == ptr)

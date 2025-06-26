@@ -6,7 +6,7 @@
 /*   By: frey-gal <frey-gal@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 12:11:29 by frey-gal          #+#    #+#             */
-/*   Updated: 2025/06/06 04:43:22 by frey-gal         ###   ########.fr       */
+/*   Updated: 2025/06/26 01:14:27 by frey-gal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,9 +33,10 @@ void	add_env_var(t_var *var, char *variable)
 {
 	char	**new_varlist;
 	int		i;
-	
+
 	var->env_len++;
-	new_varlist = (char **)memlist_alloc(var, (var->env_len + 1) * sizeof(char *));
+	new_varlist = \
+		(char **)memlist_alloc(var, (var->env_len + 1) * sizeof(char *));
 	if (!new_varlist)
 		ms_exit(var, ms_perror("", "malloc fail()", "", errno));
 	i = 0;
@@ -61,12 +62,11 @@ bool	find_env_var(t_var *var, char *var_name)
 	int	len;
 
 	i = 0;
-
 	len = ft_strlen(var_name);
 	while (var->env[i])
 	{
-		if (ft_strncmp(var_name, var->env[i], len) == 0 &&
-			(var->env[i][len] == '=' || var->env[i][len] == '\0'))
+		if (ft_strncmp(var_name, var->env[i], len) == 0
+			&& (var->env[i][len] == '=' || var->env[i][len] == '\0'))
 			return (true);
 		i++;
 	}
@@ -79,11 +79,12 @@ void	remove_env_var(t_var *var, char *var_name)
 	int		len;
 	int		i;
 	int		j;
-	
+
 	if (!find_env_var(var, var_name))
 		return ;
 	var->env_len--;
-	new_varlist = (char **)memlist_alloc(var, (var->env_len + 1) * sizeof(char *));
+	new_varlist = \
+		(char **)memlist_alloc(var, (var->env_len + 1) * sizeof(char *));
 	if (!new_varlist)
 		ms_exit(var, ms_perror("", "malloc fail()", "", errno));
 	i = 0;
@@ -91,8 +92,8 @@ void	remove_env_var(t_var *var, char *var_name)
 	len = ft_strlen(var_name);
 	while (var->env && var->env[i])
 	{
-		if (ft_strncmp(var_name, var->env[i], len) == 0 &&
-			(var->env[i][len] == '=' || var->env[i][len] == '\0'))
+		if (ft_strncmp(var_name, var->env[i], len) == 0
+			&& (var->env[i][len] == '=' || var->env[i][len] == '\0'))
 		{
 			i++;
 			continue ;
@@ -118,8 +119,8 @@ char	*get_env_var(t_var *var, char *var_name)
 	len = ft_strlen(var_name);
 	while (var->env && var->env[i])
 	{
-		if (ft_strncmp(var_name, var->env[i], len) == 0 &&
-			(var->env[i][len] == '=' || var->env[i][len] == '\0'))
+		if (ft_strncmp(var_name, var->env[i], len) == 0
+			&& (var->env[i][len] == '=' || var->env[i][len] == '\0'))
 		{
 			tmp = ft_strchr(var->env[i], '=');
 			if (!tmp || !tmp[1])
@@ -148,9 +149,9 @@ void	modify_env_var(t_var *var, char *var_name, char *new_content)
 	memlist_free_ptr(var, new_var);
 }
 
-void    create_env(t_var *var, char **env)
+void	create_env(t_var *var, char **env)
 {
-    int i;
+	int	i;
 
 	i = 0;
 	var->env = NULL;

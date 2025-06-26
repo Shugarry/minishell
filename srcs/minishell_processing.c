@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   minishell_processing.c                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: frey-gal <frey-gal@student.42barcelona.co  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/06/26 01:06:17 by frey-gal          #+#    #+#             */
+/*   Updated: 2025/06/26 03:32:05 by frey-gal         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../minishell.h"
 
 int	var_len_diff(t_var *var, char *str)
@@ -43,40 +55,41 @@ char	*var_finder(t_var *var, char *str, char *new_token)
 	return (content);
 }
 
-int    new_token_size(t_var *var, char *token)
+int	new_token_size(t_var *var, char *token)
 {
-    int    len;
-    int    i;
-    bool   in_single;
-    bool   in_double;
+	int		len;
+	int		i;
+	bool	in_single;
+	bool	in_double;
 
-    len = ft_strlen(token);
-    i = 0;
-    in_single = false;
-    in_double = false;
-    while (token[i])
-    {
-        if (token[i] == '$' && !in_single && (ft_isalpha(token[i + 1]) || token[i + 1] == '_'))
-        {
-            len += var_len_diff(var, token + i);
-            i++;
-            while (ft_isalnum(token[i]) || token[i] == '_')
-                i++;
-            continue;
-        }
-        if (token[i] == '"' && !in_single)
-        {
-            in_double = !in_double;
-            len--;
-        }
-        else if (token[i] == '\'' && !in_double)
-        {
-            in_single = !in_single;
-            len--;
-        }
-        i++;
-    }
-    return (len);
+	len = ft_strlen(token);
+	i = 0;
+	in_single = false;
+	in_double = false;
+	while (token[i])
+	{
+		if (token[i] == '$' && !in_single && (ft_isalpha(token[i + 1])
+				|| token[i + 1] == '_'))
+		{
+			len += var_len_diff(var, token + i);
+			i++;
+			while (ft_isalnum(token[i]) || token[i] == '_')
+				i++;
+			continue ;
+		}
+		if (token[i] == '"' && !in_single)
+		{
+			in_double = !in_double;
+			len--;
+		}
+		else if (token[i] == '\'' && !in_double)
+		{
+			in_single = !in_single;
+			len--;
+		}
+		i++;
+	}
+	return (len);
 }
 
 char	*token_builder(t_var *var, char *token)
@@ -99,26 +112,24 @@ char	*token_builder(t_var *var, char *token)
 	in_double = false;
 	while (token[j])
 	{
-		if (token[j] == '$' && !in_single && (ft_isalpha(token[j + 1]) || token[j + 1] == '_'))
+		if (token[j] == '$' && !in_single && (ft_isalpha(token[j + 1])
+				|| token[j + 1] == '_'))
 		{
 			tmp = var_finder(var, token + j, new_token);
 			i += ft_strlcpy(new_token + i, tmp, ft_strlen(tmp) + 1);
 			j++;
 			while (ft_isalnum(token[j]) || token[j] == '_')
 				j++;
-			continue;
 		}
 		else if (token[j] == '"' && !in_single)
 		{
 			in_double = !in_double;
 			j++;
-			continue;
 		}
 		else if (token[j] == '\'' && !in_double)
 		{
 			in_single = !in_single;
 			j++;
-			continue;
 		}
 		else
 		{
@@ -157,10 +168,10 @@ _Bool	ms_cmd_expander(t_var *var)
 	int		i;
 
 	i = 0;
-	while(var->cmds[i])
+	while (var->cmds[i])
 	{
-		var->cmds[i] = expand_cmd(var, var->cmds[i]); 
+		var->cmds[i] = expand_cmd(var, var->cmds[i]);
 		i++;
 	}
-	return false;
+	return (false);
 }
