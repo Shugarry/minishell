@@ -47,7 +47,7 @@ typedef struct s_var
 	char			**env;
 	int				env_len;
 	char			**paths;
-	char			pwd[4096];
+	char			*pwd;
 	unsigned char	exit_code;
 	t_list			*memlist;
 }					t_var;
@@ -88,6 +88,7 @@ void	memlist_free_all(t_var *var);
 void	memlist_free_ptr(t_var *var, void *ptr);
 
 // minishell_builtins.c
+char	*getcwd_plus(t_var *var);
 void	ms_echo(char **tokens);
 void	ms_cd(t_var *var, char **tokens);
 void	ms_pwd(t_var *var);

@@ -28,9 +28,7 @@ void	ms_echo(char **tokens)
 		if (tokens[i][j] == '\0')
 			add_nl = false;
 		else
-			printf("%s", tokens[i]);
-		if (tokens[i + 1])
-			printf(" ");
+			break ;
 		i++;
 	}
 	while (tokens && tokens[i] != NULL)
@@ -44,6 +42,7 @@ void	ms_echo(char **tokens)
 		printf("\n");
 }
 
+//TODO: REMOVE SLASH AT THE END OF DIR PATH 
 char	*getcwd_plus(t_var *var)
 {
 	char	cwd[4096];
@@ -55,20 +54,15 @@ char	*getcwd_plus(t_var *var)
 		path = memlist_add(var, ft_strdup(cwd));
 	else
 		path = memlist_add(var, ft_strjoin(cwd, "/"));
-	if (!path)
-		return (NULL);
 	return (path);
 }
 
 void	ms_pwd(t_var *var)
 {
-	char	*cwd;
-
-	cwd = getcwd_plus(var);
-	if (!cwd)
-		ms_exit(var, ms_perror("", "malloc() fail", "", errno));
-	printf("%s\n", cwd);
-	memlist_free_ptr(var, cwd);
+	if (var->pwd)
+		printf("%s\n", var->pwd);
+	else if (get_env_var(var, "PWD"))
+		printf("%s\n", get_env_var(var, "PWD"));
 }
 
 int	bad_status(int status)
@@ -80,18 +74,23 @@ int	bad_status(int status)
 
 static void	cd_home(t_var *var)
 {
-	char	*home;
 	char	*pwd;
 
-	home = get_env_var(var, "HOME");
-	if (!home)
+	pwd = getcwd_plus(var);
+	if (get_env_var(var, "HOME") == NULL)
+	{
 		ms_perror("minishell: ", "cd: ", "HOME not set", 1);
-	if (bad_status(chdir(home)))
-		ms_perror("", strerror(errno), "", errno);
-	pwd = get_env_var(var, "PWD");
+		return ;
+	}
+	if (bad_status(chdir(get_env_var(var, "HOME"))))
+	{
+		ms_perror("minishell: ", "cd: ", strerror(errno), errno);
+		return ;
+	}
 	modify_env_var(var, "OLDPWD", pwd);
-	modify_env_var(var, "PWD", home);
-	memlist_free_ptr(var, home);
+	modify_env_var(var, "PWD", get_env_var(var, "HOME"));
+	memlist_free_ptr(var, var->pwd);
+	var->pwd = memlist_add(var, ft_strdup(get_env_var(var, "HOME")));
 	memlist_free_ptr(var, pwd);
 }
 
@@ -100,20 +99,26 @@ static void	cd_previous(t_var *var)
 	char	*tmp;
 
 	if (!get_env_var(var, "OLDPWD"))
+	{
 		ms_perror("minishell: ", "cd: ", "OLDPWD not set", 1);
+		return ;
+	}
 	if (bad_status(chdir(get_env_var(var, "OLDPWD"))))
+	{
 		ms_perror("minishell:", "cd:", strerror(errno), errno);
+		return ;
+	}
 	tmp = memlist_add(var, ft_strdup(get_env_var(var, "OLDPWD")));
-	if (!tmp)
-		ms_exit(var, ms_perror("", strerror(errno), "", errno));
 	modify_env_var(var, "OLDPWD", get_env_var(var, "PWD"));
 	modify_env_var(var, "PWD", tmp);
+	memlist_free_ptr(var, var->pwd);
+	var->pwd = memlist_add(var, ft_strdup(tmp));
 	memlist_free_ptr(var, tmp);
 }
 
 void	ms_cd(t_var *var, char **tokens)
 {
-	char	*pwd;
+	char	*tmp;
 
 	if (!tokens[1] || (tokens[1] && ft_strcmp(tokens[1], "--") == 0))
 		cd_home(var);
@@ -123,14 +128,19 @@ void	ms_cd(t_var *var, char **tokens)
 		cd_previous(var);
 	else
 	{
+		tmp = getcwd_plus(var);
 		if (bad_status(chdir(tokens[1])))
-			ms_perror("minishell:", "cd:", strerror(errno), errno);
-		pwd = get_env_var(var, "PWD");
-		if (!pwd)
-			ms_exit(var, ms_perror("", strerror(errno), "", errno));
-		modify_env_var(var, "OLDPWD", pwd);
-		modify_env_var(var, "PWD", tokens[1]);
-		memlist_free_ptr(var, pwd);
+		{
+			ms_perror("minishell: ", "cd: ", strerror(errno), errno);
+			return ;
+		}
+		modify_env_var(var, "OLDPWD", tmp);
+		memlist_free_ptr(var, tmp);
+		tmp = getcwd_plus(var);
+		modify_env_var(var, "PWD", tmp);
+		memlist_free_ptr(var, var->pwd);
+		var->pwd = memlist_add(var, ft_strdup(tmp));
+		memlist_free_ptr(var, tmp);
 	}
 }
 

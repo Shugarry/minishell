@@ -18,7 +18,7 @@ int	ms_regular_token_check(char *line)
 	char	quote;
 
 	len = 0;
-	while (!ft_strchr(" |&<>()", line[len]))
+	while (!ft_strchr(" |&<>", line[len]))
 	{
 		if (line[len] == '\'' || line[len] == '\"')
 		{

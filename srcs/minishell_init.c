@@ -144,6 +144,7 @@ int	main(int ac, char **av, char **env)
 	if (!env || !*env)
 		ms_exit(&var, ms_perror("", "env not found", "", 1));
 	create_env(&var, env);
+	var.pwd = getcwd_plus(&var);
 	var.paths = ft_split(get_env_var(&var, "PATH"), ':');
 	if (!var.paths)
 		ms_exit(&var, ms_perror("", strerror(errno), "", errno));

@@ -35,21 +35,14 @@ void	add_env_var(t_var *var, char *variable)
 	int		i;
 
 	var->env_len++;
-	new_varlist = \
-		(char **)memlist_alloc(var, (var->env_len + 1) * sizeof(char *));
-	if (!new_varlist)
-		ms_exit(var, ms_perror("", "malloc fail()", "", errno));
+	new_varlist = memlist_alloc(var, (var->env_len + 1) * sizeof(char *));
 	i = 0;
 	while (var->env && var->env[i])
 	{
 		new_varlist[i] = (char *)memlist_add(var, ft_strdup(var->env[i]));
-		if (!new_varlist[i])
-			ms_exit(var, ms_perror("", "malloc fail()", "", errno));
 		i++;
 	}
 	new_varlist[i] = (char *)memlist_add(var, ft_strdup(variable));
-	if (!new_varlist[i])
-		ms_exit(var, ms_perror("", "malloc fail()", "", errno));
 	i++;
 	new_varlist[i] = NULL;
 	varlist_clean(var);
@@ -83,10 +76,7 @@ void	remove_env_var(t_var *var, char *var_name)
 	if (!find_env_var(var, var_name))
 		return ;
 	var->env_len--;
-	new_varlist = \
-		(char **)memlist_alloc(var, (var->env_len + 1) * sizeof(char *));
-	if (!new_varlist)
-		ms_exit(var, ms_perror("", "malloc fail()", "", errno));
+	new_varlist = memlist_alloc(var, (var->env_len + 1) * sizeof(char *));
 	i = 0;
 	j = 0;
 	len = ft_strlen(var_name);
@@ -98,9 +88,7 @@ void	remove_env_var(t_var *var, char *var_name)
 			i++;
 			continue ;
 		}
-		new_varlist[j] = (char *)memlist_add(var, ft_strdup(var->env[i]));
-		if (!new_varlist[j])
-			ms_exit(var, ms_perror("", "malloc fail()", "", errno));
+		new_varlist[j] = memlist_add(var, ft_strdup(var->env[i]));
 		j++;
 		i++;
 	}
@@ -139,11 +127,7 @@ void	modify_env_var(t_var *var, char *var_name, char *new_content)
 	char	*new_var;
 
 	tmp = memlist_add(var, ft_strjoin(var_name, "="));
-	if (!tmp)
-		ms_exit(var, ms_perror("", "malloc fail()", "", errno));
 	new_var = memlist_add(var, ft_strjoin(tmp, new_content));
-	if (!new_var)
-		ms_exit(var, ms_perror("", "malloc fail()", "", errno));
 	remove_env_var(var, var_name);
 	add_env_var(var, new_var);
 	memlist_free_ptr(var, new_var);
