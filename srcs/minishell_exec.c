@@ -65,7 +65,7 @@ void	ft_exec_child(t_var *var, int i, int pipes)
 		ms_exit(var, 1);
 	if (var->cmds[i][0] && !ms_exec_builtins(var, i) && \
 		execve(var->cmds[i][0], var->cmds[i], var->env))
-		ms_perror(var->cmds[i][0], strerror(errno), "", errno);
+		ms_perror(var->cmds[i][0], ": ", strerror(errno), errno);
 	else
 		var->exit_code = 0;
 	ms_exit(var, -1);

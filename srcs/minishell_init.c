@@ -88,7 +88,7 @@ _Bool	ms_cmd_filler(t_var *var)
 	{
 		args = 0;
 		while (var->tokens[i + args] && \
-			!ft_strchr("|&()", *var->tokens[i + args]))
+			!ft_strchr("|", *var->tokens[i + args]))
 			args++;
 		var->cmds[var->cmd_count] = \
 			(char **)ft_calloc(args + 1, sizeof(char *));

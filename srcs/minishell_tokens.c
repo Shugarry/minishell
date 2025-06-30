@@ -18,7 +18,7 @@ int	ms_regular_token_check(char *line)
 	char	quote;
 
 	len = 0;
-	while (!ft_strchr(" |&<>", line[len]))
+	while (!ft_strchr(" |<>", line[len]))
 	{
 		if (line[len] == '\'' || line[len] == '\"')
 		{
@@ -41,24 +41,22 @@ int	ms_special_token_check(char *line, t_var *var)
 	char	token;
 
 	token = line[0];
-	if ((token == '&' && line[1] != '&') || \
-		token == '\\' || token == ';' || token == '`')
+	if (token == '\\' || token == ';' || token == '`')
 	{
 		ms_perror("syntax error near unexpected token `", &token, "'", 1);
 		return (-1);
 	}
-	if (token == '|' || token == '&' || token == '<' || token == '>')
+	if (token == '|' || token == '<' || token == '>')
 	{
-		if (var && (token == '|' || token == '&'))
-			var->cmd_count++;
-		if (line[0] == line[1])
-			return (2);
 		if (var && token == '|')
+		{
+			var->cmd_count++;
 			var->pipe_count++;
+		}
+		if (line[0] == line[1] && (token == '<' || token == '>'))
+			return (2);
 		return (1);
 	}
-	if (line[0] == '(' || line[0] == ')')
-		return (1);
 	return (0);
 }
 
