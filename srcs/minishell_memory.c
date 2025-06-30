@@ -78,10 +78,3 @@ void	memlist_free_ptr(t_var *var, void *ptr)
 		current = current->next;
 	}
 }
-
-void	memlist_free_all(t_var *var)
-{
-	if (!var || !var->memlist)
-		return ;
-	ft_lstclear(&var->memlist, free);
-}

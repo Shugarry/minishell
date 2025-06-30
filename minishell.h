@@ -84,7 +84,6 @@ void	ms_exit(t_var *var, int exit_code);
 // minishell_memory.c
 void	*memlist_alloc(t_var *var, size_t size);
 void	*memlist_add(t_var *var, void *ptr);
-void	memlist_free_all(t_var *var);
 void	memlist_free_ptr(t_var *var, void *ptr);
 
 // minishell_builtins.c

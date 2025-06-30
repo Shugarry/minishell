@@ -42,7 +42,6 @@ void	ms_echo(char **tokens)
 		printf("\n");
 }
 
-//TODO: REMOVE SLASH AT THE END OF DIR PATH 
 char	*getcwd_plus(t_var *var)
 {
 	char	cwd[4096];
@@ -50,10 +49,7 @@ char	*getcwd_plus(t_var *var)
 
 	if (!getcwd(cwd, sizeof(cwd)))
 		return (NULL);
-	if (ft_strlen(cwd) == 1 && *cwd == '/')
-		path = memlist_add(var, ft_strdup(cwd));
-	else
-		path = memlist_add(var, ft_strjoin(cwd, "/"));
+	path = memlist_add(var, ft_strdup(cwd));
 	return (path);
 }
 

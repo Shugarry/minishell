@@ -38,22 +38,23 @@ int	ms_regular_token_check(char *line)
 
 int	ms_special_token_check(char *line, t_var *var)
 {
-	char	token;
+	char	token[2];
 
-	token = line[0];
-	if (token == '\\' || token == ';' || token == '`')
+	token[0] = line[0];
+	token[1] = '\0';
+	if (*token == '\\' || *token == ';' || *token == '`')
 	{
-		ms_perror("syntax error near unexpected token `", &token, "'", 1);
+		ms_perror("syntax error near unexpected token `", token, "'", 1);
 		return (-1);
 	}
-	if (token == '|' || token == '<' || token == '>')
+	if (*token == '|' || *token == '<' || *token == '>')
 	{
-		if (var && token == '|')
+		if (var && *token == '|')
 		{
 			var->cmd_count++;
 			var->pipe_count++;
 		}
-		if (line[0] == line[1] && (token == '<' || token == '>'))
+		if (line[0] == line[1] && (*token == '<' || *token == '>'))
 			return (2);
 		return (1);
 	}
