@@ -155,7 +155,7 @@ static void	export_print(t_var *var)
 	j = 0;
 	while (var->env[j])
 	{
-		variable = (char *)memlist_add(var, ft_strdup(var->env[j]));
+		variable = memlist_add(var, ft_strdup(var->env[j]));
 		content = ft_strchr(variable, '=');
 		if (content)
 		{
@@ -173,6 +173,7 @@ static void	export_print(t_var *var)
 void	ms_export(t_var *var, char **tokens)
 {
 	int		i;
+	int		j;
 	char	*variable;
 	char	*content;
 
@@ -181,12 +182,19 @@ void	ms_export(t_var *var, char **tokens)
 		export_print(var);
 	while (tokens[i])
 	{
-		variable = (char *)memlist_add(var, ft_strdup(tokens[i]));
+		j = 0;
+		variable = memlist_add(var, ft_strdup(tokens[i]));
 		content = ft_strchr(variable, '=');
 		if (content)
 		{
 			content[0] = '\0';
 			content++;
+		}
+		while (variable[j])
+		{
+			if (!ft_isdigit(variable[0]) || !ft_isalnum(variable[j]))
+				return (perror());
+			j++;
 		}
 		modify_env_var(var, variable, content);
 		i++;

@@ -39,10 +39,10 @@ void	add_env_var(t_var *var, char *variable)
 	i = 0;
 	while (var->env && var->env[i])
 	{
-		new_varlist[i] = (char *)memlist_add(var, ft_strdup(var->env[i]));
+		new_varlist[i] = memlist_add(var, ft_strdup(var->env[i]));
 		i++;
 	}
-	new_varlist[i] = (char *)memlist_add(var, ft_strdup(variable));
+	new_varlist[i] = memlist_add(var, ft_strdup(variable));
 	i++;
 	new_varlist[i] = NULL;
 	varlist_clean(var);
@@ -133,22 +133,54 @@ void	modify_env_var(t_var *var, char *var_name, char *new_content)
 	memlist_free_ptr(var, new_var);
 }
 
+void	add_shlvl(t_var *var, char *shlvl)
+{
+	char	*tmp;
+	int		lvl;
+	int		i;
+
+	if (!*shlvl || strlen(shlvl) > 5)
+		return (add_env_var(var, "SHLVL=1"));
+	
+	i = 0;
+	while (shlvl[i])
+	{
+		if (!ft_isdigit(shlvl[i]))
+			return (add_env_var(var, "SHLVL=1"));
+		i++;
+	}
+	lvl = ft_atoi(shlvl);
+	if (lvl < 0)
+		return (add_env_var(var, "SHLVL=0"));
+	if (lvl + 1 > 1000)
+	{
+		printf("minishell: warning: shell level %d too high, resetting to 1\n", lvl + 1);
+		return (add_env_var(var, "SHLVL=1"));
+	}
+	tmp = memlist_add(var, ft_strjoin("SHLVL=", ft_itoa(lvl + 1)));
+	add_env_var(var, tmp);
+	memlist_free_ptr(var, tmp);
+}
+
 void	create_env(t_var *var, char **env)
 {
-	int	i;
+	int		i;
+	bool	shlvl;
 
 	i = 0;
+	shlvl = false;
 	var->env = NULL;
 	while (env && env[i])
 	{
 		if (ft_strncmp(env[i], "SHLVL=", ft_strlen("SHLVL=")) == 0)
 		{
-			add_env_var(var, "SHLVL=1");
-			i++;
-			continue ;
+			shlvl = true;
+			add_shlvl(var, ft_strchr(env[i], '=') + 1);
 		}
 		else
 			add_env_var(var, env[i]);
 		i++;
 	}
+	if (!shlvl)
+		add_env_var(var, "SHLVL=1");
 }
