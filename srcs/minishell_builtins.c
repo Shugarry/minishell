@@ -190,14 +190,18 @@ void	ms_export(t_var *var, char **tokens)
 			content[0] = '\0';
 			content++;
 		}
-		while (variable[j])
+		while (variable && variable[j])
 		{
-			if (!ft_isdigit(variable[0]) || !ft_isalnum(variable[j]))
-				return (perror());
+			if (!ft_isalpha(variable[0]) && (!ft_isalnum(variable[j]) || variable[j] != '_'))
+			{
+				printf("minishell: export: `%s': not a valid identifier\n", variable);
+				memlist_free_ptr(var, variable);
+				return ;
+			}
 			j++;
 		}
-		modify_env_var(var, variable, content);
 		i++;
+		modify_env_var(var, variable, content);
 		memlist_free_ptr(var, variable);
 	}
 }

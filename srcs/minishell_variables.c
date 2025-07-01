@@ -126,6 +126,12 @@ void	modify_env_var(t_var *var, char *var_name, char *new_content)
 	char	*tmp;
 	char	*new_var;
 
+	if (new_content == NULL)
+	{
+		remove_env_var(var, var_name);
+		add_env_var(var, var_name);
+		return ;
+	}
 	tmp = memlist_add(var, ft_strjoin(var_name, "="));
 	new_var = memlist_add(var, ft_strjoin(tmp, new_content));
 	remove_env_var(var, var_name);
@@ -139,9 +145,10 @@ void	add_shlvl(t_var *var, char *shlvl)
 	int		lvl;
 	int		i;
 
+	while (*shlvl == '0')
+		shlvl++;
 	if (!*shlvl || strlen(shlvl) > 5)
 		return (add_env_var(var, "SHLVL=1"));
-	
 	i = 0;
 	while (shlvl[i])
 	{
@@ -162,10 +169,13 @@ void	add_shlvl(t_var *var, char *shlvl)
 	memlist_free_ptr(var, tmp);
 }
 
+
+
 void	create_env(t_var *var, char **env)
 {
 	int		i;
 	bool	shlvl;
+	char	*tmp;
 
 	i = 0;
 	shlvl = false;
@@ -183,4 +193,9 @@ void	create_env(t_var *var, char **env)
 	}
 	if (!shlvl)
 		add_env_var(var, "SHLVL=1");
+	tmp = getcwd_plus(var);
+	if (!get_env_var(var, "PWD") && tmp)
+		modify_env_var(var, "PWD", tmp);
+	memlist_free_ptr(var, tmp);
+
 }

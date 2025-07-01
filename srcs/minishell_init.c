@@ -141,14 +141,11 @@ int	main(int ac, char **av, char **env)
 	ft_bzero(&var, sizeof(t_var));
 	if (ac != 1 || av[1])
 		ms_exit(&var, ms_perror("", "arguments are not supported yet", "", 1));
-	if (!env || !*env)
-		ms_exit(&var, ms_perror("", "env not found", "", 1));
 	create_env(&var, env);
 	var.pwd = getcwd_plus(&var);
 	var.paths = ft_split(get_env_var(&var, "PATH"), ':');
 	if (!var.paths)
 		ms_exit(&var, ms_perror("", strerror(errno), "", errno));
-	create_env(&var, env);
 	while (1)
 	{
 		signal(SIGINT, ms_signal_handle);

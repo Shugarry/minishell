@@ -29,8 +29,6 @@ int	var_len_diff(t_var *var, char *str)
 	len_content = ft_strlen(get_env_var(var, var_name));
 	len_name = ft_strlen(var_name);
 	free(var_name);
-	if (!len_content)
-		return (0);
 	return (len_content - len_name - 1);
 }
 
@@ -103,6 +101,8 @@ char	*token_builder(t_var *var, char *token)
 	bool	in_double;
 
 	len = new_token_size(var, token);
+	if (!len)
+		return (ft_strdup(""));
 	new_token = (char *)malloc(sizeof(char) * (len + 1));
 	if (!new_token)
 		return (NULL);
