@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 int	ms_perror(char *err1, char *err2, char *err3, int err_no)
 {
@@ -99,6 +99,6 @@ void	ms_exit(t_var *var, int exit_code)
 		ft_putendl_fd("exit", STDOUT_FILENO);
 	}
 	rl_clear_history();
-	memlist_free_all(&var->memlist);
+	ft_lstclear(&var->memlist, free);
 	exit(exit_code);
 }

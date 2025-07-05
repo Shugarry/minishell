@@ -47,7 +47,7 @@ typedef struct s_var
 	char			**env;
 	int				env_len;
 	char			**paths;
-	char			pwd[4096];
+	char			*pwd;
 	unsigned char	exit_code;
 	t_list			*memlist;
 }					t_var;
@@ -58,9 +58,6 @@ _Bool	ms_exec_builtins(t_var *var, int i, _Bool child);
 void	ft_exec_child(t_var *var, int i, int pipes);
 int		ms_pipex(t_var *var);
 int		ms_open_fds(t_var *var, int i);
-
-// minishell_builtins.c
-void	ms_echo(char **tokens);
 
 // minishell_init.c
 void	ms_open_heredoc(char *limit, size_t limit_len, int *hd_int);
@@ -86,15 +83,15 @@ void	ms_clean(char **var_ptr);
 void	ms_exit(t_var *var, int exit_code);
 
 // minishell_memory.c
-void	*memlist_alloc(t_list **memlist, size_t size);
-void	*memlist_add(t_list **memlist, void *ptr);
-int		memlist_free_all(t_list **memlist);
-int		memlist_free_ptr(t_list **memlist, void *ptr);
+void	*memlist_alloc(t_var *var, size_t size);
+void	*memlist_add(t_var *var, void *ptr);
+void	memlist_free_ptr(t_var *var, void *ptr);
 
 // minishell_builtins.c
+char	*getcwd_plus(t_var *var);
 void	ms_echo(char **tokens);
-int		ms_cd(t_var *var, char **tokens);
-int		ms_pwd(t_var *var);
+void	ms_cd(t_var *var, char **tokens);
+void	ms_pwd(t_var *var);
 void	ms_export(t_var *var, char **tokens);
 void	ms_unset(t_var *var, char **tokens);
 void	ms_env(t_var *var);
@@ -109,7 +106,7 @@ char	*get_env_var(t_var *var, char *variable);
 // minishell_processing.c
 bool	is_escape_char(char c);
 int		var_len_diff(t_var *var, char *str);
-char	*var_finder(t_var *var, char *str);
+char	*var_finder(t_var *var, char *str, char *new_token);
 int		new_token_size(t_var *var, char *token);
 char	*token_builder(t_var *var, char *token);
 char	**expand_cmd(t_var *var, char **cmd);
