@@ -109,7 +109,7 @@ bool	find_env_var(t_var *var, char *var_name);
 void	remove_env_var(t_var *var, char *var_name);
 char	*get_env_var(t_var *var, char *variable);
 void	modify_env_var(t_var *var, char *var_name, char *new_content);
-void	add_shlvl(t_var *var, char *shlvl)
+void	add_shlvl(t_var *var, char *shlvl);
 void	create_env(t_var *var, char **env);
 
 // minishell_processing.c
