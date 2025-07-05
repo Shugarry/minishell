@@ -103,11 +103,14 @@ void	ms_unset(t_var *var, char **tokens);
 void	ms_env(t_var *var);
 
 // minishell_variables.c
+void	varlist_clean(t_var	*var);
 void	add_env_var(t_var *var, char *variable);
+bool	find_env_var(t_var *var, char *var_name);
 void	remove_env_var(t_var *var, char *var_name);
-void	create_env(t_var *var, char **env);
-void	modify_env_var(t_var *var, char *var_name, char *new_content);
 char	*get_env_var(t_var *var, char *variable);
+void	modify_env_var(t_var *var, char *var_name, char *new_content);
+void	add_shlvl(t_var *var, char *shlvl)
+void	create_env(t_var *var, char **env);
 
 // minishell_processing.c
 int		var_len_diff(t_var *var, char *str);
