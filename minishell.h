@@ -53,7 +53,8 @@ typedef struct s_var
 }					t_var;
 
 // minishell_exec.c
-_Bool	ms_exec_builtins(t_var *var, int i);
+void	ms_exit_func_handle(t_var *var);
+_Bool	ms_exec_builtins(t_var *var, int i, _Bool child);
 void	ft_exec_child(t_var *var, int i, int pipes);
 int		ms_pipex(t_var *var);
 int		ms_open_fds(t_var *var, int i);
