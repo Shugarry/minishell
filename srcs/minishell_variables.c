@@ -142,6 +142,7 @@ void	modify_env_var(t_var *var, char *var_name, char *new_content)
 void	add_shlvl(t_var *var, char *shlvl)
 {
 	char	*tmp;
+	char	*level;
 	int		lvl;
 	int		i;
 
@@ -161,15 +162,16 @@ void	add_shlvl(t_var *var, char *shlvl)
 		return (add_env_var(var, "SHLVL=0"));
 	if (lvl + 1 > 1000)
 	{
-		printf("minishell: warning: shell level %d too high, resetting to 1\n", lvl + 1);
+		printf("minishell: warning: shell level %d too high, \
+			resetting to 1\n", lvl + 1);
 		return (add_env_var(var, "SHLVL=1"));
 	}
-	tmp = memlist_add(var, ft_strjoin("SHLVL=", ft_itoa(lvl + 1)));
+	level = ft_itoa(lvl + 1);
+	tmp = memlist_add(var, ft_strjoin("SHLVL=", level));
+	free(level);
 	add_env_var(var, tmp);
 	memlist_free_ptr(var, tmp);
 }
-
-
 
 void	create_env(t_var *var, char **env)
 {
@@ -197,5 +199,4 @@ void	create_env(t_var *var, char **env)
 	if (!get_env_var(var, "PWD") && tmp)
 		modify_env_var(var, "PWD", tmp);
 	memlist_free_ptr(var, tmp);
-
 }

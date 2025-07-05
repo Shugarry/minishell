@@ -62,7 +62,7 @@ void	ms_free_ptrs(t_var *var)
 	var->line = NULL;
 }
 
-void	ms_exit(t_var *var, int exit_code)
+void	ms_heredoc_cleaner(void)
 {
 	char	*hd_no;
 	char	*hd_name;
@@ -77,15 +77,19 @@ void	ms_exit(t_var *var, int exit_code)
 			ms_perror("", strerror(errno), "\n", errno);
 		if (hd_no)
 			free(hd_no);
-		if (access(hd_name, F_OK) == 0)
-			unlink(hd_name);
-		else
+		if (access(hd_name, F_OK))
 			break ;
+		unlink(hd_name);
 		if (hd_name)
 			free(hd_name);
 	}
 	if (hd_name)
 		free(hd_name);
+}
+
+void	ms_exit(t_var *var, int exit_code)
+{
+	ms_heredoc_cleaner();
 	if (var->fd_in > 0)
 		close(var->fd_in);
 	if (var->fd_out > 0)

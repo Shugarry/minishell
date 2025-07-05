@@ -25,7 +25,7 @@ void	ms_exit_func_handle(t_var *var)
 			if (!ft_isdigit(var->cmds[0][1][i++]))
 				ms_exit(var, ms_perror("", "exit: ", \
 					"numeric argument required", 2));
-		ms_exit(var, ft_atoi(var->cmds[i][1]));
+		ms_exit(var, ft_atoi(var->cmds[0][1]));
 	}
 	else
 		ms_perror("", "exit: ", "too many arguments", 127);

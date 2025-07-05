@@ -57,6 +57,7 @@ void	ms_exit_func_handle(t_var *var);
 _Bool	ms_exec_builtins(t_var *var, int i, _Bool child);
 void	ft_exec_child(t_var *var, int i, int pipes);
 int		ms_pipex(t_var *var);
+char	**ms_cmd_trim(char **cmd, int pos);
 int		ms_open_fds(t_var *var, int i);
 
 // minishell_init.c
@@ -78,8 +79,9 @@ _Bool	ms_token_filler(char *line, char **tokens);
 
 // minishell_utils.c
 int		ms_perror(char *err1, char *err2, char *err3, int err_no);
-void	ms_free_ptrs(t_var *var);
 void	ms_clean(char **var_ptr);
+void	ms_free_ptrs(t_var *var);
+void	ms_heredoc_clean(void);
 void	ms_exit(t_var *var, int exit_code);
 
 // minishell_memory.c
@@ -88,10 +90,14 @@ void	*memlist_add(t_var *var, void *ptr);
 void	memlist_free_ptr(t_var *var, void *ptr);
 
 // minishell_builtins.c
-char	*getcwd_plus(t_var *var);
 void	ms_echo(char **tokens);
-void	ms_cd(t_var *var, char **tokens);
+char	*getcwd_plus(t_var *var);
 void	ms_pwd(t_var *var);
+int		bad_status(int status);
+//static void	cd_home(t_var *var);
+//static void	cd_previous(t_var *var);
+void	ms_cd(t_var *var, char **tokens);
+//static void	export_print(t_var *var);
 void	ms_export(t_var *var, char **tokens);
 void	ms_unset(t_var *var, char **tokens);
 void	ms_env(t_var *var);
@@ -104,12 +110,10 @@ void	modify_env_var(t_var *var, char *var_name, char *new_content);
 char	*get_env_var(t_var *var, char *variable);
 
 // minishell_processing.c
-bool	is_escape_char(char c);
 int		var_len_diff(t_var *var, char *str);
 char	*var_finder(t_var *var, char *str, char *new_token);
 int		new_token_size(t_var *var, char *token);
 char	*token_builder(t_var *var, char *token);
-char	**expand_cmd(t_var *var, char **cmd);
-_Bool	ms_cmd_expander(t_var *var);
+_Bool	expand_cmd(t_var *var);
 
 #endif
