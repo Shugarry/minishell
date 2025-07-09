@@ -12,7 +12,26 @@
 
 #include "../minishell.h"
 
-_Bool	ms_exec_builtins(t_var *var, int i)
+void	ms_exit_func_handle(t_var *var)
+{
+	int	i;
+
+	i = 0;
+	if (!var->cmds[0][1])
+		ms_exit(var, 0);
+	else if (var->cmds[0][1] && !var->cmds[0][2])
+	{
+		while (var->cmds[0][1][i])
+			if (!ft_isdigit(var->cmds[0][1][i++]))
+				ms_exit(var, ms_perror("", "exit: ", \
+					"numeric argument required", 2));
+		ms_exit(var, ft_atoi(var->cmds[0][1]));
+	}
+	else
+		ms_perror("", "exit: ", "too many arguments", 127);
+}
+
+_Bool	ms_exec_builtins(t_var *var, int i, _Bool child)
 {
 	char	*stripped_cmd;
 
@@ -21,30 +40,22 @@ _Bool	ms_exec_builtins(t_var *var, int i)
 		stripped_cmd = var->cmds[i][0];
 	else
 		stripped_cmd++;
-
-	// Pend separete exit function and fix non numeric second argument
-	if (ft_strncmp(var->cmds[0][0], "exit", 5) == 0)
-	{
-		if (!var->cmds[0][1])
-			ms_exit(var, 0);
-		else if (var->cmds[0][1] && !var->cmds[0][2])
-			ms_exit(var, ft_atoi(var->cmds[i][1]));
-		else
-			ms_perror("", "exit: ", "too many arguments", 127);
-		return (0);
-	}
-	else if (ft_strncmp(stripped_cmd, "echo", 5) == 0)
-		ms_echo(var->cmds[i]);
-	else if (ft_strncmp(stripped_cmd, "cd", 3) == 0)
+	if (!ft_strncmp(var->cmds[0][0], "exit", 5))
+		ms_exit_func_handle(var);
+	else if (!ft_strncmp(stripped_cmd, "cd", 3))
 		ms_cd(var, var->cmds[i]);
-	else if (ft_strncmp(stripped_cmd, "pwd", 4) == 0)
+	else if (!ft_strncmp(stripped_cmd, "echo", 5) && child)
+		ms_echo(var->cmds[i]);
+	else if (!ft_strncmp(stripped_cmd, "pwd", 4) && child)
 		ms_pwd(var);
-	else if (ft_strncmp(stripped_cmd, "export", 7) == 0)
-		ms_export(var, var->cmds[i]);
-	else if (ft_strncmp(stripped_cmd, "unset", 6) == 0)
-		ms_unset(var, var->cmds[i]);
-	else if (ft_strncmp(stripped_cmd, "env", 4) == 0)
+	else if (!ft_strncmp(stripped_cmd, "env", 4) && child)
 		ms_env(var);
+	else if (!ft_strncmp(stripped_cmd, "unset", 6))
+		ms_unset(var, var->cmds[i]);
+	else if (!ft_strncmp(stripped_cmd, "export", 7) && var->cmds[i][1])
+		ms_export(var, var->cmds[i]);
+	else if (!ft_strncmp(stripped_cmd, "export", 7) && child)
+		ms_export(var, var->cmds[i]);
 	else
 		return (0);
 	return (1);
@@ -52,7 +63,7 @@ _Bool	ms_exec_builtins(t_var *var, int i)
 
 void	ft_exec_child(t_var *var, int i, int pipes)
 {
-	ms_redirect_cmds(var, i);
+	ms_open_fds(var, i);
 	if (i < pipes)
 		close(var->pipes[2 * i]);
 	if (i > 0 && dup2(var->pipes[2 * i - 2], STDIN_FILENO) < 0)
@@ -63,7 +74,7 @@ void	ft_exec_child(t_var *var, int i, int pipes)
 		ms_exit(var, 1);
 	if (var->fd_out && dup2(var->fd_out, STDOUT_FILENO) < 0)
 		ms_exit(var, 1);
-	if (var->cmds[i][0] && !ms_exec_builtins(var, i) && \
+	else if (var->cmds[i][0] && !ms_exec_builtins(var, i, 1) && \
 		execve(var->cmds[i][0], var->cmds[i], var->env))
 		ms_perror(var->cmds[i][0], ": ", strerror(errno), errno);
 	else
@@ -86,15 +97,15 @@ int	ms_pipex(t_var *var)
 			return (ms_perror("", strerror(errno), "", errno), errno);
 		if (var->cmds[i][0])
 		{
-			if (!var->pipe_count && !ms_exec_builtins(var, i))
+			if (!ms_exec_builtins(var, i, 0))
 			{
-			signal(SIGINT, ms_signal_handle_child);
-			signal(SIGQUIT, ms_signal_handle_child);
-			child = fork();
-			if (child < 0)
-				return (ms_perror("", strerror(errno), "", errno), errno);
-			else if (child == 0)
-				ft_exec_child(var, i, var->pipe_count);
+				signal(SIGINT, ms_signal_handle_child);
+				signal(SIGQUIT, ms_signal_handle_child);
+				child = fork();
+				if (child < 0)
+					return (ms_perror("", strerror(errno), "", errno), errno);
+				else if (child == 0)
+					ft_exec_child(var, i, var->pipe_count);
 			}
 		}
 		if (i < var->pipe_count)
@@ -141,7 +152,7 @@ char	**ms_cmd_trim(char **cmd, int pos)
 	return (new_cmd);
 }
 
-int	ms_redirect_cmds(t_var *var, int i)
+int	ms_open_fds(t_var *var, int i)
 {
 	int			j;
 	char		*hd_no;
@@ -192,5 +203,5 @@ int	ms_redirect_cmds(t_var *var, int i)
 			j++;
 	}
 	ms_cmd_resolve(var, i);
-	return (var->exit_code);
+	return (0);
 }

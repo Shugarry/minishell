@@ -192,9 +192,11 @@ void	ms_export(t_var *var, char **tokens)
 		}
 		while (variable && variable[j])
 		{
-			if (!ft_isalpha(variable[0]) && (!ft_isalnum(variable[j]) || variable[j] != '_'))
+			if (!ft_isalpha(variable[0]) && \
+			(!ft_isalnum(variable[j]) || variable[j] != '_'))
 			{
-				printf("minishell: export: `%s': not a valid identifier\n", variable);
+				printf("minishell: export: `%s': not a valid identifier\n", \
+					variable);
 				memlist_free_ptr(var, variable);
 				return ;
 			}

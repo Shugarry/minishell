@@ -150,36 +150,24 @@ char	*token_builder(t_var *var, char *token)
 	return (new_token);
 }
 
-char	**expand_cmd(t_var *var, char **cmd)
+_Bool	expand_cmd(t_var *var)
 {
 	int		i;
+	int		j;
 	char	*tmp;
 
-	i = 0;
-	while (cmd[i])
+	i = -1;
+	while (var->cmds[++i])
 	{
-		tmp = cmd[i];
-		cmd[i] = token_builder(var, cmd[i]);
-		if (!cmd[i])
+		j = -1;
+		while (var->cmds[i][++j])
 		{
-			ms_clean(cmd);
-			ms_exit(var, ms_perror("", "malloc() fail", "", errno));
+			tmp = var->cmds[i][j];
+			var->cmds[i][j] = token_builder(var, var->cmds[i][j]);
+			free(tmp);
+			if (!var->cmds[i][j])
+				ms_exit(var, ms_perror("", "malloc() fail", "", errno));
 		}
-		free(tmp);
-		i++;
 	}
-	return (cmd);
-}
-
-_Bool	ms_cmd_expander(t_var *var)
-{
-	int		i;
-
-	i = 0;
-	while (var->cmds[i])
-	{
-		var->cmds[i] = expand_cmd(var, var->cmds[i]);
-		i++;
-	}
-	return (false);
+	return (0);
 }
