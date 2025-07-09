@@ -23,15 +23,17 @@ void	ms_exit_func_handle(t_var *var)
 	{
 		while (var->cmds[0][1][i])
 			if (!ft_isdigit(var->cmds[0][1][i++]))
-				ms_exit(var, ms_perror("", "exit: ", \
-					"numeric argument required", 2));
+			{
+				ms_perror("", "exit: ", "numeric argument required", 2);
+				return ;
+			}
 		ms_exit(var, ft_atoi(var->cmds[0][1]));
 	}
 	else
 		ms_perror("", "exit: ", "too many arguments", 127);
 }
 
-_Bool	ms_exec_builtins(t_var *var, int i, _Bool child)
+bool	ms_exec_builtins(t_var *var, int i, bool child)
 {
 	char	*stripped_cmd;
 

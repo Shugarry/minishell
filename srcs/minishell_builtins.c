@@ -91,8 +91,11 @@ static void	cd_home(t_var *var)
 	}
 	modify_env_var(var, "OLDPWD", pwd);
 	modify_env_var(var, "PWD", get_env_var(var, "HOME"));
-	memlist_free_ptr(var, var->pwd);
-	var->pwd = memlist_add(var, ft_strdup(get_env_var(var, "HOME")));
+	if (get_env_var(var, "HOME"))
+	{
+		memlist_free_ptr(var, var->pwd);
+		var->pwd = memlist_add(var, ft_strdup(get_env_var(var, "HOME")));
+	}
 	memlist_free_ptr(var, pwd);
 }
 
@@ -113,8 +116,11 @@ static void	cd_previous(t_var *var)
 	tmp = memlist_add(var, ft_strdup(get_env_var(var, "OLDPWD")));
 	modify_env_var(var, "OLDPWD", get_env_var(var, "PWD"));
 	modify_env_var(var, "PWD", tmp);
-	memlist_free_ptr(var, var->pwd);
-	var->pwd = memlist_add(var, ft_strdup(tmp));
+	if (tmp && tmp[0])
+	{
+		memlist_free_ptr(var, var->pwd);
+		var->pwd = memlist_add(var, ft_strdup(tmp));
+	}
 	memlist_free_ptr(var, tmp);
 }
 
@@ -140,8 +146,11 @@ void	ms_cd(t_var *var, char **tokens)
 		memlist_free_ptr(var, tmp);
 		tmp = getcwd_plus(var);
 		modify_env_var(var, "PWD", tmp);
-		memlist_free_ptr(var, var->pwd);
-		var->pwd = memlist_add(var, ft_strdup(tmp));
+		if (tmp && tmp[0])
+		{
+			memlist_free_ptr(var, var->pwd);
+			var->pwd = memlist_add(var, ft_strdup(tmp));
+		}
 		memlist_free_ptr(var, tmp);
 	}
 }
@@ -195,8 +204,8 @@ void	ms_export(t_var *var, char **tokens)
 			if (!ft_isalpha(variable[0]) && \
 			(!ft_isalnum(variable[j]) || variable[j] != '_'))
 			{
-				printf("minishell: export: `%s': not a valid identifier\n", \
-					variable);
+				ms_perror("minishell: export: `", variable,
+					"': not a valid identifier\n", 1);
 				memlist_free_ptr(var, variable);
 				return ;
 			}

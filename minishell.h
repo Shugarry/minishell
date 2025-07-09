@@ -54,7 +54,7 @@ typedef struct s_var
 
 // minishell_exec.c
 void	ms_exit_func_handle(t_var *var);
-_Bool	ms_exec_builtins(t_var *var, int i, _Bool child);
+bool	ms_exec_builtins(t_var *var, int i, bool child);
 void	ft_exec_child(t_var *var, int i, int pipes);
 int		ms_pipex(t_var *var);
 char	**ms_cmd_trim(char **cmd, int pos);
@@ -63,8 +63,8 @@ int		ms_open_fds(t_var *var, int i);
 // minishell_init.c
 void	ms_open_heredoc(char *limit, size_t limit_len, int *hd_int);
 void	ms_cmd_resolve(t_var *var, int i);
-_Bool	ms_cmd_filler(t_var *var);
-_Bool	ms_start_args(t_var *va);
+bool	ms_cmd_filler(t_var *var);
+bool	ms_start_args(t_var *va);
 int		main(int ac, char **av, char **env);
 
 // minishell_signals.c
@@ -74,8 +74,8 @@ void	ms_signal_handle_child(int sig);
 // minishell_tokens.c
 int		ms_regular_token_check(char *line);
 int		ms_special_token_check(char *line, t_var *var);
-_Bool	ms_token_counter(char *line, t_var *var);
-_Bool	ms_token_filler(char *line, char **tokens);
+bool	ms_token_counter(char *line, t_var *var);
+bool	ms_token_filler(char *line, char **tokens);
 
 // minishell_utils.c
 int		ms_perror(char *err1, char *err2, char *err3, int err_no);
@@ -117,6 +117,6 @@ int		var_len_diff(t_var *var, char *str);
 char	*var_finder(t_var *var, char *str, char *new_token);
 int		new_token_size(t_var *var, char *token);
 char	*token_builder(t_var *var, char *token);
-_Bool	expand_cmd(t_var *var);
+bool	expand_cmd(t_var *var);
 
 #endif

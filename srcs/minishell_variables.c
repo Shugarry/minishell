@@ -162,14 +162,14 @@ void	add_shlvl(t_var *var, char *shlvl)
 		return (add_env_var(var, "SHLVL=0"));
 	if (lvl + 1 > 1000)
 	{
-		printf("minishell: warning: shell level %d too high, \
-			resetting to 1\n", lvl + 1);
+		ms_perror("minishell: warning: shell level ",
+				ft_itoa(lvl + 1), "too high, resetting to 1\n", 0);
 		return (add_env_var(var, "SHLVL=1"));
 	}
-	level = ft_itoa(lvl + 1);
+	level = memlist_add(var, ft_itoa(lvl + 1));
 	tmp = memlist_add(var, ft_strjoin("SHLVL=", level));
-	free(level);
 	add_env_var(var, tmp);
+	memlist_free_ptr(var, level);
 	memlist_free_ptr(var, tmp);
 }
 

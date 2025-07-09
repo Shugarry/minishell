@@ -61,7 +61,7 @@ int	ms_special_token_check(char *line, t_var *var)
 	return (0);
 }
 
-_Bool	ms_token_counter(char *line, t_var *var)
+bool	ms_token_counter(char *line, t_var *var)
 {
 	int	i;
 	int	token_len;
@@ -90,7 +90,7 @@ _Bool	ms_token_counter(char *line, t_var *var)
 	return (0);
 }
 
-_Bool	ms_token_filler(char *line, char **tokens)
+bool	ms_token_filler(char *line, char **tokens)
 {
 	int	token_len;
 

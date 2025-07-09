@@ -77,7 +77,7 @@ void	ms_cmd_resolve(t_var *var, int i)
 	}
 }
 
-_Bool	ms_cmd_filler(t_var *var)
+bool	ms_cmd_filler(t_var *var)
 {
 	int	i;
 	int	args;
@@ -106,7 +106,7 @@ _Bool	ms_cmd_filler(t_var *var)
 	return (0);
 }
 
-_Bool	ms_start_args(t_var *var)
+bool	ms_start_args(t_var *var)
 {
 	int	i;
 	int	j;

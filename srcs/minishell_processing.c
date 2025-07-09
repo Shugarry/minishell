@@ -150,7 +150,7 @@ char	*token_builder(t_var *var, char *token)
 	return (new_token);
 }
 
-_Bool	expand_cmd(t_var *var)
+bool	expand_cmd(t_var *var)
 {
 	int		i;
 	int		j;
