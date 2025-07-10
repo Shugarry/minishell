@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   minishell_variables.c                              :+:      :+:    :+:   */
+/*   minishell_env_helpers.c                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: frey-gal <frey-gal@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/14 12:11:29 by frey-gal          #+#    #+#             */
-/*   Updated: 2025/06/26 01:14:27 by frey-gal         ###   ########.fr       */
+/*   Created: 2025/07/10 18:26:43 by frey-gal          #+#    #+#             */
+/*   Updated: 2025/07/10 18:59:16 by frey-gal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,15 +82,13 @@ void	remove_env_var(t_var *var, char *var_name)
 	len = ft_strlen(var_name);
 	while (var->env && var->env[i])
 	{
-		if (ft_strncmp(var_name, var->env[i], len) == 0
+		if (ft_strncmp(var_name, var->env[i], len) == 0 \
 			&& (var->env[i][len] == '=' || var->env[i][len] == '\0'))
 		{
 			i++;
 			continue ;
 		}
-		new_varlist[j] = memlist_add(var, ft_strdup(var->env[i]));
-		j++;
-		i++;
+		new_varlist[j++] = memlist_add(var, ft_strdup(var->env[i++]));
 	}
 	new_varlist[j] = NULL;
 	varlist_clean(var);
@@ -119,84 +117,4 @@ char	*get_env_var(t_var *var, char *var_name)
 		i++;
 	}
 	return (NULL);
-}
-
-void	modify_env_var(t_var *var, char *var_name, char *new_content)
-{
-	char	*tmp;
-	char	*new_var;
-
-	if (new_content == NULL)
-	{
-		remove_env_var(var, var_name);
-		add_env_var(var, var_name);
-		return ;
-	}
-	tmp = memlist_add(var, ft_strjoin(var_name, "="));
-	new_var = memlist_add(var, ft_strjoin(tmp, new_content));
-	remove_env_var(var, var_name);
-	add_env_var(var, new_var);
-	memlist_free_ptr(var, new_var);
-}
-
-void	add_shlvl(t_var *var, char *shlvl)
-{
-	char	*tmp;
-	char	*level;
-	int		lvl;
-	int		i;
-
-	while (*shlvl == '0')
-		shlvl++;
-	if (!*shlvl || strlen(shlvl) > 5)
-		return (add_env_var(var, "SHLVL=1"));
-	i = 0;
-	while (shlvl[i])
-	{
-		if (!ft_isdigit(shlvl[i]))
-			return (add_env_var(var, "SHLVL=1"));
-		i++;
-	}
-	lvl = ft_atoi(shlvl);
-	if (lvl < 0)
-		return (add_env_var(var, "SHLVL=0"));
-	if (lvl + 1 > 1000)
-	{
-		ms_perror("minishell: warning: shell level ",
-				ft_itoa(lvl + 1), "too high, resetting to 1\n", 0);
-		return (add_env_var(var, "SHLVL=1"));
-	}
-	level = memlist_add(var, ft_itoa(lvl + 1));
-	tmp = memlist_add(var, ft_strjoin("SHLVL=", level));
-	add_env_var(var, tmp);
-	memlist_free_ptr(var, level);
-	memlist_free_ptr(var, tmp);
-}
-
-void	create_env(t_var *var, char **env)
-{
-	int		i;
-	bool	shlvl;
-	char	*tmp;
-
-	i = 0;
-	shlvl = false;
-	var->env = NULL;
-	while (env && env[i])
-	{
-		if (ft_strncmp(env[i], "SHLVL=", ft_strlen("SHLVL=")) == 0)
-		{
-			shlvl = true;
-			add_shlvl(var, ft_strchr(env[i], '=') + 1);
-		}
-		else
-			add_env_var(var, env[i]);
-		i++;
-	}
-	if (!shlvl)
-		add_env_var(var, "SHLVL=1");
-	tmp = getcwd_plus(var);
-	if (!get_env_var(var, "PWD") && tmp)
-		modify_env_var(var, "PWD", tmp);
-	memlist_free_ptr(var, tmp);
 }

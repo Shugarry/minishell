@@ -12,27 +12,6 @@
 
 #include "../minishell.h"
 
-void	ms_exit_func_handle(t_var *var)
-{
-	int	i;
-
-	i = 0;
-	if (!var->cmds[0][1])
-		ms_exit(var, 0);
-	else if (var->cmds[0][1] && !var->cmds[0][2])
-	{
-		while (var->cmds[0][1][i])
-			if (!ft_isdigit(var->cmds[0][1][i++]))
-			{
-				ms_perror("", "exit: ", "numeric argument required", 2);
-				return ;
-			}
-		ms_exit(var, ft_atoi(var->cmds[0][1]));
-	}
-	else
-		ms_perror("", "exit: ", "too many arguments", 127);
-}
-
 bool	ms_exec_builtins(t_var *var, int i, bool child)
 {
 	char	*stripped_cmd;
@@ -43,7 +22,7 @@ bool	ms_exec_builtins(t_var *var, int i, bool child)
 	else
 		stripped_cmd++;
 	if (!ft_strncmp(var->cmds[0][0], "exit", 5))
-		ms_exit_func_handle(var);
+		ms_exit_builtin(var);
 	else if (!ft_strncmp(stripped_cmd, "cd", 3))
 		ms_cd(var, var->cmds[i]);
 	else if (!ft_strncmp(stripped_cmd, "echo", 5) && child)
