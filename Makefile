@@ -47,7 +47,7 @@ LIB_SRC		= $(addprefix libft/ft_, atoi.c bzero.c calloc.c isalnum.c isalpha.c \
 				putchar_fd.c putendl_fd.c putnbr_fd.c putstr_fd.c split.c strchr.c \
 				strdup.c striteri.c strjoin.c strlcat.c strlcpy.c strlen.c \
 				strmapi.c strncmp.c strnstr.c strrchr.c strtrim.c substr.c \
-				tolower.c toupper.c strcmp.c) $(addprefix libft/, get_next_line_bonus.c)
+				tolower.c toupper.c) $(addprefix libft/, get_next_line_bonus.c)
 
 LIB_DEP = $(LIB_SRC) $(LIB_HDR) libft/Makefile 
 

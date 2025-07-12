@@ -55,6 +55,8 @@ typedef struct s_var
 	char			**tokens;
 	char			**env;
 	int				env_len;
+	int				int_error;
+	char			*str_error;
 	char			**paths;
 	char			*pwd;
 	unsigned char	exit_code;
@@ -121,6 +123,7 @@ void	ms_env(t_var *var);
 
 // minishell_env_init.c
 void	modify_env_var(t_var *var, char *var_name, char *new_content);
+//static bool	validate_shlvl(char *shlvl)
 void	add_shlvl(t_var *var, char *shlvl);
 void	create_env(t_var *var, char **env);
 // minishell_env_helpers.c

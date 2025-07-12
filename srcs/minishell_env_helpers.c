@@ -102,6 +102,11 @@ char	*get_env_var(t_var *var, char *var_name)
 	char	*tmp;
 
 	i = 0;
+	if (ft_strncmp("?", var_name, 2) == 0)
+	{
+		var->str_error = memlist_add(var, ft_itoa(var->int_error));
+		return (var->str_error);
+	}
 	len = ft_strlen(var_name);
 	while (var->env && var->env[i])
 	{

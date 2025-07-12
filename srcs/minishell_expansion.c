@@ -15,23 +15,26 @@
 static void	token_size_logic(t_var *var, char *token, int *len, t_builder *b)
 {
 	if (token[b->i] == '$' && !b->in_single && (ft_isalpha(token[b->i + 1])
-			|| token[b->i + 1] == '_'))
+			|| token[b->i + 1] == '_' || token[b->i + 1] == '?'))
 	{
-		len += var_len_diff(var, token + b->i);
+		*len += var_len_diff(var, token + b->i);
 		b->i++;
-		while (ft_isalnum(token[b->i]) || token[b->i] == '_')
+		if (token[b->i] == '?')
 			b->i++;
+		else
+			while (ft_isalnum(token[b->i]) || token[b->i] == '_')
+				b->i++;
 		return ;
 	}
 	if (token[b->i] == '"' && !b->in_single)
 	{
 		b->in_double = !b->in_double;
-		len--;
+		(*len)--;
 	}
 	else if (token[b->i] == '\'' && !b->in_double)
 	{
 		b->in_single = !b->in_single;
-		len--;
+		(*len)--;
 	}
 	b->i++;
 }
@@ -53,13 +56,15 @@ static void	token_builder_logic(t_builder *b, char *token, t_var *var)
 	char	*tmp;
 
 	if (token[b->j] == '$' && !b->in_single && (ft_isalpha(token[b->j + 1])
-			|| token[b->j + 1] == '_'))
+			|| token[b->j + 1] == '_' || token[b->j + 1] == '?'))
 	{
 		tmp = var_finder(var, token + b->j, b->new_token);
 		b->i += ft_strlcpy(b->new_token + b->i, tmp, ft_strlen(tmp) + 1);
-		b->j++;
-		while (ft_isalnum(token[b->j]) || token[b->j] == '_')
+		if (token[++b->j] == '?')
 			b->j++;
+		else
+			while (ft_isalnum(token[b->j]) || token[b->j] == '_')
+				b->j++;
 	}
 	else if (token[b->j] == '"' && !b->in_single)
 	{

@@ -93,11 +93,11 @@ static void	cd_todir(t_var *var, char **tokens)
 
 void	ms_cd(t_var *var, char **tokens)
 {
-	if (!tokens[1] || (tokens[1] && ft_strcmp(tokens[1], "--") == 0))
+	if (!tokens[1] || (tokens[1] && ft_strncmp(tokens[1], "--", 3) == 0))
 		cd_home(var);
 	else if (tokens[2] != NULL)
 		ms_perror("minishell: ", "cd: ", "too many arguments", 1);
-	else if (ft_strcmp(tokens[1], "-") == 0)
+	else if (ft_strncmp(tokens[1], "-", 2) == 0)
 		cd_previous(var);
 	else
 		cd_todir(var, tokens);

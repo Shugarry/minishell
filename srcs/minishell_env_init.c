@@ -30,33 +30,42 @@ void	modify_env_var(t_var *var, char *var_name, char *new_content)
 	memlist_free_ptr(var, new_var);
 }
 
-// NOTE: check shlvl a bit more
+static bool	validate_shlvl(char *shlvl)
+{
+	int		i;
+
+	i = 0;
+	if (!shlvl[i])
+		return (false);
+	if (shlvl[i] == '-' || shlvl[i] == '+')
+		i++;
+	while (shlvl[i] == '0')
+		i++;
+	if (ft_strlen(shlvl + i) > 4)
+		return (false);
+	while (shlvl[i])
+		if (!ft_isdigit(shlvl[i++]))
+			return (false);
+	return (true);
+}
+
 void	add_shlvl(t_var *var, char *shlvl)
 {
 	char	*tmp;
 	char	*lvlstr;
 	int		lvl;
-	int		i;
 
-	while (*shlvl == '0')
-		shlvl++;
-	if (!*shlvl || strlen(shlvl) > 5)
+	if (validate_shlvl(shlvl) == false)
 		return (add_env_var(var, "SHLVL=1"));
-	i = 0;
-	while (shlvl[i])
-	{
-		if (!ft_isdigit(shlvl[i]))
-			return (add_env_var(var, "SHLVL=1"));
-		i++;
-	}
 	lvl = ft_atoi(shlvl);
-	lvlstr = memlist_add(var, ft_itoa(lvl + 1));
 	if (lvl < 0)
 		return (add_env_var(var, "SHLVL=0"));
+	lvlstr = memlist_add(var, ft_itoa(lvl + 1));
 	if (lvl + 1 > 1000)
 	{
 		ms_perror("minishell: warning: shell level ",
 			lvlstr, "too high, resetting to 1\n", 0);
+		memlist_free_ptr(var, lvlstr);
 		return (add_env_var(var, "SHLVL=1"));
 	}
 	tmp = memlist_add(var, ft_strjoin("SHLVL=", lvlstr));
