@@ -56,6 +56,9 @@ void	ms_cmd_resolve(t_var *var, int i)
 	char	*cmd;
 
 	j = -1;
+	var->paths = ft_split(get_env_var(var, "PATH"), ':');
+	if (!var->paths && get_env_var(var, "PATH"))
+		ms_exit(var, ms_perror("", "malloc fail()", "", errno));
 	while (var->paths[++j])
 	{
 		if (var->cmds[i][0] && ft_strncmp(var->cmds[i][0], "/", 1))
@@ -144,9 +147,6 @@ int	main(int ac, char **av, char **env)
 		ms_exit(&var, ms_perror("", "arguments are not supported yet", "", 1));
 	create_env(&var, env);
 	var.pwd = getcwd_plus(&var);
-	var.paths = ft_split(get_env_var(&var, "PATH"), ':');
-	if (!var.paths)
-		ms_exit(&var, ms_perror("", strerror(errno), "", errno));
 	while (1)
 	{
 		signal(SIGINT, ms_signal_handle);
