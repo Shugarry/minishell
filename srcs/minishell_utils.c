@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 int	ms_perror(char *err1, char *err2, char *err3, int err_no)
 {
@@ -62,11 +62,34 @@ void	ms_free_ptrs(t_var *var)
 	var->line = NULL;
 }
 
+void	ms_heredoc_cleaner(void)
+{
+	char	*hd_no;
+	char	*hd_name;
+	int		hd_int;
+
+	hd_int = 0;
+	while (1)
+	{
+		hd_no = ft_itoa(hd_int++);
+		hd_name = ft_strjoin(".here_doc_", hd_no);
+		if (!hd_no || !hd_name)
+			ms_perror("", strerror(errno), "\n", errno);
+		if (hd_no)
+			free(hd_no);
+		if (access(hd_name, F_OK))
+			break ;
+		unlink(hd_name);
+		if (hd_name)
+			free(hd_name);
+	}
+	if (hd_name)
+		free(hd_name);
+}
+
 void	ms_exit(t_var *var, int exit_code)
 {
-	close(STDIN_FILENO);
-	if (access(".here_doc", F_OK) == 0)
-		unlink(".here_doc");
+	ms_heredoc_cleaner();
 	if (var->fd_in > 0)
 		close(var->fd_in);
 	if (var->fd_out > 0)
@@ -75,8 +98,13 @@ void	ms_exit(t_var *var, int exit_code)
 	if (var->paths)
 		ms_clean(var->paths);
 	if (!exit_code)
+	{
+		close(STDIN_FILENO);
 		ft_putendl_fd("exit", STDOUT_FILENO);
+	}
 	rl_clear_history();
-	memlist_free_all(&var->memlist);
+	ft_lstclear(&var->memlist, free);
+	if (exit_code < 0)
+		exit(0);
 	exit(exit_code);
 }

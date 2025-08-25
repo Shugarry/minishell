@@ -6,7 +6,7 @@
 /*   By: miggarc2 <miggarc2@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/15 17:54:28 by miggarc2          #+#    #+#             */
-/*   Updated: 2025/03/25 16:08:12 by miggarc2         ###   ########.fr       */
+/*   Updated: 2025/06/24 14:22:17 by miggarc2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ char	*ft_itoa(int n)
 	size = ft_nbr_size(n);
 	nbr = (char *)malloc(sizeof(char) * (size + 1));
 	if (!nbr)
-		return (0);
+		return (NULL);
 	ft_fill_nbr(nbr, n, size);
 	return (nbr);
 }
