@@ -55,7 +55,6 @@ typedef struct s_var
 	char			**tokens;
 	char			**env;
 	int				env_len;
-	int				int_error;
 	char			*str_error;
 	char			**paths;
 	char			*pwd;
