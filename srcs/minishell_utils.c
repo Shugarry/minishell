@@ -104,5 +104,7 @@ void	ms_exit(t_var *var, int exit_code)
 	}
 	rl_clear_history();
 	ft_lstclear(&var->memlist, free);
+	if (exit_code < 0)
+		exit(0);
 	exit(exit_code);
 }

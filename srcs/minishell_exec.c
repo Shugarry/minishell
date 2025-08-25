@@ -59,8 +59,8 @@ void	ft_exec_child(t_var *var, int i, int pipes)
 		execve(var->cmds[i][0], var->cmds[i], var->env))
 		ms_perror(var->cmds[i][0], ": ", strerror(errno), errno);
 	else
-		var->exit_code = 0;
-	ms_exit(var, -1);
+		ms_exit(var, -1);
+	ms_exit(var, 127);
 }
 
 int	ms_pipex(t_var *var)

@@ -22,7 +22,7 @@ int	var_len_diff(t_var *var, char *str)
 
 	i = 1;
 	if (ft_strncmp("$?", str, 2) == 0)
-		return (2 - ft_strlen(get_env_var(var, "?")) - 1);
+		return (ft_strlen(get_env_var(var, "?")) - 2);
 	var_name = ft_strdup(str + 1);
 	if (!var_name)
 		ms_exit(var, ms_perror("", "malloc fail()", "", errno));
@@ -47,7 +47,7 @@ char	*var_finder(t_var *var, char *str, char *new_token)
 	char	*content;
 
 	i = 1;
-	if (ft_strncmp("$?", str, 2) == 0)
+	if (ft_strncmp("$?", str, 2) == 0) 
 		return (get_env_var(var, "?"));
 	var_name = ft_strdup(str + 1);
 	if (!var_name)

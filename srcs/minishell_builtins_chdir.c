@@ -27,11 +27,13 @@ static void	cd_home(t_var *var)
 	if (get_env_var(var, "HOME") == NULL)
 	{
 		ms_perror("minishell: ", "cd: ", "HOME not set", 1);
+		var->exit_code = 1;
 		return ;
 	}
 	if (bad_status(chdir(get_env_var(var, "HOME"))))
 	{
 		ms_perror("minishell: ", "cd: ", strerror(errno), errno);
+		//TODO: work around bad status
 		return ;
 	}
 	modify_env_var(var, "OLDPWD", pwd);
@@ -42,6 +44,7 @@ static void	cd_home(t_var *var)
 		var->pwd = memlist_add(var, ft_strdup(get_env_var(var, "HOME")));
 	}
 	memlist_free_ptr(var, pwd);
+	var->exit_code = 0;
 }
 
 static void	cd_previous(t_var *var)
@@ -51,11 +54,13 @@ static void	cd_previous(t_var *var)
 	if (!get_env_var(var, "OLDPWD"))
 	{
 		ms_perror("minishell: ", "cd: ", "OLDPWD not set", 1);
+		var->exit_code = 1;
 		return ;
 	}
 	if (bad_status(chdir(get_env_var(var, "OLDPWD"))))
 	{
 		ms_perror("minishell:", "cd:", strerror(errno), errno);
+		//TODO BAD STATUS
 		return ;
 	}
 	tmp = memlist_add(var, ft_strdup(get_env_var(var, "OLDPWD")));
@@ -67,6 +72,7 @@ static void	cd_previous(t_var *var)
 		var->pwd = memlist_add(var, ft_strdup(tmp));
 	}
 	memlist_free_ptr(var, tmp);
+	var->exit_code = 0;
 }
 
 static void	cd_todir(t_var *var, char **tokens)
@@ -76,6 +82,7 @@ static void	cd_todir(t_var *var, char **tokens)
 	tmp = getcwd_plus(var);
 	if (bad_status(chdir(tokens[1])))
 	{
+		// TODO BAD STATUS
 		ms_perror("minishell: ", "cd: ", strerror(errno), errno);
 		return ;
 	}
@@ -89,6 +96,7 @@ static void	cd_todir(t_var *var, char **tokens)
 		var->pwd = memlist_add(var, ft_strdup(tmp));
 	}
 	memlist_free_ptr(var, tmp);
+	var->exit_code = 0;
 }
 
 void	ms_cd(t_var *var, char **tokens)
