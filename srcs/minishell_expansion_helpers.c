@@ -47,7 +47,7 @@ char	*var_finder(t_var *var, char *str, char *new_token)
 	char	*content;
 
 	i = 1;
-	if (ft_strncmp("$?", str, 2) == 0) 
+	if (ft_strncmp("$?", str, 2) == 0)
 		return (get_env_var(var, "?"));
 	var_name = ft_strdup(str + 1);
 	if (!var_name)

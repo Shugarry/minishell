@@ -116,7 +116,7 @@ void	ms_cd(t_var *var, char **tokens);
 //static void	export_add(t_var *var, char *token)
 void	ms_export(t_var *var, char **tokens);
 void	ms_unset(t_var *var, char **tokens);
-void	ms_env(t_var *var);
+void	ms_env(t_var *var, char **tokens);
 
 // ENVIRONMENT VARIABLES
 

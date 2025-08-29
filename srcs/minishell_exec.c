@@ -30,7 +30,7 @@ bool	ms_exec_builtins(t_var *var, int i, bool child)
 	else if (!ft_strncmp(stripped_cmd, "pwd", 4) && child)
 		ms_pwd(var);
 	else if (!ft_strncmp(stripped_cmd, "env", 4) && child)
-		ms_env(var);
+		ms_env(var, var->cmds[i]);
 	else if (!ft_strncmp(stripped_cmd, "unset", 6))
 		ms_unset(var, var->cmds[i]);
 	else if (!ft_strncmp(stripped_cmd, "export", 7) && var->cmds[i][1])

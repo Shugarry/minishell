@@ -46,16 +46,14 @@ static void	export_add(t_var *var, char *token)
 	variable = memlist_add(var, ft_strdup(token));
 	content = ft_strchr(variable, '=');
 	if (content)
-	{
-		content[0] = '\0';
-		content++;
-	}
+		*content++ = '\0';
 	while (variable && variable[++j])
 	{
-		if (!ft_isalpha(variable[0]) && \
-			(!ft_isalnum(variable[j]) || variable[j] != '_'))
+		if ((!ft_isalpha(variable[0]) && variable[0] != '_') && \
+			(!ft_isalnum(variable[j]) && variable[j] != '_'))
 		{
-			ms_perror("minishell: export: `", variable,
+			var->exit_code = 1;
+			ms_perror("minishell: export: `", token,
 				"': not a valid identifier\n", 1);
 			memlist_free_ptr(var, variable);
 			return ;
@@ -74,6 +72,7 @@ void	ms_export(t_var *var, char **tokens)
 		export_print(var);
 	while (tokens[i])
 	{
+		var->exit_code = 0;
 		export_add(var, tokens[i]);
 		i++;
 	}
@@ -91,11 +90,18 @@ void	ms_unset(t_var *var, char **tokens)
 	}
 }
 
-void	ms_env(t_var *var)
+void	ms_env(t_var *var, char **tokens)
 {
 	int	i;
 
 	i = 0;
+	if (tokens[1])
+	{
+		var->exit_code = 127;
+		ms_perror("minishell: env: '", tokens[1],
+			"': No such file or directory\n", 127);
+		return ;
+	}
 	while (var->env[i] != NULL)
 	{
 		if (ft_strchr(var->env[i], '='))
