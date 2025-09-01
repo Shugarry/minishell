@@ -12,6 +12,54 @@
 
 #include "../minishell.h"
 
+bool	builder_if_helper(char *token, t_builder *b)
+{
+	return (token[b->j] == '$' && !b->in_single && (ft_isalpha(token[b->j + 1])
+			|| token[b->j + 1] == '_' || token[b->j + 1] == '?'));
+}
+
+void	logic_quote_case(char *token, int *len, t_builder *b)
+{
+	if (token[b->i] == '$' && !b->in_single && !b->in_double
+		&& (token[b->i + 1] == '\'' || token[b->i + 1] == '"'))
+	{
+		(*len)--;
+		b->i++;
+		if (token[b->i] == '"')
+		{
+			b->in_double = !b->in_double;
+			(*len)--;
+		}
+		else if (token[b->i] == '\'')
+		{
+			b->in_single = !b->in_single;
+			(*len)--;
+		}
+		b->i++;
+		return ;
+	}
+}
+
+void	builder_quote_case(char *token, t_builder *b)
+{
+	if (token[b->j] == '$' && !b->in_single && !b->in_double
+		&& (token[b->j + 1] == '\'' || token[b->j + 1] == '"'))
+	{
+		b->j++;
+		if (token[b->j] == '"')
+		{
+			b->in_double = !b->in_double;
+			b->j++;
+		}
+		else if (token[b->j] == '\'')
+		{
+			b->in_single = !b->in_single;
+			b->j++;
+		}
+		return ;
+	}
+}
+
 int	var_len_diff(t_var *var, char *str)
 {
 	int		i;

@@ -14,6 +14,7 @@
 
 static void	token_size_logic(t_var *var, char *token, int *len, t_builder *b)
 {
+	logic_quote_case(token, len, b);
 	if (token[b->i] == '$' && !b->in_single && (ft_isalpha(token[b->i + 1])
 			|| token[b->i + 1] == '_' || token[b->i + 1] == '?'))
 	{
@@ -51,12 +52,12 @@ int	new_token_size(t_var *var, char *token)
 	return (len);
 }
 
-static void	token_builder_logic(t_builder *b, char *token, t_var *var)
+static void	token_builder_logic(t_var *var, char *token, t_builder *b)
 {
 	char	*tmp;
 
-	if (token[b->j] == '$' && !b->in_single && (ft_isalpha(token[b->j + 1])
-			|| token[b->j + 1] == '_' || token[b->j + 1] == '?'))
+	builder_quote_case(token, b);
+	if (builder_if_helper(token, b))
 	{
 		tmp = var_finder(var, token + b->j, b->new_token);
 		b->i += ft_strlcpy(b->new_token + b->i, tmp, ft_strlen(tmp) + 1);
@@ -93,7 +94,7 @@ char	*token_builder(t_var *var, char *token)
 	if (!b.new_token)
 		return (NULL);
 	while (token[b.j])
-		token_builder_logic(&b, token, var);
+		token_builder_logic(var, token, &b);
 	b.new_token[b.i] = '\0';
 	return (b.new_token);
 }

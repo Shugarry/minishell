@@ -136,7 +136,10 @@ char	*get_env_var(t_var *var, char *variable);
 // minishell_expansion.c
 //static void token_size_logic(t_var *var, char *token, int *len, t_builder *b)
 int		new_token_size(t_var *var, char *token);
-//static void token_builder_logic(t_builder *b, char *token, t_var *var)
+void	logic_quote_case(char *token, int *len, t_builder *b);
+bool	builder_if_helper(char *token, t_builder *b);
+void	builder_quote_case(char *token, t_builder *b);
+//static void	token_builder_logic(t_var *var, char *token, t_builder *b)
 char	*token_builder(t_var *var, char *token);
 bool	expand_cmd(t_var *var);
 // minishell_expansion_helpers.c
