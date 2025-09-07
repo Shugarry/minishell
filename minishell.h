@@ -70,7 +70,7 @@ char	**ms_cmd_trim(char **cmd, int pos);
 int		ms_open_fds(t_var *var, int i);
 
 // minishell_init.c
-void	ms_open_heredoc(char *limit, size_t limit_len, int *hd_int);
+void	ms_open_heredoc(t_var *var, char *limit, size_t limit_len, int *hd_int);
 void	ms_cmd_resolve(t_var *var, int i);
 bool	ms_cmd_filler(t_var *var);
 bool	ms_start_args(t_var *va);
@@ -145,5 +145,6 @@ bool	expand_cmd(t_var *var);
 // minishell_expansion_helpers.c
 int		var_len_diff(t_var *var, char *str);
 char	*var_finder(t_var *var, char *str, char *new_token);
-
+// minishell_heredoc_helpers.c
+char	*hd_var_expansion(t_var *var, char *line);
 #endif

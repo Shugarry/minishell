@@ -23,7 +23,7 @@ RM			= rm -f
 SRC			= $(addprefix srcs/minishell_, builtins_chdir.c builtins_extra.c \
 			  builtins_vars.c env_helpers.c env_init.c exec.c expansion.c \
 			  expansion_helpers.c init.c memory.c signals.c tokens.c \
-			  utils.c)
+			  utils.c heredoc_helpers.c)
 
 OBJ			= $(SRC:.c=.o)
 

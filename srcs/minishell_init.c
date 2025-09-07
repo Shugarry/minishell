@@ -13,12 +13,13 @@
 #include "../minishell.h"
 
 // Pend fix multiple heredocs and hd_int update (useless in child)
-void	ms_open_heredoc(char *limit, size_t limit_len, int *hd_int)
+void	ms_open_heredoc(t_var *var, char *limit, size_t limit_len, int *hd_int)
 {
 	char	*line;
 	int		here_fd;
 	char	*hd_no;
 	char	*hd_name;
+	char	*tmp;
 
 	hd_no = ft_itoa((*hd_int)++);
 	hd_name = ft_strjoin(".here_doc_", hd_no);
@@ -37,6 +38,9 @@ void	ms_open_heredoc(char *limit, size_t limit_len, int *hd_int)
 		line = get_next_line(STDIN_FILENO);
 		if (!line)
 			break ;
+		tmp = hd_var_expansion(var, line); // CON ESTA FUNCION SE EXPANDA LA STRING "char *line". USARLA COMO SEA NECESARIA.
+		printf("%s\n", tmp);
+		memlist_free_ptr(var, tmp);
 		if (ft_strncmp(line, limit, limit_len) == 0 && line[limit_len] == '\n')
 		{
 			free(line);
@@ -130,7 +134,7 @@ bool	ms_start_args(t_var *var)
 		j = 0;
 		while (var->cmds[i][j])
 			if (!ft_strncmp(var->cmds[i][j++], "<<", 3))
-				ms_open_heredoc(var->cmds[i][j], \
+				ms_open_heredoc(var, var->cmds[i][j], \
 					ft_strlen(var->cmds[i][j]), &var->hd_int);
 		var->hd_int = 0;
 		ms_cmd_resolve(var, i);
