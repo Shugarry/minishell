@@ -38,16 +38,15 @@ void	ms_open_heredoc(t_var *var, char *limit, size_t limit_len, int *hd_int)
 		line = get_next_line(STDIN_FILENO);
 		if (!line)
 			break ;
-		tmp = hd_var_expansion(var, line); // CON ESTA FUNCION SE EXPANDA LA STRING "char *line". USARLA COMO SEA NECESARIA.
-		printf("%s\n", tmp);
-		memlist_free_ptr(var, tmp);
+		tmp = hd_var_expansion(var, line);
 		if (ft_strncmp(line, limit, limit_len) == 0 && line[limit_len] == '\n')
 		{
 			free(line);
 			break ;
 		}
 		else
-			ft_putstr_fd(line, here_fd);
+			ft_putstr_fd(tmp, here_fd);
+		memlist_free_ptr(var, tmp);
 		free(line);
 	}
 	close(here_fd);
@@ -60,6 +59,8 @@ void	ms_cmd_resolve(t_var *var, int i)
 	char	*cmd;
 
 	j = -1;
+	if (var->paths)
+		ms_clean(var->paths);
 	var->paths = ft_split(get_env_var(var, "PATH"), ':');
 	if (!var->paths && get_env_var(var, "PATH"))
 		ms_exit(var, ms_perror("", "malloc fail()", "", errno));

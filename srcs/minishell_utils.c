@@ -14,9 +14,12 @@
 
 int	ms_perror(char *err1, char *err2, char *err3, int err_no)
 {
-	ft_putstr_fd(err1, STDERR_FILENO);
-	ft_putstr_fd(err2, STDERR_FILENO);
-	ft_putendl_fd(err3, STDERR_FILENO);
+	if (err1 && err2 && err3)
+	{
+		ft_putstr_fd(err1, STDERR_FILENO);
+		ft_putstr_fd(err2, STDERR_FILENO);
+		ft_putendl_fd(err3, STDERR_FILENO);
+	}
 	return (err_no);
 }
 

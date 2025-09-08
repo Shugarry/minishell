@@ -60,7 +60,8 @@ void	ft_exec_child(t_var *var, int i, int pipes)
 		ms_perror(var->cmds[i][0], ": ", strerror(errno), errno);
 	else
 		ms_exit(var, -1);
-	ms_exit(var, 127);
+	printf("salida\n");
+	ms_exit(var, var->exit_code);
 }
 
 int	ms_pipex(t_var *var)
@@ -112,7 +113,7 @@ char	**ms_cmd_trim(char **cmd, int pos)
 	size = 0;
 	while (cmd[size])
 		size++;
-	new_cmd = (char **)ft_calloc(size - 1, sizeof(char *));
+	new_cmd = (char **)ft_calloc(size, sizeof(char *));
 	if (!new_cmd)
 	{
 		ms_perror("", strerror(errno), "", errno);
@@ -120,12 +121,13 @@ char	**ms_cmd_trim(char **cmd, int pos)
 	}
 	i = 0;
 	j = 0;
-	while (j < size)
+	while (j <= size)
 	{
 		if (j == pos)
 		{
 			free (cmd[j++]);
-			free (cmd[j++]);
+			if (cmd[j])
+				free (cmd[j++]);
 		}
 		new_cmd[i++] = cmd[j++];
 	}
@@ -148,10 +150,10 @@ int	ms_open_fds(t_var *var, int i)
 				ms_perror("", "syntax error near unexpected token `'", "'", 2);
 			if (var->fd_out > 0)
 				close(var->fd_out);
-			if (var->cmds[i][j + 1] && !ft_strncmp(var->cmds[i][j], ">", 2))
+			if (!ft_strncmp(var->cmds[i][j], ">", 2) && var->cmds[i][j + 1])
 				var->fd_out = open(var->cmds[i][j + 1],
 						O_WRONLY | O_CREAT | O_TRUNC, 0644);
-			else if (!ft_strncmp(var->cmds[i][j], ">>", 3))
+			else if (!ft_strncmp(var->cmds[i][j], ">>", 3) && var->cmds[i][j + 1])
 				var->fd_out = open(var->cmds[i][j + 1],
 						O_WRONLY | O_CREAT | O_APPEND, 0644);
 			if (var->fd_out < 0)
@@ -164,9 +166,9 @@ int	ms_open_fds(t_var *var, int i)
 				ms_perror("", "syntax error near unexpected token `'", "'", 2);
 			if (var->fd_in > 0)
 				close(var->fd_in);
-			if (var->cmds[i][j + 1] && !ft_strncmp(var->cmds[i][j], "<", 2))
+			if (!ft_strncmp(var->cmds[i][j], "<", 2) && var->cmds[i][j + 1])
 				var->fd_in = open(var->cmds[i][j + 1], O_RDONLY);
-			else if (!ft_strncmp(var->cmds[i][j], "<<", 3))
+			else if (!ft_strncmp(var->cmds[i][j], "<<", 3) && var->cmds[i][j + 1])
 			{
 				hd_no = ft_itoa(var->hd_int++);
 				hd_name = ft_strjoin(".here_doc_", hd_no);
