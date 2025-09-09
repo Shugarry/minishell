@@ -127,7 +127,7 @@ bool	ms_start_args(t_var *var)
 		(var->pipe_count && !var->pipes))
 		return (ms_perror("", strerror(errno), "", errno));
 	if (ms_token_filler(var->line, var->tokens) || ms_cmd_filler(var) || \
-		expand_cmd(var))
+		valid_tokens(var, var->tokens) == false || expand_cmd(var))
 		return (1);
 	i = -1;
 	while (var->cmds[++i])

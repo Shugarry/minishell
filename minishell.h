@@ -147,4 +147,7 @@ int		var_len_diff(t_var *var, char *str);
 char	*var_finder(t_var *var, char *str, char *new_token);
 // minishell_heredoc_helpers.c
 char	*hd_var_expansion(t_var *var, char *line);
+// minishell_token_validation.c
+bool	valid_tokens(t_var *var, char **toks);
+
 #endif
