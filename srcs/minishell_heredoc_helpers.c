@@ -20,7 +20,7 @@ static int	new_hd_line_len(t_var *var, char *line, int len)
 	while (line[i])
 	{
 		if (line[i] == '$' && (ft_isalpha(line[i + 1])
-			|| line[i + 1] == '_' || line[i + 1] == '?'))
+				|| line[i + 1] == '_' || line[i + 1] == '?'))
 		{
 			len += var_len_diff(var, line + i);
 			i++;
@@ -28,7 +28,7 @@ static int	new_hd_line_len(t_var *var, char *line, int len)
 				i++;
 			else
 				while (ft_isalnum(line[i]) || line[i] == '_')
-				i++;
+					i++;
 		}
 		else
 			i++;
@@ -49,7 +49,7 @@ static char	*build_new_line(t_var *var, char *line, int new_len)
 	while (line[i])
 	{
 		if (line[i] == '$' && (ft_isalpha(line[i + 1])
-			|| line[i + 1] == '_' || line[i + 1] == '?'))
+				|| line[i + 1] == '_' || line[i + 1] == '?'))
 		{
 			tmp = var_finder(var, line + i, NULL);
 			j += ft_strlcpy(new_line + j, tmp, ft_strlen(tmp) + 1);

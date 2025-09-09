@@ -15,7 +15,7 @@
 static bool	is_invalid_char(char c)
 {
 	return (c == '`' || c == ';' || c == '\\' || c == '{' || c == '}'
-	|| c == '(' || c == ')' || c == '&' );
+		|| c == '(' || c == ')' || c == '&' );
 }
 
 static bool	is_special_token(char *token)
@@ -37,7 +37,7 @@ static bool	is_special_token(char *token)
 
 static bool	token_error(t_var *var, char *token, int len)
 {
-	char	tmp[len + 1];
+	char	*tmp;
 	char	*nl_str;
 
 	nl_str = "newline";
@@ -47,6 +47,7 @@ static bool	token_error(t_var *var, char *token, int len)
 		var->exit_code = 2;
 		return (false);
 	}
+	tmp = (char *)memlist_alloc(var, sizeof(char) * (len + 1));
 	ft_strlcpy(tmp, token, len + 1);
 	ms_perror("syntax error near unexpected token `", tmp, "'", 1);
 	var->exit_code = 2;
@@ -79,25 +80,28 @@ static bool	are_chars_valid(t_var *var, char *tok)
 
 bool	valid_tokens(t_var *var, char **toks)
 {
-	int		i;
+	int	i;
+	int	hd_counter;
 
 	i = 0;
+	hd_counter = 0;
 	while (toks[i])
 	{
 		if (are_chars_valid(var, toks[i]) == false)
 			return (false);
+		if (ft_strncmp(toks[i], "<<", 3) == 0)
+			hd_counter++;
+		if (ft_strncmp(toks[i], "|", 2) == 0)
+			if (i == 0 || toks[i + 1] == NULL
+				|| ft_strncmp(toks[i + 1], "|", 2) == 0)
+				return (token_error(var, toks[i], ft_strlen(toks[i])));
 		if (is_special_token(toks[i]) && ft_strncmp(toks[i], "|", 2) != 0)
-		{
 			if (toks[i + 1] == NULL || is_special_token(toks[i + 1]))
 				return (token_error(var, toks[i + 1], ft_strlen(toks[i + 1])));
-		}	
-		else if (ft_strncmp(toks[i], "|", 2) == 0)
-		{
-			if (i == 0 || toks[i + 1] == NULL ||
-				ft_strncmp(toks[i + 1], "|", 2) == 0)
-				return (token_error(var, toks[i], ft_strlen(toks[i])));
-		}	
 		i++;
 	}
+	if (hd_counter > 16)
+		ms_exit(var, ms_perror("minishell: maximum heredoc count exceded",
+				"", "", 2));
 	return (true);
 }
