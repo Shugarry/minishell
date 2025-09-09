@@ -12,7 +12,7 @@
 
 #include "../minishell.h"
 
-volatile sig_atomic_t	g_signal_code = 0;
+volatile sig_atomic_t	g_signal_code = 0; // NOTE:: GLOBALES SOLO STATIC O CONST Y EN EL HEADER (MIRAR NORMA)
 
 void	ms_signal_handle(int sig)
 {
@@ -37,5 +37,14 @@ void	ms_signal_handle_child(int sig)
 	{
 		ft_putendl_fd("Quit (core dumped)", STDOUT_FILENO);
 		g_signal_code = 131;
+	}
+}
+
+void	catch_and_get_signal(t_var *var)
+{
+	if (g_signal_code)
+	{
+		var->exit_code = g_signal_code;
+		g_signal_code = 0;
 	}
 }

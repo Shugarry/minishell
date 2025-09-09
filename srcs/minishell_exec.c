@@ -144,10 +144,8 @@ int	ms_open_fds(t_var *var, int i)
 	j = 0;
 	while (var->cmds[i][j])
 	{
-		if (!ft_strncmp(var->cmds[i][j], ">", 1))
+		if (!ft_strncmp(var->cmds[i][j], ">", 2))
 		{
-			if (!var->cmds[i][j + 1])
-				ms_perror("", "syntax error near unexpected token `'", "'", 2);
 			if (var->fd_out > 0)
 				close(var->fd_out);
 			if (!ft_strncmp(var->cmds[i][j], ">", 2) && var->cmds[i][j + 1])
@@ -160,10 +158,8 @@ int	ms_open_fds(t_var *var, int i)
 				ms_perror(strerror(errno), ": ", var->cmds[i][j + 1], 1);
 			var->cmds[i] = ms_cmd_trim(var->cmds[i], j);
 		}
-		else if (!ft_strncmp(var->cmds[i][j], "<", 1))
+		else if (!ft_strncmp(var->cmds[i][j], "<", 2))
 		{
-			if (!var->cmds[i][j + 1])
-				ms_perror("", "syntax error near unexpected token `'", "'", 2);
 			if (var->fd_in > 0)
 				close(var->fd_in);
 			if (!ft_strncmp(var->cmds[i][j], "<", 2) && var->cmds[i][j + 1])

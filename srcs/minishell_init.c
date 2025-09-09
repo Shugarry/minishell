@@ -157,6 +157,7 @@ int	main(int ac, char **av, char **env)
 		signal(SIGINT, ms_signal_handle);
 		signal(SIGQUIT, SIG_IGN);
 		var.line = readline(GREEN "minishell$ " RESET);
+		catch_and_get_signal(&var);
 		if (!var.line)
 			ms_exit(&var, 0);
 		var.cmd_count = 1;

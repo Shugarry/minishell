@@ -79,6 +79,7 @@ int		main(int ac, char **av, char **env);
 // minishell_signals.c
 void	ms_signal_handle(int sig);
 void	ms_signal_handle_child(int sig);
+void	catch_and_get_signal(t_var *var);
 
 // minishell_tokens.c
 int		ms_regular_token_check(char *line);
