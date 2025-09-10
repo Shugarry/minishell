@@ -42,12 +42,6 @@ int	ms_special_token_check(char *line, t_var *var)
 
 	token[0] = line[0];
 	token[1] = '\0';
-	if (*token == '\\' || *token == ';' || *token == '`')
-	{
-		ms_perror("syntax error near unexpected token `", token, "'", 1);
-		var->exit_code = 2;
-		return (-1);
-	}
 	if (*token == '|' || *token == '<' || *token == '>')
 	{
 		if (var && *token == '|')

@@ -52,7 +52,7 @@ static void	export_add(t_var *var, char *token)
 		if ((!ft_isalpha(variable[0]) && variable[0] != '_') && \
 			(!ft_isalnum(variable[j]) && variable[j] != '_'))
 		{
-			var->exit_code = 1;
+			g_signal_code = 1;
 			ms_perror("minishell: export: `", token,
 				"': not a valid identifier\n", 1);
 			memlist_free_ptr(var, variable);
@@ -72,7 +72,7 @@ void	ms_export(t_var *var, char **tokens)
 		export_print(var);
 	while (tokens[i])
 	{
-		var->exit_code = 0;
+		g_signal_code = 0;
 		export_add(var, tokens[i]);
 		i++;
 	}
@@ -97,7 +97,7 @@ void	ms_env(t_var *var, char **tokens)
 	i = 0;
 	if (tokens[1])
 	{
-		var->exit_code = 127;
+		g_signal_code = 127;
 		ms_perror("minishell: env: '", tokens[1],
 			"': No such file or directory\n", 127);
 		return ;

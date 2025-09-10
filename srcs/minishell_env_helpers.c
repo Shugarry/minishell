@@ -104,7 +104,7 @@ char	*get_env_var(t_var *var, char *var_name)
 	i = 0;
 	if (ft_strncmp("?", var_name, 2) == 0)
 	{
-		var->str_error = memlist_add(var, ft_itoa(var->exit_code));
+		var->str_error = memlist_add(var, ft_itoa(g_signal_code));
 		return (var->str_error);
 	}
 	len = ft_strlen(var_name);

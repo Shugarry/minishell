@@ -62,7 +62,7 @@ void	ms_pwd(t_var *var)
 		printf("%s\n", get_env_var(var, "PWD"));
 	else
 	{
-		var->exit_code = 1;
+		g_signal_code = 1;
 		ms_perror("minishell: ", "pwd: ", \
 			"error retrieving current directory: No such file or directory", 1);
 	}

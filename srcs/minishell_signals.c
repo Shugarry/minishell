@@ -12,7 +12,7 @@
 
 #include "../minishell.h"
 
-volatile sig_atomic_t	g_signal_code = 0;
+volatile sig_atomic_t	g_signal_code = 0; // NOTE:: GLOBALES SOLO STATIC O CONST Y EN EL HEADER (MIRAR NORMA)
 
 void	ms_signal_handle(int sig)
 {

@@ -100,7 +100,8 @@ char	*var_finder(t_var *var, char *str, char *new_token)
 	var_name = ft_strdup(str + 1);
 	if (!var_name)
 	{
-		free(new_token);
+		if (new_token)
+			free(new_token);
 		ms_exit(var, ms_perror("", "malloc fail()", "", errno));
 	}
 	while (ft_isalnum(var_name[i]) || var_name[i] == '_')
