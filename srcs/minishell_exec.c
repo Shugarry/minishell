@@ -60,8 +60,7 @@ void	ft_exec_child(t_var *var, int i, int pipes)
 		ms_perror(var->cmds[i][0], ": ", strerror(errno), errno);
 	else
 		ms_exit(var, -1);
-	printf("salida\n");
-	ms_exit(var, var->exit_code);
+	ms_exit(var, 127);
 }
 
 int	ms_pipex(t_var *var)
@@ -96,7 +95,7 @@ int	ms_pipex(t_var *var)
 	while (i-- > 0)
 	{
 		if (waitpid(-1, &status, 0) == child && WIFEXITED(status))
-			var->exit_code = WEXITSTATUS(status);
+				var->exit_code = WEXITSTATUS(status);
 		if (i > 0)
 			close(var->pipes[2 * (i - 1)]);
 	}

@@ -32,6 +32,8 @@ void	ms_open_heredoc(t_var *var, char *limit, size_t limit_len, int *hd_int)
 	if (here_fd < 0)
 		ms_perror("", strerror(errno), "\n", errno);
 	free(hd_name);
+//	signal(SIGINT, ms_signal_handle_hd); PEND IMPLEMENT
+//	signal(SIGQUIT, ms_signal_handle_hd); PEND IMPLEMENT
 	while (1)
 	{
 		ft_putstr_fd("> ", STDOUT_FILENO);
@@ -39,7 +41,8 @@ void	ms_open_heredoc(t_var *var, char *limit, size_t limit_len, int *hd_int)
 		if (!line)
 			break ;
 		tmp = hd_var_expansion(var, line);
-		if (ft_strncmp(line, limit, limit_len) == 0 && line[limit_len] == '\n')
+		if (g_signal_code == 130 || \
+			(ft_strncmp(line, limit, limit_len) == 0 && line[limit_len] == '\n'))
 		{
 			free(line);
 			break ;
@@ -159,7 +162,7 @@ int	main(int ac, char **av, char **env)
 		var.line = readline(GREEN "minishell$ " RESET);
 		catch_and_get_signal(&var);
 		if (!var.line)
-			ms_exit(&var, 0);
+			ms_exit(&var, var.exit_code);
 		var.cmd_count = 1;
 		if (*var.line)
 			add_history(var.line);

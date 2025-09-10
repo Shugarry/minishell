@@ -13,6 +13,10 @@
 #include "../minishell.h"
 
 volatile sig_atomic_t	g_signal_code = 0; // NOTE:: GLOBALES SOLO STATIC O CONST Y EN EL HEADER (MIRAR NORMA)
+//NORM: Declaration and an initialisation cannot be on the same line, except for global
+ //variables (when allowed), static variables, and constants. (it's enumerating different kinds of variables)
+ //Also in C the global variables can be declared as extern in the .h, but defined (valor assign)
+ //in the .c files, otherwise it wil generate conflicts.
 
 void	ms_signal_handle(int sig)
 {
@@ -22,8 +26,10 @@ void	ms_signal_handle(int sig)
 		rl_on_new_line();
 		rl_replace_line("", 0);
 		rl_redisplay();
+		g_signal_code = 130;
 	}
-	g_signal_code = 130;
+	else if (sig == SIGQUIT)
+		g_signal_code = 131;
 }
 
 void	ms_signal_handle_child(int sig)
