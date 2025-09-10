@@ -36,6 +36,12 @@ static int	new_hd_line_len(t_var *var, char *line, int len)
 	return (len);
 }
 
+static bool	bnl_if_helper(char *line, int i)
+{
+	return (line[i] == '$' && (ft_isalpha(line[i + 1])
+			|| line[i + 1] == '_' || line[i + 1] == '?'));
+}
+
 static char	*build_new_line(t_var *var, char *line, int new_len)
 {
 	int		i;
@@ -48,8 +54,7 @@ static char	*build_new_line(t_var *var, char *line, int new_len)
 	new_line = (char *)memlist_alloc(var, sizeof(char) * (new_len + 1));
 	while (line[i])
 	{
-		if (line[i] == '$' && (ft_isalpha(line[i + 1])
-				|| line[i + 1] == '_' || line[i + 1] == '?'))
+		if (bnl_if_helper(line, i))
 		{
 			tmp = var_finder(var, line + i, NULL);
 			j += ft_strlcpy(new_line + j, tmp, ft_strlen(tmp) + 1);
@@ -60,9 +65,7 @@ static char	*build_new_line(t_var *var, char *line, int new_len)
 					i++;
 		}
 		else
-		{
 			new_line[j++] = line[i++];
-		}
 	}
 	new_line[j] = '\0';
 	return (new_line);

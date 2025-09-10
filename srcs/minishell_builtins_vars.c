@@ -56,7 +56,7 @@ static void	export_add(t_var *var, char *token)
 		{
 			var->exit_code = 1;
 			ms_perror("minishell: export: `", token,
-			 "': not a valid identifier", 1);
+				"': not a valid identifier", 1);
 			memlist_free_ptr(var, variable);
 			return ;
 		}
