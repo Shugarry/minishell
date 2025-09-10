@@ -23,7 +23,7 @@ RM			= rm -f
 SRC			= $(addprefix srcs/minishell_, builtins_chdir.c builtins_extra.c \
 			  builtins_vars.c env_helpers.c env_init.c exec.c expansion.c \
 			  expansion_helpers.c init.c memory.c signals.c tokens.c \
-			  utils.c heredoc_helpers.c token_validation.c)
+			  utils.c heredoc_helpers.c token_validation.c exec_builtins.c exec_extra.c)
 
 OBJ			= $(SRC:.c=.o)
 
@@ -49,7 +49,7 @@ LIB_SRC		= $(addprefix libft/ft_, atoi.c bzero.c calloc.c isalnum.c isalpha.c \
 				strmapi.c strncmp.c strnstr.c strrchr.c strtrim.c substr.c \
 				tolower.c toupper.c) $(addprefix libft/, get_next_line_bonus.c)
 
-LIB_DEP = $(LIB_SRC) $(LIB_HDR) libft/Makefile 
+LIB_DEP = $(LIB_SRC) $(LIB_HDR) libft/Makefile
 
 # ================================== RULES =================================== #
 

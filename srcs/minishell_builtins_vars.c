@@ -49,8 +49,8 @@ static void	export_add(t_var *var, char *token)
 		*content++ = '\0';
 	while (variable && variable[++j])
 	{
-		if ((!ft_isalpha(variable[0]) && variable[0] != '_') && \
-			(!ft_isalnum(variable[j]) && variable[j] != '_'))
+		if ((!ft_isalpha(variable[0]) && variable[0] != '_')
+			&& (!ft_isalnum(variable[j]) && variable[j] != '_'))
 		{
 			g_signal_code = 1;
 			ms_perror("minishell: export: `", token,

@@ -63,7 +63,7 @@ void	ms_pwd(t_var *var)
 	else
 	{
 		g_signal_code = 1;
-		ms_perror("minishell: ", "pwd: ", \
+		ms_perror("minishell: ", "pwd: ",
 			"error retrieving current directory: No such file or directory", 1);
 	}
 }

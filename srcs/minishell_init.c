@@ -1,13 +1,13 @@
 /* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   minishell_init.c                                   :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: miggarc2 <marvin@42.fr>                    +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/02/06 19:02:08 by miggarc2          #+#    #+#             */
-/*   Updated: 2025/06/23 07:21:23 by frey-gal         ###   ########.fr       */
-/*                                                                            */
+/*																			*/
+/*														:::	  ::::::::   */
+/*   minishell_init.c								   :+:	  :+:	:+:   */
+/*													+:+ +:+		 +:+	 */
+/*   By: miggarc2 <marvin@42.fr>					+#+  +:+	   +#+		*/
+/*												+#+#+#+#+#+   +#+		   */
+/*   Created: 2025/02/06 19:02:08 by miggarc2		  #+#	#+#			 */
+/*   Updated: 2025/06/23 07:21:23 by frey-gal		 ###   ########.fr	   */
+/*																			*/
 /* ************************************************************************** */
 
 #include "../minishell.h"
@@ -95,11 +95,10 @@ bool	ms_cmd_filler(t_var *var)
 	while (var->tokens[++i])
 	{
 		args = 0;
-		while (var->tokens[i + args] && \
-			!ft_strchr("|", *var->tokens[i + args]))
+		while (var->tokens[i + args]
+			&& !ft_strchr("|", *var->tokens[i + args]))
 			args++;
-		var->cmds[var->cmd_count] = \
-			(char **)ft_calloc(args + 1, sizeof(char *));
+		var->cmds[var->cmd_count] = (char **)ft_calloc(args + 1, sizeof(char *));
 		if (!var->cmds[var->cmd_count])
 			return (ms_perror("", strerror(errno), "", errno));
 		tmp = 0;
@@ -122,11 +121,11 @@ bool	ms_start_args(t_var *var)
 	var->cmds = (char ***)ft_calloc(var->cmd_count + 1, sizeof(char **));
 	var->cmd_splitters = (char **)ft_calloc(var->cmd_count, sizeof(char *));
 	var->pipes = (int *)ft_calloc((var->pipe_count) * 2, sizeof(int));
-	if (!var->tokens || !var->cmds || !var->cmd_splitters || \
-		(var->pipe_count && !var->pipes))
+	if (!var->tokens || !var->cmds || !var->cmd_splitters
+		|| (var->pipe_count && !var->pipes))
 		return (ms_perror("", strerror(errno), "", errno));
-	if (ms_token_filler(var->line, var->tokens) || ms_cmd_filler(var) || \
-		valid_tokens(var, var->tokens) == false || expand_cmd(var))
+	if (ms_token_filler(var->line, var->tokens) || ms_cmd_filler(var)
+		|| valid_tokens(var, var->tokens) == false || expand_cmd(var))
 		return (1);
 	i = -1;
 	while (var->cmds[++i])
@@ -135,8 +134,7 @@ bool	ms_start_args(t_var *var)
 		while (var->cmds[i][j])
 			if (!ft_strncmp(var->cmds[i][j++], "<<", 3))
 			{
-				ms_open_heredoc(var, var->cmds[i][j], \
-					ft_strlen(var->cmds[i][j]), &var->hd_int);
+				ms_open_heredoc(var, var->cmds[i][j], ft_strlen(var->cmds[i][j]), &var->hd_int);
 				return 1;
 			}
 		var->hd_int = 0;

@@ -82,7 +82,7 @@ void	remove_env_var(t_var *var, char *var_name)
 	len = ft_strlen(var_name);
 	while (var->env && var->env[i])
 	{
-		if (ft_strncmp(var_name, var->env[i], len) == 0 \
+		if (ft_strncmp(var_name, var->env[i], len) == 0
 			&& (var->env[i][len] == '=' || var->env[i][len] == '\0'))
 		{
 			i++;
