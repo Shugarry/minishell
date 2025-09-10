@@ -77,16 +77,21 @@ void	ms_exit_builtin(t_var *var)
 		ms_exit(var, 0);
 	else if (var->cmds[0][1] && !var->cmds[0][2])
 	{
+		if (var->cmds[0][1][i] == '+' || var->cmds[0][1][i] == '-')
+			i++;
 		while (var->cmds[0][1][i])
 		{
 			if (!ft_isdigit(var->cmds[0][1][i++]))
 			{
 				ms_perror("", "exit: ", "numeric argument required", 2);
+				var->exit_code = 2;
 				return ;
 			}
 		}
+		if (ft_atoi(var->cmds[0][1]) < 0)
+			ms_exit(var, ft_atoi(var->cmds[0][1]) + 256);
 		ms_exit(var, ft_atoi(var->cmds[0][1]));
 	}
-	else
-		ms_perror("", "exit: ", "too many arguments", 127);
+	var->exit_code = 1;
+	ms_perror("", "exit: ", "too many arguments", 2);
 }

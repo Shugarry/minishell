@@ -55,8 +55,8 @@ void	ft_exec_child(t_var *var, int i, int pipes)
 		ms_exit(var, 1);
 	if (var->fd_out && dup2(var->fd_out, STDOUT_FILENO) < 0)
 		ms_exit(var, 1);
-	else if (var->cmds[i][0] && !ms_exec_builtins(var, i, 1) && \
-		execve(var->cmds[i][0], var->cmds[i], var->env))
+	else if (var->cmds[i][0] && !ms_exec_builtins(var, i, 1)
+			&& execve(var->cmds[i][0], var->cmds[i], var->env))
 		ms_perror(var->cmds[i][0], ": ", strerror(errno), errno);
 	else
 		ms_exit(var, -1);
@@ -68,10 +68,12 @@ int	ms_pipex(t_var *var)
 	int		i;
 	int		status;
 	pid_t	child;
+	bool	forked_child;
 
 	i = -1;
 	child = -1;
 	status = 0;
+	forked_child = false;
 	while (var->cmds[++i])
 	{
 		if (i < var->pipe_count && pipe(&var->pipes[2 * i]) < 0)
@@ -80,6 +82,7 @@ int	ms_pipex(t_var *var)
 		{
 			if (!ms_exec_builtins(var, i, 0))
 			{
+				forked_child = true;
 				signal(SIGINT, ms_signal_handle_child);
 				signal(SIGQUIT, ms_signal_handle_child);
 				child = fork();
@@ -94,8 +97,8 @@ int	ms_pipex(t_var *var)
 	}
 	while (i-- > 0)
 	{
-		if (waitpid(-1, &status, 0) == child && WIFEXITED(status))
-				var->exit_code = WEXITSTATUS(status);
+		if (forked_child && waitpid(-1, &status, 0) == child && WIFEXITED(status))
+			var->exit_code = WEXITSTATUS(status);
 		if (i > 0)
 			close(var->pipes[2 * (i - 1)]);
 	}

@@ -11,6 +11,8 @@
 /* ************************************************************************** */
 
 #include "../minishell.h"
+#include <stdio.h>
+#include <unistd.h>
 
 static void	export_print(t_var *var)
 {
@@ -42,22 +44,23 @@ static void	export_add(t_var *var, char *token)
 	char	*content;
 	int		j;
 
-	j = -1;
+	j = 0;
 	variable = memlist_add(var, ft_strdup(token));
 	content = ft_strchr(variable, '=');
 	if (content)
 		*content++ = '\0';
-	while (variable && variable[++j])
+	while ((variable && variable[j]) || token[0] == '=')
 	{
-		if ((!ft_isalpha(variable[0]) && variable[0] != '_') && \
-			(!ft_isalnum(variable[j]) && variable[j] != '_'))
+		if (token[0] == '=' || (!ft_isalpha(variable[0]) && variable[0] != '_')
+			|| (!ft_isalnum(variable[j]) && variable[j] != '_'))
 		{
 			var->exit_code = 1;
 			ms_perror("minishell: export: `", token,
-				"': not a valid identifier\n", 1);
+			 "': not a valid identifier", 1);
 			memlist_free_ptr(var, variable);
 			return ;
 		}
+		j++;
 	}
 	modify_env_var(var, variable, content);
 	memlist_free_ptr(var, variable);

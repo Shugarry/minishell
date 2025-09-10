@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "../minishell.h"
+#include <stdio.h>
 
 static int	bad_status(int status)
 {
@@ -35,7 +36,7 @@ static void	cd_home(t_var *var)
 	if (bad_status(status))
 	{
 		ms_perror("minishell: ", "cd: ", strerror(errno), errno);
-		var->exit_code = status;
+		var->exit_code = 1;
 		return ;
 	}
 	modify_env_var(var, "OLDPWD", pwd);
@@ -63,7 +64,7 @@ static void	cd_previous(t_var *var)
 	if (bad_status(status))
 	{
 		ms_perror("minishell:", "cd:", strerror(errno), errno);
-		var->exit_code = status;
+		var->exit_code = 1;
 		return ;
 	}
 	tmp = memlist_add(var, ft_strdup(get_env_var(var, "OLDPWD")));
@@ -87,7 +88,7 @@ static void	cd_todir(t_var *var, char **tokens)
 	if (bad_status(status))
 	{
 		ms_perror("minishell: ", "cd: ", strerror(errno), errno);
-		var->exit_code = status;
+		var->exit_code = 1;
 		return ;
 	}
 	modify_env_var(var, "OLDPWD", tmp);
@@ -111,8 +112,8 @@ void	ms_cd(t_var *var, char **tokens)
 	}
 	else if (tokens[2] != NULL)
 	{
-		ms_perror("minishell: ", "cd: ", "too many arguments", 1);
 		var->exit_code = 1;
+		ms_perror("minishell: ", "cd: ", "too many arguments", 1);
 	}
 	else if (ft_strncmp(tokens[1], "-", 2) == 0)
 	{
