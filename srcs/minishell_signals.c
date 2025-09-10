@@ -28,8 +28,15 @@ void	ms_signal_handle(int sig)
 		rl_redisplay();
 		g_signal_code = 130;
 	}
-	else if (sig == SIGQUIT)
-		g_signal_code = 131;
+}
+
+void	ms_signal_handle_hd(int sig)
+{
+	if (sig == SIGINT)
+	{
+		g_signal_code = 130;
+		write(STDIN_FILENO, "\n", 1);
+	}
 }
 
 void	ms_signal_handle_child(int sig)
@@ -37,6 +44,7 @@ void	ms_signal_handle_child(int sig)
 	if (sig == SIGINT)
 	{
 		ft_putendl_fd("", STDOUT_FILENO);
+		rl_on_new_line();
 		g_signal_code = 130;
 	}
 	else if (sig == SIGQUIT)

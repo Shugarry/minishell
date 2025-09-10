@@ -20,6 +20,7 @@ void	ms_open_heredoc(t_var *var, char *limit, size_t limit_len, int *hd_int)
 	char	*hd_no;
 	char	*hd_name;
 	char	*tmp;
+	int		line_number;
 
 	hd_no = ft_itoa((*hd_int)++);
 	hd_name = ft_strjoin(".here_doc_", hd_no);
@@ -32,27 +33,32 @@ void	ms_open_heredoc(t_var *var, char *limit, size_t limit_len, int *hd_int)
 	if (here_fd < 0)
 		ms_perror("", strerror(errno), "\n", errno);
 	free(hd_name);
-//	signal(SIGINT, ms_signal_handle_hd); PEND IMPLEMENT
-//	signal(SIGQUIT, ms_signal_handle_hd); PEND IMPLEMENT
+	signal(SIGINT, ms_signal_handle_hd);
+	line_number = 1;
 	while (1)
 	{
-		ft_putstr_fd("> ", STDOUT_FILENO);
-		line = get_next_line(STDIN_FILENO);
+		line = readline("> ");
 		if (!line)
 			break ;
-		tmp = hd_var_expansion(var, line);
-		if (g_signal_code == 130 || \
-			(ft_strncmp(line, limit, limit_len) == 0 && line[limit_len] == '\n'))
+		if (g_signal_code == 130 || ft_strncmp(line, limit, limit_len) == 0)
 		{
 			free(line);
 			break ;
 		}
 		else
-			ft_putstr_fd(tmp, here_fd);
+		{
+			tmp = hd_var_expansion(var, line);
+			ft_putendl_fd(tmp, here_fd);
+		}
 		memlist_free_ptr(var, tmp);
 		free(line);
+		line_number++;
 	}
 	close(here_fd);
+	if (line == NULL)
+	printf("minishell: warning: here-doc at line %d limited by `%s'\n",\
+		line_number, limit);
+	signal(SIGINT, ms_signal_handle);
 }
 
 void	ms_cmd_resolve(t_var *var, int i)
