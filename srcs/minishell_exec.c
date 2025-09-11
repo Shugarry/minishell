@@ -21,8 +21,9 @@ bool	ms_exec_builtins(t_var *var, int i, bool child)
 		stripped_cmd = var->cmds[i][0];
 	else
 		stripped_cmd++;
-	if (!ft_strncmp(var->cmds[0][0], "exit", 5))
-		ms_exit_builtin(var);
+	if (!ft_strncmp(var->cmds[i][0], "exit", 5) && 
+		(!var->pipe_count || child))
+		ms_exit_builtin(var, i);
 	else if (!ft_strncmp(stripped_cmd, "cd", 3))
 		ms_cd(var, var->cmds[i]);
 	else if (!ft_strncmp(stripped_cmd, "echo", 5) && child)
@@ -112,7 +113,7 @@ char	**ms_cmd_trim(char **cmd, int pos)
 	size = 0;
 	while (cmd[size])
 		size++;
-	new_cmd = (char **)ft_calloc(size, sizeof(char *));
+	new_cmd = (char **)ft_calloc(size - 1, sizeof(char *));
 	if (!new_cmd)
 	{
 		ms_perror("", strerror(errno), "", errno);
@@ -125,8 +126,7 @@ char	**ms_cmd_trim(char **cmd, int pos)
 		if (j == pos)
 		{
 			free (cmd[j++]);
-			if (cmd[j])
-				free (cmd[j++]);
+			free (cmd[j++]);
 		}
 		new_cmd[i++] = cmd[j++];
 	}
@@ -143,27 +143,27 @@ int	ms_open_fds(t_var *var, int i)
 	j = 0;
 	while (var->cmds[i][j])
 	{
-		if (!ft_strncmp(var->cmds[i][j], ">", 2))
+		if (!ft_strncmp(var->cmds[i][j], ">", 1))
 		{
 			if (var->fd_out > 0)
 				close(var->fd_out);
-			if (!ft_strncmp(var->cmds[i][j], ">", 2) && var->cmds[i][j + 1])
+			if (!ft_strncmp(var->cmds[i][j], ">", 2) )
 				var->fd_out = open(var->cmds[i][j + 1],
 						O_WRONLY | O_CREAT | O_TRUNC, 0644);
-			else if (!ft_strncmp(var->cmds[i][j], ">>", 3) && var->cmds[i][j + 1])
+			else if (!ft_strncmp(var->cmds[i][j], ">>", 3))
 				var->fd_out = open(var->cmds[i][j + 1],
 						O_WRONLY | O_CREAT | O_APPEND, 0644);
 			if (var->fd_out < 0)
 				ms_perror(strerror(errno), ": ", var->cmds[i][j + 1], 1);
 			var->cmds[i] = ms_cmd_trim(var->cmds[i], j);
 		}
-		else if (!ft_strncmp(var->cmds[i][j], "<", 2))
+		else if (!ft_strncmp(var->cmds[i][j], "<", 1))
 		{
 			if (var->fd_in > 0)
 				close(var->fd_in);
-			if (!ft_strncmp(var->cmds[i][j], "<", 2) && var->cmds[i][j + 1])
+			if (!ft_strncmp(var->cmds[i][j], "<", 2))
 				var->fd_in = open(var->cmds[i][j + 1], O_RDONLY);
-			else if (!ft_strncmp(var->cmds[i][j], "<<", 3) && var->cmds[i][j + 1])
+			else if (!ft_strncmp(var->cmds[i][j], "<<", 3))
 			{
 				hd_no = ft_itoa(var->hd_int++);
 				hd_name = ft_strjoin(".here_doc_", hd_no);

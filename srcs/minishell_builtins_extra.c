@@ -68,24 +68,24 @@ void	ms_pwd(t_var *var)
 	}
 }
 
-void	ms_exit_builtin(t_var *var)
+void	ms_exit_builtin(t_var *var, int i)
 {
-	int	i;
+	int	k;
 
-	i = 0;
-	if (!var->cmds[0][1])
+	k = 0;
+	if (!var->cmds[i][1])
 		ms_exit(var, 0);
-	else if (var->cmds[0][1] && !var->cmds[0][2])
+	else if (var->cmds[i][1] && !var->cmds[i][2])
 	{
-		while (var->cmds[0][1][i])
+		while (var->cmds[i][1][k])
 		{
-			if (!ft_isdigit(var->cmds[0][1][i++]))
+			if (!ft_isdigit(var->cmds[i][1][k++]))
 			{
 				ms_perror("", "exit: ", "numeric argument required", 2);
 				return ;
 			}
 		}
-		ms_exit(var, ft_atoi(var->cmds[0][1]));
+		ms_exit(var, ft_atoi(var->cmds[i][1]));
 	}
 	else
 		ms_perror("", "exit: ", "too many arguments", 127);

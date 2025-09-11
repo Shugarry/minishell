@@ -27,7 +27,10 @@ int	ms_regular_token_check(char *line)
 				len++;
 			if (!line[len])
 			{
-				ms_perror(&quote, ": error quotes must be closed", "", 1);
+				if (quote == '\'')
+					ms_perror("\'", ": error quotes must be closed", "", 1);
+				else
+					ms_perror("\"", ": error quotes must be closed", "", 1);
 				return (-1);
 			}
 		}

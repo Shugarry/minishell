@@ -70,7 +70,7 @@ char	**ms_cmd_trim(char **cmd, int pos);
 int		ms_open_fds(t_var *var, int i);
 
 // minishell_init.c
-void	ms_open_heredoc(t_var *var, char *limit, size_t limit_len, int *hd_int);
+bool	ms_open_heredoc(t_var *var, char *limit, size_t limit_len, int *hd_int);
 void	ms_cmd_resolve(t_var *var, int i);
 bool	ms_cmd_filler(t_var *var);
 bool	ms_start_args(t_var *va);
@@ -106,7 +106,7 @@ void	memlist_free_ptr(t_var *var, void *ptr);
 void	ms_echo(char **tokens);
 char	*getcwd_plus(t_var *var);
 void	ms_pwd(t_var *var);
-void	ms_exit_builtin(t_var *var);
+void	ms_exit_builtin(t_var *var, int i);
 // minishell_builtins_chdir.c
 //static int	bad_status(int status);
 //static void	cd_home(t_var *var);

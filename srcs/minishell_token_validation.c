@@ -15,7 +15,7 @@
 static bool	is_invalid_char(char c)
 {
 	return (c == '`' || c == ';' || c == '\\' || c == '{' || c == '}'
-		|| c == '(' || c == ')' || c == '&' );
+		|| c == '(' || c == ')' || c == '&' || c == '~');
 }
 
 static bool	is_special_token(char *token)

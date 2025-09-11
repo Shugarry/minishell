@@ -13,7 +13,7 @@
 #include "../minishell.h"
 
 // Pend fix multiple heredocs and hd_int update (useless in child)
-void	ms_open_heredoc(t_var *var, char *limit, size_t limit_len, int *hd_int)
+bool	ms_open_heredoc(t_var *var, char *limit, size_t limit_len, int *hd_int)
 {
 	char	*line;
 	int		here_fd;
@@ -21,6 +21,8 @@ void	ms_open_heredoc(t_var *var, char *limit, size_t limit_len, int *hd_int)
 	char	*hd_name;
 	char	*tmp;
 	int		line_number;
+	pid_t	child;
+	int		status;
 
 	hd_no = ft_itoa((*hd_int)++);
 	hd_name = ft_strjoin(".here_doc_", hd_no);
@@ -34,31 +36,42 @@ void	ms_open_heredoc(t_var *var, char *limit, size_t limit_len, int *hd_int)
 		ms_perror("", strerror(errno), "\n", errno);
 	free(hd_name);
 	signal(SIGINT, ms_signal_handle_hd);
-	line_number = 1;
-	while (1)
+	child = fork();
+	if (child < 0 && ms_perror("", strerror(errno), "", errno))
+		return (1);
+	else if (child == 0)
 	{
-		line = readline("> ");
-		if (!line)
-			break ;
-		if (g_signal_code == 130 || ft_strncmp(line, limit, limit_len) == 0)
+		line_number = 1;
+		while (1)
 		{
+			line = readline("> ");
+			if (!line)
+				break;
+			if (ft_strncmp(line, limit, limit_len) == 0)
+			{
+				free(line);
+				break;
+			}
+			else
+			{
+				tmp = hd_var_expansion(var, line);
+				ft_putendl_fd(tmp, here_fd);
+			}
+			memlist_free_ptr(var, tmp);
 			free(line);
-			break ;
+			line_number++;
 		}
-		else
-		{
-			tmp = hd_var_expansion(var, line);
-			ft_putendl_fd(tmp, here_fd);
-		}
-		memlist_free_ptr(var, tmp);
-		free(line);
-		line_number++;
+		close(here_fd);
+		if (line == NULL)
+			ft_printf("minishell: warning: here-doc at line %d limited by `%s'\n",
+				   line_number, limit);
+		exit(0);
 	}
-	close(here_fd);
-	if (line == NULL)
-	printf("minishell: warning: here-doc at line %d limited by `%s'\n",\
-		line_number, limit);
 	signal(SIGINT, ms_signal_handle);
+	if (waitpid(child, &status, 0) == child && WIFEXITED(status)\
+		&& WEXITSTATUS(status) == 130)
+			return (1);
+	return (0);
 }
 
 void	ms_cmd_resolve(t_var *var, int i)
@@ -143,9 +156,10 @@ bool	ms_start_args(t_var *var)
 	{
 		j = 0;
 		while (var->cmds[i][j])
-			if (!ft_strncmp(var->cmds[i][j++], "<<", 3))
+			if (!ft_strncmp(var->cmds[i][j++], "<<", 3) &&
 				ms_open_heredoc(var, var->cmds[i][j], \
-					ft_strlen(var->cmds[i][j]), &var->hd_int);
+					ft_strlen(var->cmds[i][j]), &var->hd_int))
+						return (1);
 		var->hd_int = 0;
 		ms_cmd_resolve(var, i);
 	}
