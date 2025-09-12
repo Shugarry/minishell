@@ -6,7 +6,7 @@
 #    By: frey-gal <frey-gal@student.42barcelona.co  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/04/20 02:23:03 by frey-gal          #+#    #+#              #
-#    Updated: 2025/07/10 21:27:18 by frey-gal         ###   ########.fr        #
+#    Updated: 2025/09/12 21:08:51 by frey-gal         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,7 +23,7 @@ RM			= rm -f
 SRC			= $(addprefix srcs/minishell_, builtins_chdir.c builtins_extra.c \
 			  builtins_vars.c env_helpers.c env_init.c exec.c expansion.c \
 			  expansion_helpers.c init.c memory.c signals.c tokens.c \
-			  utils.c heredoc_helpers.c token_validation.c fds.c)
+			  utils.c heredoc.c heredoc_helpers.c token_validation.c fds.c)
 
 OBJ			= $(SRC:.c=.o)
 
