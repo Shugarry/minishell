@@ -17,7 +17,7 @@ bool	check_hd_expansion(t_var *var)
 	int	i;
 
 	i = ft_strlen(var->line);
-	while(i >= 0)
+	while (i >= 0)
 	{
 		if (i > 0 && var->line[i] == '<' && var->line[i - 1] == '<')
 		{
@@ -32,6 +32,16 @@ bool	check_hd_expansion(t_var *var)
 		i--;
 	}
 	return (true);
+}
+
+static void	child_hd_helper(char *line, int here_fd, int l_no, char *limit)
+{
+	if (line)
+		free(line);
+	close(here_fd);
+	if (line == NULL)
+		printf("warn: here-doc at line %d limited by `%s'\n", l_no, limit);
+	exit(0);
 }
 
 void	ms_child_hd(t_var *var, char *limit, size_t limit_len, int here_fd)
@@ -57,10 +67,5 @@ void	ms_child_hd(t_var *var, char *limit, size_t limit_len, int here_fd)
 			break ;
 		free(line);
 	}
-	if (line)
-		free (line);
-	close(here_fd);
-	if (line == NULL)
-		printf("warn: here-doc at line %d limited by `%s'\n", l_no, limit);
-	exit(0);
+	child_hd_helper(line, here_fd, l_no, limit);
 }
