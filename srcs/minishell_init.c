@@ -12,15 +12,39 @@
 
 #include "../minishell.h"
 
-// Pend fix multiple heredocs and hd_int update (useless in child)
-bool	ms_open_heredoc(t_var *var, char *limit, size_t limit_len, int *hd_int)
+void	ms_child_hd(t_var *var, char *limit, size_t limit_len, int here_fd)
 {
 	char	*line;
+	char	*tmp;
+	int		l_no;
+
+	l_no = 0;
+	while (++l_no)
+	{
+		line = readline("> ");
+		if (line && ft_strncmp(line, limit, limit_len))
+		{
+			tmp = hd_var_expansion(var, line);
+			ft_putendl_fd(tmp, here_fd);
+			memlist_free_ptr(var, tmp);
+		}
+		else
+			break ;
+		free(line);
+	}
+	if (line)
+		free (line);
+	close(here_fd);
+	if (line == NULL)
+		printf("warn: here-doc at line %d limited by `%s'\n", l_no, limit);
+	exit(0);
+}
+
+bool	ms_open_heredoc(t_var *var, char *limit, size_t limit_len, int *hd_int)
+{
 	int		here_fd;
 	char	*hd_no;
 	char	*hd_name;
-	char	*tmp;
-	int		l_no;
 	pid_t	child;
 	int		status;
 
@@ -40,32 +64,7 @@ bool	ms_open_heredoc(t_var *var, char *limit, size_t limit_len, int *hd_int)
 	if (child < 0 && ms_perror("", strerror(errno), "", errno))
 		return (1);
 	else if (child == 0)
-	{
-		l_no = 1;
-		while (1)
-		{
-			line = readline("> ");
-			if (!line)
-				break ;
-			if (ft_strncmp(line, limit, limit_len) == 0)
-			{
-				free(line);
-				break ;
-			}
-			else
-			{
-				tmp = hd_var_expansion(var, line);
-				ft_putendl_fd(tmp, here_fd);
-			}
-			memlist_free_ptr(var, tmp);
-			free(line);
-			l_no++;
-		}
-		close(here_fd);
-		if (line == NULL)
-			printf("warn: here-doc at line %d limited by `%s'\n", l_no, limit);
-		exit(0);
-	}
+		ms_child_hd(var, limit, limit_len, here_fd);
 	signal(SIGINT, ms_signal_handle);
 	if (waitpid(child, &status, 0) == child && WIFEXITED(status) \
 		&& WEXITSTATUS(status) == 130)
@@ -73,18 +72,13 @@ bool	ms_open_heredoc(t_var *var, char *limit, size_t limit_len, int *hd_int)
 	return (0);
 }
 
-void	ms_cmd_resolve(t_var *var, int i)
+char	*ms_cmd_build(t_var *var, int i)
 {
-	int		j;
 	char	*tmp;
 	char	*cmd;
+	int		j;
 
 	j = -1;
-	if (var->paths)
-		ms_clean(var->paths);
-	var->paths = ft_split(get_env_var(var, "PATH"), ':');
-	if (!var->paths && get_env_var(var, "PATH"))
-		ms_exit(var, ms_perror("", "malloc fail()", "", errno));
 	while (var->paths[++j])
 	{
 		if (var->cmds[i][0] && ft_strncmp(var->cmds[i][0], "/", 1))
@@ -102,8 +96,29 @@ void	ms_cmd_resolve(t_var *var, int i)
 	if (var->paths[j])
 	{
 		free(var->cmds[i][0]);
-		var->cmds[i][0] = cmd;
+		return (cmd);
 	}
+	return (var->cmds[i][0]);
+}
+
+bool	ms_cmd_resolve(t_var *var, int i)
+{
+	int		j;
+
+	j = 0;
+	while (var->cmds[i][j])
+		if (!ft_strncmp(var->cmds[i][j++], "<<", 3) &&
+			ms_open_heredoc(var, var->cmds[i][j],
+				ft_strlen(var->cmds[i][j]), &var->hd_int))
+			return (1);
+	var->hd_int = 0;
+	if (var->paths)
+		ms_clean(var->paths);
+	var->paths = ft_split(get_env_var(var, "PATH"), ':');
+	if (!var->paths && get_env_var(var, "PATH"))
+		ms_exit(var, ms_perror("", "malloc fail()", "", errno));
+	var->cmds[i][0] = ms_cmd_build(var, i);
+	return (0);
 }
 
 bool	ms_cmd_filler(t_var *var)
@@ -138,7 +153,6 @@ bool	ms_cmd_filler(t_var *var)
 bool	ms_start_args(t_var *var)
 {
 	int	i;
-	int	j;
 
 	var->tokens = (char **)ft_calloc(var->token_count + 1, sizeof(char *));
 	var->cmds = (char ***)ft_calloc(var->cmd_count + 1, sizeof(char **));
@@ -152,16 +166,8 @@ bool	ms_start_args(t_var *var)
 		return (1);
 	i = -1;
 	while (var->cmds[++i])
-	{
-		j = 0;
-		while (var->cmds[i][j])
-			if (!ft_strncmp(var->cmds[i][j++], "<<", 3) &&
-				ms_open_heredoc(var, var->cmds[i][j], \
-					ft_strlen(var->cmds[i][j]), &var->hd_int))
-					return (1);
-		var->hd_int = 0;
-		ms_cmd_resolve(var, i);
-	}
+		if (ms_cmd_resolve(var, i))
+			return (1);
 	return (0);
 }
 

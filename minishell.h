@@ -70,8 +70,10 @@ char	**ms_cmd_trim(char **cmd, int pos);
 int		ms_open_fds(t_var *var, int i);
 
 // minishell_init.c
+void	ms_child_hd(t_var *var, char *limit, size_t limit_len, int here_fd);
 bool	ms_open_heredoc(t_var *var, char *limit, size_t limit_len, int *hd_int);
-void	ms_cmd_resolve(t_var *var, int i);
+char	*ms_cmd_build(t_var *var, int i);
+bool	ms_cmd_resolve(t_var *var, int i);
 bool	ms_cmd_filler(t_var *var);
 bool	ms_start_args(t_var *va);
 int		main(int ac, char **av, char **env);
