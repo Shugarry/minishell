@@ -28,6 +28,8 @@
 
 # define GREEN "\033[0;32m"
 # define RESET "\033[0m"
+# define HD_NO 0
+# define HD_NAME 1
 
 extern volatile sig_atomic_t	g_signal_code;
 
