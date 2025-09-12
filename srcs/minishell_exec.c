@@ -21,7 +21,7 @@ bool	ms_exec_builtins(t_var *var, int i, bool child)
 		stripped_cmd = var->cmds[i][0];
 	else
 		stripped_cmd++;
-	if (!ft_strncmp(var->cmds[i][0], "exit", 5) &&
+	if (!ft_strncmp(var->cmds[i][0], "exit", 5) && 
 		(!var->pipe_count || child))
 		ms_exit_builtin(var, i);
 	else if (!ft_strncmp(stripped_cmd, "cd", 3))
@@ -69,12 +69,12 @@ int	ms_pipex(t_var *var)
 	int		i;
 	int		status;
 	pid_t	child;
-	bool	fork_child;
+	bool	forked_child;
 
 	i = -1;
 	child = -1;
 	status = 0;
-	fork_child = false;
+	forked_child = false;
 	while (var->cmds[++i])
 	{
 		if (i < var->pipe_count && pipe(&var->pipes[2 * i]) < 0)
@@ -83,7 +83,7 @@ int	ms_pipex(t_var *var)
 		{
 			if (!ms_exec_builtins(var, i, 0))
 			{
-				fork_child = true;
+				forked_child = true;
 				signal(SIGINT, ms_signal_handle_child);
 				signal(SIGQUIT, ms_signal_handle_child);
 				child = fork();
@@ -98,7 +98,7 @@ int	ms_pipex(t_var *var)
 	}
 	while (i-- > 0)
 	{
-		if (fork_child && waitpid(-1, &status, 0) == child && WIFEXITED(status))
+		if (forked_child && waitpid(-1, &status, 0) == child && WIFEXITED(status))
 			var->exit_code = WEXITSTATUS(status);
 		if (i > 0)
 			close(var->pipes[2 * (i - 1)]);
@@ -150,7 +150,7 @@ int	ms_open_fds(t_var *var, int i)
 		{
 			if (var->fd_out > 0)
 				close(var->fd_out);
-			if (!ft_strncmp(var->cmds[i][j], ">", 2))
+			if (!ft_strncmp(var->cmds[i][j], ">", 2) )
 				var->fd_out = open(var->cmds[i][j + 1],
 						O_WRONLY | O_CREAT | O_TRUNC, 0644);
 			else if (!ft_strncmp(var->cmds[i][j], ">>", 3))
