@@ -12,11 +12,9 @@
 
 #include "../minishell.h"
 
-char	**ms_cmd_trim(char **cmd, int pos)
+char	**ms_cmd_trim(char **cmd, int pos, int i, int j)
 {
 	int		size;
-	int		i;
-	int		j;
 	char	**new_cmd;
 
 	size = 0;
@@ -28,8 +26,6 @@ char	**ms_cmd_trim(char **cmd, int pos)
 		ms_perror("", strerror(errno), "", errno);
 		return (NULL);
 	}
-	i = 0;
-	j = 0;
 	while (j <= size)
 	{
 		if (j == pos)
@@ -49,13 +45,13 @@ static void	opfds_helper_a(t_var *var, int i, int j)
 		close(var->fd_out);
 	if (!ft_strncmp(var->cmds[i][j], ">", 2))
 		var->fd_out = open(var->cmds[i][j + 1],
-					 O_WRONLY | O_CREAT | O_TRUNC, 0644);
+				O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	else if (!ft_strncmp(var->cmds[i][j], ">>", 3))
 		var->fd_out = open(var->cmds[i][j + 1],
-					 O_WRONLY | O_CREAT | O_APPEND, 0644);
+				O_WRONLY | O_CREAT | O_APPEND, 0644);
 	if (var->fd_out < 0)
 		ms_perror(strerror(errno), ": ", var->cmds[i][j + 1], 1);
-	var->cmds[i] = ms_cmd_trim(var->cmds[i], j);
+	var->cmds[i] = ms_cmd_trim(var->cmds[i], j, 0, 0);
 }
 
 static void	opfds_helper_b(t_var *var, int i, int j, char **hd_vars)
@@ -76,7 +72,7 @@ static void	opfds_helper_b(t_var *var, int i, int j, char **hd_vars)
 	}
 	if (var->fd_in < 0)
 		ms_perror(strerror(errno), ": ", var->cmds[i][j + 1], 1);
-	var->cmds[i] = ms_cmd_trim(var->cmds[i], j);
+	var->cmds[i] = ms_cmd_trim(var->cmds[i], j, 0, 0);
 }
 
 int	ms_open_fds(t_var *var, int i)

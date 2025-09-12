@@ -68,12 +68,10 @@ typedef struct s_var
 bool	ms_exec_builtins(t_var *var, int i, bool child);
 void	ft_exec_child(t_var *var, int i, int pipes);
 int		ms_pipex(t_var *var);
-char	**ms_cmd_trim(char **cmd, int pos);
+char	**ms_cmd_trim(char **cmd, int pos, int i, int j);
 int		ms_open_fds(t_var *var, int i);
 
 // minishell_init.c
-void	ms_child_hd(t_var *var, char *limit, size_t limit_len, int here_fd);
-bool	ms_open_heredoc(t_var *var, char *limit, size_t limit_len, int *hd_int);
 char	*ms_cmd_build(t_var *var, int i);
 bool	ms_cmd_resolve(t_var *var, int i);
 bool	ms_cmd_filler(t_var *var);
@@ -145,14 +143,20 @@ int		new_token_size(t_var *var, char *token);
 void	logic_quote_case(char *token, int *len, t_builder *b);
 bool	builder_if_helper(char *token, t_builder *b);
 void	builder_quote_case(char *token, t_builder *b);
+
 //static void	token_builder_logic(t_var *var, char *token, t_builder *b)
 char	*token_builder(t_var *var, char *token);
 bool	expand_cmd(t_var *var);
+
 // minishell_expansion_helpers.c
 int		var_len_diff(t_var *var, char *str);
 char	*var_finder(t_var *var, char *str, char *new_token);
+
 // minishell_heredoc_helpers.c
+void	ms_child_hd(t_var *var, char *limit, size_t limit_len, int here_fd);
+bool	ms_open_heredoc(t_var *var, char *limit, size_t limit_len, int *hd_int);
 char	*hd_var_expansion(t_var *var, char *line);
+
 // minishell_token_validation.c
 bool	valid_tokens(t_var *var, char **toks);
 

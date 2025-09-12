@@ -14,7 +14,6 @@
 
 static char	*stripped_cmd(t_var *var, int i)
 {
-
 	char	*stripped_cmd;
 
 	stripped_cmd = ft_strrchr(var->cmds[i][0], '/');

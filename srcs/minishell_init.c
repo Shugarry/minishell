@@ -12,63 +12,6 @@
 
 #include "../minishell.h"
 
-void	ms_child_hd(t_var *var, char *limit, size_t limit_len, int here_fd)
-{
-	char	*line;
-	char	*tmp;
-	int		l_no;
-
-	l_no = 0;
-	while (++l_no)
-	{
-		line = readline("> ");
-		if (line && ft_strncmp(line, limit, limit_len))
-		{
-			tmp = hd_var_expansion(var, line);
-			ft_putendl_fd(tmp, here_fd);
-			memlist_free_ptr(var, tmp);
-		}
-		else
-			break ;
-		free(line);
-	}
-	if (line)
-		free (line);
-	close(here_fd);
-	if (line == NULL)
-		printf("warn: here-doc at line %d limited by `%s'\n", l_no, limit);
-	exit(0);
-}
-
-bool	ms_open_heredoc(t_var *var, char *limit, size_t limit_len, int *hd_int)
-{
-	int		here_fd;
-	char	*hd_no;
-	char	*hd_name;
-	pid_t	child;
-	int		status;
-
-	hd_no = ft_itoa((*hd_int)++);
-	hd_name = ft_strjoin(".here_doc_", hd_no);
-	if (!hd_no || !hd_name)
-		ms_perror("", strerror(errno), "\n", errno);
-	free(hd_no);
-	here_fd = open(hd_name, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	free(hd_name);
-	if (here_fd < 0)
-		ms_perror("", strerror(errno), "\n", errno);
-	signal(SIGINT, ms_signal_handle_hd);
-	child = fork();
-	if (child == 0)
-		ms_child_hd(var, limit, limit_len, here_fd);
-	signal(SIGINT, ms_signal_handle);
-	if ((child < 0 && ms_perror("", strerror(errno), "", errno)) || \
-		(waitpid(child, &status, 0) == child && WIFEXITED(status) \
-		&& WEXITSTATUS(status) == 130))
-		return (1);
-	return (0);
-}
-
 char	*ms_cmd_build(t_var *var, int i)
 {
 	char	*tmp;
