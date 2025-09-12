@@ -6,14 +6,15 @@
 /*   By: miggarc2 <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 19:02:08 by miggarc2          #+#    #+#             */
-/*   Updated: 2025/06/23 07:41:43 by frey-gal         ###   ########.fr       */
+/*   Updated: 2025/09/12 19:26:37 by frey-gal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-bool	ms_exec_builtins(t_var *var, int i, bool child)
+static char	*stripped_cmd(t_var *var, int i)
 {
+
 	char	*stripped_cmd;
 
 	stripped_cmd = ft_strrchr(var->cmds[i][0], '/');
@@ -21,22 +22,27 @@ bool	ms_exec_builtins(t_var *var, int i, bool child)
 		stripped_cmd = var->cmds[i][0];
 	else
 		stripped_cmd++;
+	return (stripped_cmd);
+}
+
+bool	ms_exec_builtins(t_var *var, int i, bool child)
+{
 	if (!ft_strncmp(var->cmds[i][0], "exit", 5) &&
 		(!var->pipe_count || child))
 		ms_exit_builtin(var, i);
-	else if (!ft_strncmp(stripped_cmd, "cd", 3))
+	else if (!ft_strncmp(stripped_cmd(var, i), "cd", 3))
 		ms_cd(var, var->cmds[i]);
-	else if (!ft_strncmp(stripped_cmd, "echo", 5) && child)
+	else if (!ft_strncmp(stripped_cmd(var, i), "echo", 5) && child)
 		ms_echo(var->cmds[i]);
-	else if (!ft_strncmp(stripped_cmd, "pwd", 4) && child)
+	else if (!ft_strncmp(stripped_cmd(var, i), "pwd", 4) && child)
 		ms_pwd(var);
-	else if (!ft_strncmp(stripped_cmd, "env", 4) && child)
+	else if (!ft_strncmp(stripped_cmd(var, i), "env", 4) && child)
 		ms_env(var, var->cmds[i]);
-	else if (!ft_strncmp(stripped_cmd, "unset", 6))
+	else if (!ft_strncmp(stripped_cmd(var, i), "unset", 6))
 		ms_unset(var, var->cmds[i]);
-	else if (!ft_strncmp(stripped_cmd, "export", 7) && var->cmds[i][1])
+	else if (!ft_strncmp(stripped_cmd(var, i), "export", 7) && var->cmds[i][1])
 		ms_export(var, var->cmds[i]);
-	else if (!ft_strncmp(stripped_cmd, "export", 7) && child)
+	else if (!ft_strncmp(stripped_cmd(var, i), "export", 7) && child)
 		ms_export(var, var->cmds[i]);
 	else
 		return (0);
@@ -64,41 +70,50 @@ void	ft_exec_child(t_var *var, int i, int pipes)
 	ms_exit(var, 127);
 }
 
+static int	ms_pipex_helper(t_var *var, int i, bool *is_forked, pid_t *child)
+{
+	if (i < var->pipe_count && pipe(&var->pipes[2 * i]) < 0)
+		return (ms_perror("", strerror(errno), "", errno), errno);
+	if (var->cmds[i][0])
+	{
+		if (!ms_exec_builtins(var, i, 0))
+		{
+			*is_forked = true;
+			signal(SIGINT, ms_signal_handle_child);
+			signal(SIGQUIT, ms_signal_handle_child);
+			*child = fork();
+			if (*child < 0)
+				return (ms_perror("", strerror(errno), "", errno), errno);
+			else if (*child == 0)
+				ft_exec_child(var, i, var->pipe_count);
+		}
+	}
+	if (i < var->pipe_count)
+		close(var->pipes[2 * i + 1]);
+	return (0);
+}
+
 int	ms_pipex(t_var *var)
 {
 	int		i;
 	int		status;
 	pid_t	child;
-	bool	fork_child;
+	bool	is_forked;
+	int		helper_ret;
 
 	i = -1;
 	child = -1;
 	status = 0;
-	fork_child = false;
+	is_forked = false;
 	while (var->cmds[++i])
 	{
-		if (i < var->pipe_count && pipe(&var->pipes[2 * i]) < 0)
-			return (ms_perror("", strerror(errno), "", errno), errno);
-		if (var->cmds[i][0])
-		{
-			if (!ms_exec_builtins(var, i, 0))
-			{
-				fork_child = true;
-				signal(SIGINT, ms_signal_handle_child);
-				signal(SIGQUIT, ms_signal_handle_child);
-				child = fork();
-				if (child < 0)
-					return (ms_perror("", strerror(errno), "", errno), errno);
-				else if (child == 0)
-					ft_exec_child(var, i, var->pipe_count);
-			}
-		}
-		if (i < var->pipe_count)
-			close(var->pipes[2 * i + 1]);
+		helper_ret = ms_pipex_helper(var, i, &is_forked, &child);
+		if (helper_ret)
+			return (helper_ret);
 	}
 	while (i-- > 0)
 	{
-		if (fork_child && waitpid(-1, &status, 0) == child && WIFEXITED(status))
+		if (is_forked && waitpid(-1, &status, 0) == child && WIFEXITED(status))
 			var->exit_code = WEXITSTATUS(status);
 		if (i > 0)
 			close(var->pipes[2 * (i - 1)]);
@@ -137,49 +152,59 @@ char	**ms_cmd_trim(char **cmd, int pos)
 	return (new_cmd);
 }
 
+static void	opfds_helper_a(t_var *var, int i, int j)
+{
+	if (var->fd_out > 0)
+		close(var->fd_out);
+	if (!ft_strncmp(var->cmds[i][j], ">", 2))
+		var->fd_out = open(var->cmds[i][j + 1],
+					 O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	else if (!ft_strncmp(var->cmds[i][j], ">>", 3))
+		var->fd_out = open(var->cmds[i][j + 1],
+					 O_WRONLY | O_CREAT | O_APPEND, 0644);
+	if (var->fd_out < 0)
+		ms_perror(strerror(errno), ": ", var->cmds[i][j + 1], 1);
+	var->cmds[i] = ms_cmd_trim(var->cmds[i], j);
+}
+
+#define HD_NO 0
+#define	HD_NAME 1
+
+static void	opfds_helper_b(t_var *var, int i, int j, char **hd_vars)
+{
+	if (var->fd_in > 0)
+		close(var->fd_in);
+	if (!ft_strncmp(var->cmds[i][j], "<", 2))
+		var->fd_in = open(var->cmds[i][j + 1], O_RDONLY);
+	else if (!ft_strncmp(var->cmds[i][j], "<<", 3))
+	{
+		hd_vars[HD_NO] = ft_itoa(var->hd_int++);
+		hd_vars[HD_NAME] = ft_strjoin(".here_doc_", hd_vars[HD_NO]);
+		if (!hd_vars[HD_NO] || !hd_vars[HD_NAME])
+			ms_perror("", strerror(errno), "\n", errno);
+		free(hd_vars[HD_NO]);
+		var->fd_in = open(hd_vars[HD_NAME], O_RDONLY);
+		free(hd_vars[HD_NAME]);
+	}
+	if (var->fd_in < 0)
+		ms_perror(strerror(errno), ": ", var->cmds[i][j + 1], 1);
+	var->cmds[i] = ms_cmd_trim(var->cmds[i], j);
+}
+
 int	ms_open_fds(t_var *var, int i)
 {
 	int			j;
-	char		*hd_no;
-	char		*hd_name;
+	char		*hd_vars[2];
 
 	j = 0;
 	while (var->cmds[i][j])
 	{
-		if (!ft_strncmp(var->cmds[i][j], ">", 1))
-		{
-			if (var->fd_out > 0)
-				close(var->fd_out);
-			if (!ft_strncmp(var->cmds[i][j], ">", 2))
-				var->fd_out = open(var->cmds[i][j + 1],
-						O_WRONLY | O_CREAT | O_TRUNC, 0644);
-			else if (!ft_strncmp(var->cmds[i][j], ">>", 3))
-				var->fd_out = open(var->cmds[i][j + 1],
-						O_WRONLY | O_CREAT | O_APPEND, 0644);
-			if (var->fd_out < 0)
-				ms_perror(strerror(errno), ": ", var->cmds[i][j + 1], 1);
-			var->cmds[i] = ms_cmd_trim(var->cmds[i], j);
-		}
-		else if (!ft_strncmp(var->cmds[i][j], "<", 1))
-		{
-			if (var->fd_in > 0)
-				close(var->fd_in);
-			if (!ft_strncmp(var->cmds[i][j], "<", 2))
-				var->fd_in = open(var->cmds[i][j + 1], O_RDONLY);
-			else if (!ft_strncmp(var->cmds[i][j], "<<", 3))
-			{
-				hd_no = ft_itoa(var->hd_int++);
-				hd_name = ft_strjoin(".here_doc_", hd_no);
-				if (!hd_no || !hd_name)
-					ms_perror("", strerror(errno), "\n", errno);
-				free(hd_no);
-				var->fd_in = open(hd_name, O_RDONLY);
-				free(hd_name);
-			}
-			if (var->fd_in < 0)
-				ms_perror(strerror(errno), ": ", var->cmds[i][j + 1], 1);
-			var->cmds[i] = ms_cmd_trim(var->cmds[i], j);
-		}
+		if (!ft_strncmp(var->cmds[i][j], ">", 1) && var->cmds[i][j + 1]
+			&& ft_strlen(var->cmds[i][j]) <= 2)
+			opfds_helper_a(var, i, j);
+		else if (!ft_strncmp(var->cmds[i][j], "<", 1) && var->cmds[i][j + 1]
+			&& ft_strlen(var->cmds[i][j]) <= 2)
+			opfds_helper_b(var, i, j, hd_vars);
 		else
 			j++;
 	}
