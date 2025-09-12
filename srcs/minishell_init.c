@@ -53,21 +53,18 @@ bool	ms_open_heredoc(t_var *var, char *limit, size_t limit_len, int *hd_int)
 	if (!hd_no || !hd_name)
 		ms_perror("", strerror(errno), "\n", errno);
 	free(hd_no);
-	if (access(hd_name, F_OK) == 0)
-		unlink(hd_name);
 	here_fd = open(hd_name, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	free(hd_name);
 	if (here_fd < 0)
 		ms_perror("", strerror(errno), "\n", errno);
-	free(hd_name);
 	signal(SIGINT, ms_signal_handle_hd);
 	child = fork();
-	if (child < 0 && ms_perror("", strerror(errno), "", errno))
-		return (1);
-	else if (child == 0)
+	if (child == 0)
 		ms_child_hd(var, limit, limit_len, here_fd);
 	signal(SIGINT, ms_signal_handle);
-	if (waitpid(child, &status, 0) == child && WIFEXITED(status) \
-		&& WEXITSTATUS(status) == 130)
+	if ((child < 0 && ms_perror("", strerror(errno), "", errno)) || \
+		(waitpid(child, &status, 0) == child && WIFEXITED(status) \
+		&& WEXITSTATUS(status) == 130))
 		return (1);
 	return (0);
 }
