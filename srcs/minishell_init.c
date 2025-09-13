@@ -44,13 +44,18 @@ char	*ms_cmd_build(t_var *var, int i)
 bool	ms_cmd_resolve(t_var *var, int i)
 {
 	int		j;
+	bool	check;
 
 	j = 0;
 	while (var->cmds[i][j])
+	{
+		check = was_token_quoted(var, i, j);
 		if (!ft_strncmp(var->cmds[i][j++], "<<", 3)
-			&& ms_open_heredoc(var, var->cmds[i][j],
+				&& check == false
+				&& ms_open_heredoc(var, var->cmds[i][j],
 				ft_strlen(var->cmds[i][j]), &var->hd_int))
 			return (1);
+	}
 	var->hd_int = 0;
 	if (var->paths)
 		ms_clean(var->paths);
