@@ -149,6 +149,7 @@ char	*hd_var_expansion(t_var *var, char *line);
 
 // minishell_heredoc_helpers.c
 bool	check_hd_expansion(t_var *var);
+bool	was_token_quoted(t_var *var, int cmd_idx, int token_idx);
 
 // minishell_token_validation.c
 bool	valid_tokens(t_var *var, char **toks);

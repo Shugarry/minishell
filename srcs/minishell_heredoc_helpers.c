@@ -69,3 +69,50 @@ void	ms_child_hd(t_var *var, char *limit, size_t limit_len, int here_fd)
 	}
 	child_hd_helper(line, here_fd, l_no, limit);
 }
+
+static void	skip_token(char *line, int *i)
+{
+	char	quote;
+
+	if (line[*i] == '"' || line[*i] == '\'')
+	{
+		quote = line[(*i)++];
+		while (line[*i] && line[*i] != quote)
+			(*i)++;
+		if (line[*i])
+			(*i)++;
+	}
+	else
+	{
+		while (line[*i] && !ft_strchr(" |<>\"'", line[*i]))
+			(*i)++;
+	}
+}
+
+bool	was_token_quoted(t_var *var, int cmd_idx, int token_idx)
+{
+	char	*line;
+	int		i;
+	int		current_cmd;
+	int		current_token;
+
+	line = var->line;
+	i = 0;
+	current_cmd = 0;
+	current_token = 0;
+	while (current_cmd < cmd_idx && line[i])
+		if (line[i++] == '|')
+			current_cmd++;
+	while (line[i] && line[i] != '|')
+	{
+		while (line[i] == ' ')
+			i++;
+		if (!line[i] || line[i] == '|')
+			break ;
+		if (current_token == token_idx)
+			return (line[i] == '"' || line[i] == '\'');
+		skip_token(line, &i);
+		current_token++;
+	}
+	return (false);
+}

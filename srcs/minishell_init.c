@@ -47,8 +47,8 @@ bool	ms_cmd_resolve(t_var *var, int i)
 
 	j = 0;
 	while (var->cmds[i][j])
-		if (!ft_strncmp(var->cmds[i][j++], "<<", 3) &&
-			ms_open_heredoc(var, var->cmds[i][j],
+		if (!ft_strncmp(var->cmds[i][j++], "<<", 3)
+			&& ms_open_heredoc(var, var->cmds[i][j],
 				ft_strlen(var->cmds[i][j]), &var->hd_int))
 			return (1);
 	var->hd_int = 0;

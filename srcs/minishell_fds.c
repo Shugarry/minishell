@@ -75,40 +75,6 @@ static void	opfds_helper_b(t_var *var, int i, int j, char **hd_vars)
 	var->cmds[i] = ms_cmd_trim(var->cmds[i], j, 0, 0);
 }
 
-static bool was_token_quoted(t_var *var, int cmd_idx, int token_idx)
-{
-    int		i = -1;
-	int		current_cmd = 0;
-	int		current_token = 0;
-	char	quote;
-    
-    while (current_cmd < cmd_idx && var->line[++i])
-        if (var->line[i] == '|')
-            current_cmd++;
-    while (var->line[i] && var->line[i] != '|')
-    {
-        while (var->line[i] == ' ')
-			i++;
-        if (!var->line[i] || var->line[i] == '|')
-			break ;
-        if (current_token == token_idx)
-            return (var->line[i] == '"' || var->line[i] == '\'');
-        if (var->line[i] == '"' || var->line[i] == '\'')
-        {
-            quote = var->line[i++];
-            while (var->line[i] && var->line[i] != quote)
-				i++;
-            if (var->line[i])
-				i++;
-        }
-        else
-            while (var->line[i] && !ft_strchr(" |<>\"'", var->line[i]))
-				i++;
-        current_token++;
-    }
-    return (false);
-}
-
 int	ms_open_fds(t_var *var, int i)
 {
 	int			j;
